@@ -1,4 +1,17 @@
+import nodemailer from 'nodemailer'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from './contact'
+
+function getTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  })
+}
 
 export async function sendBookingConfirmation({
   parentName,
@@ -21,12 +34,12 @@ export async function sendBookingConfirmation({
   recurringDay?: string | null
   recurringTime?: string | null
 }) {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.warn('[Email] RESEND_API_KEY not set — skipping confirmation email')
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('[Email] SMTP_USER or SMTP_PASS not set — skipping confirmation email')
     return
   }
 
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER
   const formatLabel = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
 
   let sessionsHtml = ''
@@ -58,7 +71,7 @@ export async function sendBookingConfirmation({
     <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;color:#0f172a;">
       <div style="border-top:3px solid #0369a1;padding-top:24px;margin-bottom:24px;">
         <p style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#94a3b8;margin:0 0 8px 0;">Swim with Shirel · Côte Saint-Luc</p>
-        <h1 style="font-size:26px;font-weight:700;margin:0 0 4px 0;color:#0f172a;">Your lesson is confirmed! 🎉</h1>
+        <h1 style="font-size:26px;font-weight:700;margin:0 0 4px 0;color:#0f172a;">Your lesson is confirmed!</h1>
       </div>
 
       <p style="color:#475569;margin:0 0 20px 0;">Hi <strong style="color:#0f172a;">${parentName}</strong>,</p>
@@ -74,7 +87,7 @@ export async function sendBookingConfirmation({
         ${childrenHtml}
         ${sessionsHtml}
         <p style="margin:0;color:#64748b;font-size:13px;border-top:1px solid #e0f2fe;padding-top:12px;">
-          💳 Payment is due within 2 hours of the lesson — cash or e-transfer accepted.
+          Payment is due within 2 hours of the lesson — cash or e-transfer accepted.
         </p>
       </div>
 
@@ -82,7 +95,7 @@ export async function sendBookingConfirmation({
         If you need to cancel, please do so at least <strong>2 hours before</strong> your scheduled lesson.
       </p>
       <p style="color:#475569;margin:0 0 32px 0;">
-        See you at the pool! 🏊<br/>
+        See you at the pool!<br/>
         <strong style="color:#0f172a;">Shirel</strong>
       </p>
 
@@ -97,26 +110,13 @@ export async function sendBookingConfirmation({
     </div>
   `
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'Swim with Shirel <onboarding@resend.dev>',
-      reply_to: CONTACT_EMAIL,
-      to: [parentEmail],
-      subject: 'Your swim lesson is confirmed — Swim with Shirel',
-      html,
-    }),
+  const transporter = getTransporter()
+  await transporter.sendMail({
+    from: `"Swim with Shirel" <${from}>`,
+    to: parentEmail,
+    subject: 'Your swim lesson is confirmed — Swim with Shirel',
+    html,
   })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`Resend API error ${response.status}: ${errorText}`)
-  }
-
-  const result = await response.json()
-  console.log('[Email] Confirmation sent successfully, id:', result.id)
+  console.log(`[Email] Confirmation sent to ${parentEmail}`)
 }
