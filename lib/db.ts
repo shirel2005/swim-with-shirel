@@ -54,6 +54,16 @@ export function getDb(): Database.Database {
     );
   `)
 
+  // One-time migration: create migrations tracking table and remove seeded availability
+  db.exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY)`)
+  const hasSeedCleanup = db.prepare(`SELECT name FROM migrations WHERE name = 'remove_seeded_availability'`).get()
+  if (!hasSeedCleanup) {
+    // Remove all slots that were auto-seeded (any slot not created by admin manually has no way to distinguish,
+    // so we clear everything — admin will re-add real slots)
+    db.prepare(`DELETE FROM availability`).run()
+    db.prepare(`INSERT INTO migrations (name) VALUES ('remove_seeded_availability')`).run()
+  }
+
   // Add new columns if they don't exist (SQLite doesn't support IF NOT EXISTS for columns)
   const alterCols = [
     `ALTER TABLE bookings ADD COLUMN lesson_type TEXT`,
@@ -70,45 +80,5 @@ export function getDb(): Database.Database {
     try { db.exec(sql) } catch {}
   }
 
-  // Seed availability if empty
-  const availCount = (db.prepare('SELECT COUNT(*) as cnt FROM availability').get() as { cnt: number }).cnt
-  if (availCount === 0) {
-    seedAvailability(db)
-  }
-
   return db
-}
-
-function seedAvailability(db: Database.Database) {
-  const insert = db.prepare(
-    'INSERT INTO availability (date, time_slot, duration) VALUES (?, ?, ?)'
-  )
-
-  const timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00']
-  const durations = [30, 45, 30, 45, 30, 45] // alternating pattern
-
-  const now = new Date()
-  const insertMany = db.transaction(() => {
-    let slotCounter = 0
-    for (let week = 0; week < 4; week++) {
-      for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
-        const date = new Date(now)
-        date.setDate(now.getDate() + week * 7 + dayOffset + 1)
-        const dayOfWeek = date.getDay() // 0=Sun, 6=Sat
-
-        // Mon-Sat only (1-6)
-        if (dayOfWeek === 0) continue
-
-        const dateStr = date.toISOString().split('T')[0]
-
-        for (let i = 0; i < timeSlots.length; i++) {
-          const duration = durations[(slotCounter + i) % durations.length]
-          insert.run(dateStr, timeSlots[i], duration)
-        }
-        slotCounter++
-      }
-    }
-  })
-
-  insertMany()
 }

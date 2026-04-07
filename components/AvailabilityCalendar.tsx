@@ -5,7 +5,7 @@ import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   addDays, isSameMonth, isSameDay, isBefore, addMonths, subMonths, parseISO,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight, Clock, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, RefreshCw, Waves } from 'lucide-react'
 import { AvailabilitySlot } from '@/lib/types'
 
 interface AvailabilityCalendarProps {
@@ -89,6 +89,16 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
 
   if (error) {
     return <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">{error}</div>
+  }
+
+  if (allSlots.length === 0) {
+    return (
+      <div className="card p-10 text-center">
+        <Waves className="w-10 h-10 text-sky-200 mx-auto mb-4" />
+        <p className="text-slate-700 font-semibold mb-1">No available lesson times at the moment.</p>
+        <p className="text-slate-400 text-sm">Please check back soon or <a href="mailto:swim.with.shirel@gmail.com" className="text-sky-600 hover:underline">contact me</a> directly.</p>
+      </div>
+    )
   }
 
   const selectedDateSlots = selectedDate ? getSlotsForDate(selectedDate) : []

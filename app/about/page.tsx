@@ -59,29 +59,34 @@ export default function AboutPage() {
             {/* Photo */}
             <div className="flex justify-center lg:justify-end order-1 lg:order-none">
               <div className="relative">
-                <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-sky-200 to-sky-50 opacity-60" />
-                <div className="relative w-72 h-80 sm:w-80 sm:h-96 lg:w-96 lg:h-[480px] rounded-3xl overflow-hidden shadow-2xl shadow-sky-200">
-                  {imgError ? (
-                    <div className="absolute inset-0 bg-sky-50 flex flex-col items-center justify-center gap-3">
-                      <Waves className="w-12 h-12 text-sky-300" />
-                      <p className="text-sm text-sky-400">Photo coming soon</p>
-                    </div>
-                  ) : (
-                    <Image
-                      src="/shirel.jpg"
-                      alt="Shirel – swim instructor"
-                      fill
-                      className="object-cover object-top"
-                      priority
-                      onError={() => setImgError(true)}
-                    />
-                  )}
-                </div>
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl shadow-lg border border-sky-100 px-4 py-3 flex items-center gap-2">
-                  <div>
-                    <p className="text-[10px] tracking-widest uppercase text-slate-400">Teaching since</p>
-                    <p className="text-sm font-bold text-slate-900 leading-none mt-0.5">2020</p>
+                {/* Background glow */}
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-200 via-sky-100 to-white opacity-70 blur-sm" />
+                {/* Portrait frame — 3:4 ratio */}
+                <div className="relative w-64 sm:w-72 lg:w-80" style={{ aspectRatio: '3/4' }}>
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-sky-200/60">
+                    {imgError ? (
+                      <div className="absolute inset-0 bg-sky-50 flex flex-col items-center justify-center gap-3">
+                        <Waves className="w-12 h-12 text-sky-300" />
+                        <p className="text-sm text-sky-400">Photo coming soon</p>
+                      </div>
+                    ) : (
+                      <Image
+                        src="/shirel.jpg"
+                        alt="Shirel – swim instructor"
+                        fill
+                        className="object-cover object-center"
+                        style={{ objectPosition: 'center 15%' }}
+                        sizes="(max-width: 640px) 256px, (max-width: 1024px) 288px, 320px"
+                        priority
+                        onError={() => setImgError(true)}
+                      />
+                    )}
                   </div>
+                </div>
+                {/* Badge */}
+                <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl shadow-lg border border-sky-100 px-4 py-3">
+                  <p className="text-[10px] tracking-widest uppercase text-slate-400">Teaching since</p>
+                  <p className="text-sm font-bold text-slate-900 leading-none mt-0.5">2020</p>
                 </div>
               </div>
             </div>
