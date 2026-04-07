@@ -5,7 +5,7 @@ import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   addDays, isSameMonth, isSameDay, isBefore, addMonths, subMonths, parseISO,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight, Clock } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, RefreshCw } from 'lucide-react'
 import { AvailabilitySlot } from '@/lib/types'
 
 interface AvailabilityCalendarProps {
@@ -15,17 +15,31 @@ interface AvailabilityCalendarProps {
 export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCalendarProps) {
   const [allSlots, setAllSlots] = useState<AvailabilitySlot[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedSlots, setSelectedSlots] = useState<AvailabilitySlot[]>([])
 
+  const fetchSlots = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
+    else setLoading(true)
+    try {
+      const res = await fetch(`/api/availability?t=${Date.now()}`, { cache: 'no-store' })
+      if (!res.ok) throw new Error('Failed to load')
+      const data: AvailabilitySlot[] = await res.json()
+      setAllSlots(data)
+      setError('')
+    } catch {
+      setError('Failed to load availability. Please refresh the page.')
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
+
   useEffect(() => {
-    setLoading(true)
-    fetch('/api/availability', { cache: 'no-store' })
-      .then((r) => { if (!r.ok) throw new Error('Failed to load'); return r.json() })
-      .then((data: AvailabilitySlot[]) => { setAllSlots(data); setLoading(false) })
-      .catch(() => { setError('Failed to load availability. Please refresh the page.'); setLoading(false) })
+    fetchSlots()
   }, [])
 
   const today = new Date()
@@ -93,9 +107,21 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
           >
             <ChevronLeft size={18} />
           </button>
-          <h3 className="text-sm font-bold text-slate-800 tracking-wide">
-            {format(currentMonth, 'MMMM yyyy')}
-          </h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-bold text-slate-800 tracking-wide">
+              {format(currentMonth, 'MMMM yyyy')}
+            </h3>
+            <button
+              type="button"
+              onClick={() => fetchSlots(true)}
+              disabled={refreshing}
+              className="p-1.5 rounded-lg hover:bg-sky-100 transition-colors text-slate-400 hover:text-sky-700"
+              aria-label="Refresh availability"
+              title="Refresh availability"
+            >
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
