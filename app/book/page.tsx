@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import BookingForm from '@/components/BookingForm'
 
 export default function BookPage() {

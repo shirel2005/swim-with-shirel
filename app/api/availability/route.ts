@@ -32,7 +32,12 @@ export async function GET() {
       slots = slots.filter((s) => !blockedIds.has(s.id))
     }
 
-    return NextResponse.json(slots)
+    return NextResponse.json(slots, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    })
   } catch (error) {
     console.error('Error fetching availability:', error)
     return NextResponse.json({ error: 'Failed to fetch availability' }, { status: 500 })

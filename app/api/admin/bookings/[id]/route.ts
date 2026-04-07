@@ -38,6 +38,8 @@ export async function PATCH(
           parent_name: string
           parent_email: string
           lesson_format: string | null
+          lesson_type: string | null
+          children: string
           is_weekly_request: number
           recurring_day: string | null
           recurring_time: string | null
@@ -47,6 +49,8 @@ export async function PATCH(
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
+
+    const previousStatus = booking.status
 
     const updateBooking = db.transaction(() => {
       db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
@@ -66,8 +70,8 @@ export async function PATCH(
 
     updateBooking()
 
-    // Send confirmation email when booking is confirmed
-    if (status === 'confirmed') {
+    // Send confirmation email only when transitioning TO confirmed for the first time
+    if (status === 'confirmed' && previousStatus !== 'confirmed') {
       try {
         const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
         let slots: Array<{ date: string; time_slot: string; duration: number }> = []
@@ -79,10 +83,17 @@ export async function PATCH(
             .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
         }
 
+        // Parse children from JSON
+        let childrenParsed: Array<{ name: string }> = []
+        try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
+        const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
+
         await sendBookingConfirmation({
           parentName: booking.parent_name,
           parentEmail: booking.parent_email,
           lessonFormat: booking.lesson_format || 'private',
+          lessonType: booking.lesson_type || undefined,
+          children: childNames,
           slots,
           isWeeklyRequest: booking.is_weekly_request === 1,
           recurringDay: booking.recurring_day,

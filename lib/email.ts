@@ -18,6 +18,8 @@ export async function sendBookingConfirmation({
   parentName,
   parentEmail,
   lessonFormat,
+  lessonType,
+  children,
   slots,
   isWeeklyRequest,
   recurringDay,
@@ -26,6 +28,8 @@ export async function sendBookingConfirmation({
   parentName: string
   parentEmail: string
   lessonFormat: string
+  lessonType?: string
+  children?: string[]
   slots: Array<{ date: string; time_slot: string; duration: number }>
   isWeeklyRequest: boolean
   recurringDay?: string | null
@@ -37,7 +41,7 @@ export async function sendBookingConfirmation({
   }
 
   const from = process.env.SMTP_FROM || process.env.SMTP_USER
-  const format = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const formatLabel = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
 
   let sessionsHtml = ''
   if (slots.length > 0) {
@@ -52,6 +56,18 @@ export async function sendBookingConfirmation({
       <p style="margin:0 0 16px 0;color:#57534e;">Every ${recurringDay} at ${recurringTime}</p>`
   }
 
+  const childrenHtml =
+    children && children.length > 0
+      ? `<p style="margin:0 0 6px 0;font-weight:600;color:#1c1917;">Child${children.length > 1 ? 'ren' : ''}:</p>
+         <ul style="margin:0 0 16px 0;padding-left:18px;color:#57534e;">
+           ${children.map((c) => `<li>${c}</li>`).join('')}
+         </ul>`
+      : ''
+
+  const lessonTypeHtml = lessonType
+    ? `<p style="margin:0 0 16px 0;color:#57534e;"><strong style="color:#1c1917;">Lesson Type:</strong> ${lessonType}</p>`
+    : ''
+
   const html = `
     <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;color:#1c1917;">
       <div style="border-top:2px solid #1c1917;padding-top:24px;margin-bottom:24px;">
@@ -65,7 +81,9 @@ export async function sendBookingConfirmation({
       </p>
 
       <div style="border:1px solid #e7e5e4;padding:20px;margin-bottom:24px;">
-        <p style="margin:0 0 6px 0;font-weight:600;color:#1c1917;">Lesson Format: <span style="color:#0369a1;">${format}</span></p>
+        <p style="margin:0 0 6px 0;font-weight:600;color:#1c1917;">Lesson Format: <span style="color:#0369a1;">${formatLabel}</span></p>
+        ${lessonTypeHtml}
+        ${childrenHtml}
         ${sessionsHtml}
         <p style="margin:0;color:#78716c;font-size:13px;">Payment is due within 2 hours of the lesson — cash or e-transfer accepted.</p>
       </div>

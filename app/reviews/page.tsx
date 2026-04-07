@@ -51,8 +51,8 @@ export default function ReviewsPage() {
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-16 card">
-              <p className="text-lg font-semibold text-slate-700 mb-2">No reviews yet</p>
-              <p className="text-slate-400 text-sm">Be the first to share your experience.</p>
+              <p className="text-lg font-semibold text-slate-700 mb-2">No reviews yet — be the first to leave one!</p>
+              <p className="text-slate-400 text-sm">Share your experience with Shirel&apos;s swim lessons.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

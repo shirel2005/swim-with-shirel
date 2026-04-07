@@ -22,7 +22,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
 
   useEffect(() => {
     setLoading(true)
-    fetch('/api/availability')
+    fetch('/api/availability', { cache: 'no-store' })
       .then((r) => { if (!r.ok) throw new Error('Failed to load'); return r.json() })
       .then((data: AvailabilitySlot[]) => { setAllSlots(data); setLoading(false) })
       .catch(() => { setError('Failed to load availability. Please refresh the page.'); setLoading(false) })

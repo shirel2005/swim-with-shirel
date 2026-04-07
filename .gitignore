@@ -2,3 +2,7 @@
 data/
 node_modules/
 .next/
+.DS_Store
+.claude/
+tsconfig.tsbuildinfo
+scripts/

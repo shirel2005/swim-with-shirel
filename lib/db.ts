@@ -76,12 +76,6 @@ export function getDb(): Database.Database {
     seedAvailability(db)
   }
 
-  // Seed reviews if empty
-  const reviewCount = (db.prepare('SELECT COUNT(*) as cnt FROM reviews').get() as { cnt: number }).cnt
-  if (reviewCount === 0) {
-    seedReviews(db)
-  }
-
   return db
 }
 
@@ -113,56 +107,6 @@ function seedAvailability(db: Database.Database) {
         }
         slotCounter++
       }
-    }
-  })
-
-  insertMany()
-}
-
-function seedReviews(db: Database.Database) {
-  const insert = db.prepare(
-    `INSERT INTO reviews (parent_name, child_name, rating, review_text, lesson_type, status, created_at)
-     VALUES (?, ?, ?, ?, ?, 'approved', ?)`
-  )
-
-  const reviews = [
-    {
-      parent_name: 'Sarah Thompson',
-      child_name: 'Emma',
-      rating: 5,
-      review_text: 'Absolutely amazing experience! Emma went from being terrified of the water to swimming on her own in just 6 lessons. The instructor is incredibly patient and encouraging. We couldn\'t be happier with the progress she has made.',
-      lesson_type: '10-pack 30 min',
-      created_at: '2024-06-15 10:23:00',
-    },
-    {
-      parent_name: 'David Leblanc',
-      child_name: 'Noah',
-      rating: 5,
-      review_text: 'We\'ve tried other swim schools before but nothing compares to the personalized attention here. Noah actually looks forward to his lessons every week, which says everything. The private pool setting is clean, safe, and welcoming.',
-      lesson_type: '45 min',
-      created_at: '2024-07-03 14:45:00',
-    },
-    {
-      parent_name: 'Michelle Goldberg',
-      child_name: 'Lily',
-      rating: 5,
-      review_text: 'My daughter Lily has been coming for 3 months now and the transformation has been incredible. The instructor tailors each session to her specific needs and celebrates every small milestone. Highly recommend to any parent in Côte Saint-Luc!',
-      lesson_type: '10-pack 45 min',
-      created_at: '2024-07-22 09:10:00',
-    },
-    {
-      parent_name: 'Ahmed Benali',
-      child_name: 'Yusuf',
-      rating: 5,
-      review_text: 'Signing up was easy and the booking process was straightforward. Yusuf has developed real confidence in the water. The instructor is professional, kind, and clearly passionate about teaching. Worth every penny for the peace of mind it gives us.',
-      lesson_type: '30 min',
-      created_at: '2024-08-05 16:30:00',
-    },
-  ]
-
-  const insertMany = db.transaction(() => {
-    for (const r of reviews) {
-      insert.run(r.parent_name, r.child_name, r.rating, r.review_text, r.lesson_type, r.created_at)
     }
   })
 

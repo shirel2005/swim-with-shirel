@@ -26,8 +26,8 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
         {reviews.length === 0 ? (
           <div className="text-center py-16 card">
             <Star size={44} className="text-sky-100 mx-auto mb-4" />
-            <p className="text-lg font-semibold text-slate-700 mb-2">No reviews yet</p>
-            <p className="text-slate-400 text-sm mb-6">Be the first to share your experience.</p>
+            <p className="text-lg font-semibold text-slate-700 mb-2">No reviews yet — be the first to leave one!</p>
+            <p className="text-slate-400 text-sm mb-6">Share your experience with Shirel&apos;s swim lessons.</p>
             <Link href="/reviews" className="btn-primary text-sm">
               Leave a Review
             </Link>
