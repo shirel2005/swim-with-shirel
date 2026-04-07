@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-800;
+}
+
+/* Design system tokens */
+@layer components {
+  .btn-primary {
+    @apply px-7 py-3 bg-sky-700 text-white font-semibold rounded-xl hover:bg-sky-800 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+  }
+  .btn-secondary {
+    @apply px-7 py-3 border-2 border-sky-700 text-sky-700 font-semibold rounded-xl hover:bg-sky-50 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+  }
+  .btn-ghost {
+    @apply px-7 py-3 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/15 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-sky-100 shadow-sm;
+  }
+  .section-label {
+    @apply text-xs tracking-[0.25em] uppercase text-sky-600 font-semibold mb-3;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400 text-sm bg-white text-slate-900 placeholder:text-slate-300 transition-colors;
+  }
+  .input-error {
+    @apply w-full px-4 py-3 rounded-xl border border-red-300 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 text-sm bg-white;
+  }
+}
