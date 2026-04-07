@@ -54,16 +54,6 @@ export function getDb(): Database.Database {
     );
   `)
 
-  // One-time migration: create migrations tracking table and remove seeded availability
-  db.exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY)`)
-  const hasSeedCleanup = db.prepare(`SELECT name FROM migrations WHERE name = 'remove_seeded_availability'`).get()
-  if (!hasSeedCleanup) {
-    // Remove all slots that were auto-seeded (any slot not created by admin manually has no way to distinguish,
-    // so we clear everything — admin will re-add real slots)
-    db.prepare(`DELETE FROM availability`).run()
-    db.prepare(`INSERT INTO migrations (name) VALUES ('remove_seeded_availability')`).run()
-  }
-
   // Add new columns if they don't exist (SQLite doesn't support IF NOT EXISTS for columns)
   const alterCols = [
     `ALTER TABLE bookings ADD COLUMN lesson_type TEXT`,
