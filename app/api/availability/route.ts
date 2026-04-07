@@ -8,7 +8,11 @@ export const revalidate = 0
 export async function GET() {
   try {
     const db = getDb()
-    const today = new Date().toISOString().split('T')[0]
+    // Use Montreal timezone for today's cutoff so slots aren't hidden early due to UTC offset
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Toronto',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(new Date())
 
     // Get confirmed booking slot IDs
     const confirmedBookings = db

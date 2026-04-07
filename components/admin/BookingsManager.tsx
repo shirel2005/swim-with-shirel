@@ -77,8 +77,15 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
   }
 
   const formatDate = (dateStr: string) => {
-    try { return format(parseISO(dateStr.replace(' ', 'T')), 'MMM d, yyyy h:mm a') }
-    catch { return dateStr }
+    try {
+      // SQLite stores UTC as "YYYY-MM-DD HH:MM:SS" — append Z so JS parses as UTC, then display in Montreal time
+      const utcStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T') + 'Z'
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Toronto',
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      }).format(new Date(utcStr))
+    } catch { return dateStr }
   }
 
   const parseChildren = (raw: string): Child[] => {
