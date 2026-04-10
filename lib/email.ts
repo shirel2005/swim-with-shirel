@@ -1,5 +1,21 @@
-import nodemailer from 'nodemailer'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from './contact'
+
+// Uses Gmail HTTP API (OAuth2) — no SMTP ports needed, works on Railway
+async function getAccessToken(): Promise<string> {
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: process.env.GMAIL_REFRESH_TOKEN!,
+      client_id: process.env.GMAIL_CLIENT_ID!,
+      client_secret: process.env.GMAIL_CLIENT_SECRET!,
+    }),
+  })
+  const data = await res.json()
+  if (!data.access_token) throw new Error('Failed to get Gmail access token: ' + JSON.stringify(data))
+  return data.access_token
+}
 
 export async function sendBookingConfirmation({
   parentName,
@@ -22,34 +38,16 @@ export async function sendBookingConfirmation({
   recurringDay?: string | null
   recurringTime?: string | null
 }) {
-  console.log('[Email] sendBookingConfirmation called for:', parentEmail)
+  const clientId = process.env.GMAIL_CLIENT_ID
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET
+  const refreshToken = process.env.GMAIL_REFRESH_TOKEN
 
-  const user = process.env.SMTP_USER
-  const pass = process.env.SMTP_PASS
-  const from = process.env.SMTP_FROM || user
-
-  if (!user || !pass) {
-    console.error('[Email] MISSING CREDENTIALS — SMTP_USER:', user ? 'set' : 'MISSING', '| SMTP_PASS:', pass ? 'set' : 'MISSING')
-    throw new Error('Email credentials not configured. Set SMTP_USER and SMTP_PASS in Railway Variables.')
+  if (!clientId || !clientSecret || !refreshToken) {
+    console.warn('[Email] Gmail credentials not set — skipping. Need: GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN')
+    return
   }
 
-  console.log('[Email] Credentials present. SMTP_USER:', user, '| Host: smtp.gmail.com:465')
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // SSL
-    auth: { user, pass },
-  })
-
-  // Verify connection before sending
-  try {
-    await transporter.verify()
-    console.log('[Email] SMTP connection verified successfully')
-  } catch (verifyErr) {
-    console.error('[Email] SMTP connection FAILED:', verifyErr)
-    throw verifyErr
-  }
+  console.log('[Email] Sending confirmation to:', parentEmail)
 
   const formatLabel = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
 
@@ -100,12 +98,38 @@ export async function sendBookingConfirmation({
       </div>
     </div>`
 
-  const info = await transporter.sendMail({
-    from: `"Swim with Shirel" <${from}>`,
-    to: parentEmail,
-    subject: 'Your swim lesson is confirmed — Swim with Shirel',
+  // Build RFC 2822 email message
+  const subject = 'Your swim lesson is confirmed — Swim with Shirel'
+  const messageParts = [
+    `From: "Swim with Shirel" <${CONTACT_EMAIL}>`,
+    `To: ${parentEmail}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset=utf-8`,
+    ``,
     html,
+  ]
+  const raw = Buffer.from(messageParts.join('\r\n'))
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+
+  const accessToken = await getAccessToken()
+
+  const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ raw }),
   })
 
-  console.log('[Email] Sent successfully. Message ID:', info.messageId)
+  if (!sendRes.ok) {
+    const err = await sendRes.text()
+    throw new Error(`Gmail API send failed: ${err}`)
+  }
+
+  console.log('[Email] Sent successfully via Gmail API to:', parentEmail)
 }
