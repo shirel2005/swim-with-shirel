@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import AvailabilityCalendar from './AvailabilityCalendar'
-import { AvailabilitySlot, BookingFormData, Child } from '@/lib/types'
+import { ComputedSlot, BookingFormData, Child } from '@/lib/types'
 import { format, parseISO } from 'date-fns'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from '@/lib/contact'
 import {
@@ -24,8 +24,8 @@ const LESSON_TYPES = [
   { value: '10pack-45min', label: '10-Pack (45 min)',  privatePrice: '$600 total',   semiPrice: '$1,200 total', desc: 'Ideal for committed learners' },
 ]
 
-function getSlotPrice(duration: number, format: 'private' | 'semi-private'): number {
-  if (format === 'semi-private') return duration === 30 ? 100 : 150
+function getSlotPrice(duration: number, lessonFormat: 'private' | 'semi-private'): number {
+  if (lessonFormat === 'semi-private') return duration === 30 ? 100 : 150
   return duration === 30 ? 50 : 75
 }
 
@@ -97,7 +97,7 @@ function StepHeading({ step, title, subtitle }: StepHeadingProps) {
 
 export default function BookingForm() {
   const [form, setForm] = useState<BookingFormData>(defaultForm)
-  const [selectedSlots, setSelectedSlots] = useState<AvailabilitySlot[]>([])
+  const [selectedSlots, setSelectedSlots] = useState<ComputedSlot[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -123,16 +123,16 @@ export default function BookingForm() {
   const addChild = () => setField('children', [...form.children, { name: '', age: '', skill_level: '', notes: '' }])
   const removeChild = (idx: number) => { if (form.children.length <= 1) return; setField('children', form.children.filter((_, i) => i !== idx)) }
 
-  const handleSlotsChange = (slots: AvailabilitySlot[]) => {
+  const handleSlotsChange = (slots: ComputedSlot[]) => {
     setSelectedSlots(slots)
-    setField('slot_ids', slots.map((s) => s.id))
+    setField('slot_ids', [])
     if (errors.sessions) setErrors((prev) => { const e = { ...prev }; delete e.sessions; return e })
   }
 
-  const removeSlot = (slotId: number) => {
+  const removeSlot = (slotId: string) => {
     const updated = selectedSlots.filter((s) => s.id !== slotId)
     setSelectedSlots(updated)
-    setField('slot_ids', updated.map((s) => s.id))
+    setField('slot_ids', [])
   }
 
   const validate = () => {
@@ -151,7 +151,7 @@ export default function BookingForm() {
     if (form.lesson_format === 'semi-private' && form.children.length !== 2) {
       newErrors.lesson_format = 'Semi-Private lessons require exactly 2 children. Please add or remove a child.'
     }
-    if (form.slot_ids.length === 0 && !form.is_weekly_request) {
+    if (selectedSlots.length === 0 && !form.is_weekly_request) {
       newErrors.sessions = 'Please select at least one session or enable a weekly recurring request'
     }
     if (form.is_weekly_request) {
@@ -171,6 +171,13 @@ export default function BookingForm() {
       const payload = {
         ...form,
         children: form.children.filter((c) => c.name.trim()),
+        booked_slots: selectedSlots.map(s => ({
+          window_id: s.window_id,
+          date: s.date,
+          start_time: s.start_time,
+          duration: s.duration,
+        })),
+        slot_ids: [],  // kept for DB compatibility
         recurring: form.is_weekly_request ? {
           ...form.recurring,
           weeks: durationType === 'weeks' ? form.recurring?.weeks : '',
@@ -439,7 +446,7 @@ export default function BookingForm() {
                 <div key={slot.id} className="flex items-center justify-between bg-sky-50 rounded-xl px-4 py-2.5 border border-sky-100">
                   <div className="text-sm">
                     <span className="font-semibold text-slate-800">{formatSlotDate(slot.date)}</span>
-                    <span className="text-slate-500 ml-2">at {slot.time_slot}</span>
+                    <span className="text-slate-500 ml-2">at {slot.start_time}</span>
                     <span className="text-slate-400 ml-2 text-xs">({slot.duration} min)</span>
                   </div>
                   <div className="flex items-center gap-3">

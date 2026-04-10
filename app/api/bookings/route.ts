@@ -10,7 +10,8 @@ export async function POST(request: NextRequest) {
       parent_email,
       parent_phone,
       children,
-      slot_ids,
+      slot_ids = [],
+      booked_slots = [],
       lesson_type,
       lesson_format: rawLessonFormat,
       is_weekly_request,
@@ -49,8 +50,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Require either slot_ids or is_weekly_request
-    const hasSlots = Array.isArray(slot_ids) && slot_ids.length > 0
+    // Require either booked_slots, slot_ids, or is_weekly_request
+    const hasBookedSlots = Array.isArray(booked_slots) && booked_slots.length > 0
+    const hasSlotIds = Array.isArray(slot_ids) && slot_ids.length > 0
+    const hasSlots = hasBookedSlots || hasSlotIds
     const isWeeklyReq = is_weekly_request === true || is_weekly_request === 1
     if (!hasSlots && !isWeeklyReq) {
       return NextResponse.json(
@@ -72,45 +75,54 @@ export async function POST(request: NextRequest) {
 
     const db = getDb()
 
+    const lessonFormat = lesson_format
+    const multiplier = lessonFormat === 'semi-private' ? 2 : 1
     let totalPrice = 0
 
-    // If slots selected, verify they exist and are available
-    if (hasSlots) {
+    if (hasBookedSlots) {
+      // New format: compute price from booked_slots
+      totalPrice = booked_slots.reduce((sum: number, s: { duration: number }) => {
+        return sum + (s.duration === 30 ? 50 : 75) * multiplier
+      }, 0)
+    } else if (hasSlotIds) {
+      // Legacy: verify slots from old availability table
       const placeholders = slot_ids.map(() => '?').join(',')
-      const slots = db
-        .prepare(`SELECT * FROM availability WHERE id IN (${placeholders})`)
-        .all(...slot_ids) as Array<{ id: number; duration: number; is_available: number }>
+      try {
+        const slots = db
+          .prepare(`SELECT * FROM availability WHERE id IN (${placeholders})`)
+          .all(...slot_ids) as Array<{ id: number; duration: number; is_available: number }>
 
-      if (slots.length !== slot_ids.length) {
-        return NextResponse.json({ error: 'One or more selected slots no longer exist' }, { status: 400 })
-      }
-
-      const unavailableSlots = slots.filter((s) => s.is_available !== 1)
-      if (unavailableSlots.length > 0) {
-        return NextResponse.json(
-          { error: 'One or more selected slots are no longer available' },
-          { status: 409 }
-        )
-      }
-
-      // Pricing: private = $50 (30min) / $75 (45min); semi-private = double ($100 / $150)
-      for (const slot of slots) {
-        if (lesson_format === 'semi-private') {
-          totalPrice += slot.duration === 30 ? 100 : 150
-        } else {
-          totalPrice += slot.duration === 30 ? 50 : 75
+        if (slots.length !== slot_ids.length) {
+          return NextResponse.json({ error: 'One or more selected slots no longer exist' }, { status: 400 })
         }
+
+        const unavailableSlots = slots.filter((s) => s.is_available !== 1)
+        if (unavailableSlots.length > 0) {
+          return NextResponse.json(
+            { error: 'One or more selected slots are no longer available' },
+            { status: 409 }
+          )
+        }
+
+        for (const slot of slots) {
+          totalPrice += (slot.duration === 30 ? 50 : 75) * multiplier
+        }
+      } catch {
+        // availability table may not exist in new setups, just calculate from count
+        totalPrice = slot_ids.length * 50 * multiplier
       }
     }
 
     const rec: RecurringRequest | undefined = isWeeklyReq ? recurring : undefined
 
-    // Mark slots as unavailable and create booking in a transaction
+    // Create booking in a transaction
     const createBooking = db.transaction(() => {
-      // Mark slots as unavailable
-      if (hasSlots) {
+      // Mark old-style slots as unavailable (legacy compatibility)
+      if (hasSlotIds && !hasBookedSlots) {
         for (const id of slot_ids) {
-          db.prepare('UPDATE availability SET is_available = 0 WHERE id = ?').run(id)
+          try {
+            db.prepare('UPDATE availability SET is_available = 0 WHERE id = ?').run(id)
+          } catch {}
         }
       }
 
@@ -119,22 +131,23 @@ export async function POST(request: NextRequest) {
         .prepare(
           `INSERT INTO bookings (
             parent_name, parent_email, parent_phone,
-            children, slot_ids, total_price, notes,
+            children, slot_ids, booked_slots, total_price, notes,
             lesson_type, lesson_format, is_weekly_request,
             recurring_day, recurring_time, recurring_start_date,
             recurring_end_date, recurring_weeks, recurring_frequency
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .run(
           parent_name.trim(),
           parent_email.trim(),
           parent_phone.trim(),
           JSON.stringify(validChildren),
-          JSON.stringify(hasSlots ? slot_ids : []),
+          JSON.stringify(hasSlotIds ? slot_ids : []),
+          JSON.stringify(hasBookedSlots ? booked_slots : []),
           totalPrice,
           notes || null,
           lesson_type || null,
-          lesson_format,
+          lessonFormat,
           isWeeklyReq ? 1 : 0,
           rec?.day || null,
           rec?.time || null,

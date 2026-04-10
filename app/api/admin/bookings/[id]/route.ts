@@ -34,6 +34,7 @@ export async function PATCH(
     const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(id) as
       | {
           slot_ids: string
+          booked_slots: string
           status: string
           parent_name: string
           parent_email: string
@@ -52,36 +53,35 @@ export async function PATCH(
 
     const previousStatus = booking.status
 
-    const updateBooking = db.transaction(() => {
-      db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
-
-      const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-
-      if (status === 'confirmed') {
-        for (const slotId of slotIds) {
-          db.prepare('UPDATE availability SET is_available = 0 WHERE id = ?').run(slotId)
-        }
-      } else if (status === 'cancelled') {
-        for (const slotId of slotIds) {
-          db.prepare('UPDATE availability SET is_available = 1 WHERE id = ?').run(slotId)
-        }
-      }
-    })
-
-    updateBooking()
+    db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
 
     // Send confirmation email — fully isolated, never crashes the app
     if (status === 'confirmed' && previousStatus !== 'confirmed') {
       setImmediate(async () => {
         try {
-          const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
           let slots: Array<{ date: string; time_slot: string; duration: number }> = []
-          if (slotIds.length > 0) {
-            const placeholders = slotIds.map(() => '?').join(',')
-            slots = db
-              .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
-              .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
-          }
+          try {
+            const bookedSlots = JSON.parse(booking.booked_slots || '[]')
+            if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
+              slots = bookedSlots.map((s: { date: string; start_time: string; duration: number }) => ({
+                date: s.date,
+                time_slot: s.start_time,
+                duration: s.duration,
+              }))
+            } else {
+              // Legacy: try to look up from old availability table
+              const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+              if (slotIds.length > 0) {
+                try {
+                  const placeholders = slotIds.map(() => '?').join(',')
+                  slots = db
+                    .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
+                    .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
+                } catch {}
+              }
+            }
+          } catch {}
+
           let childrenParsed: Array<{ name: string }> = []
           try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
           const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
@@ -125,15 +125,6 @@ export async function DELETE(
     }
 
     const db = getDb()
-
-    // Restore slot availability before deleting
-    const booking = db.prepare('SELECT slot_ids, status FROM bookings WHERE id = ?').get(id) as { slot_ids: string; status: string } | undefined
-    if (booking) {
-      const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-      for (const slotId of slotIds) {
-        db.prepare('UPDATE availability SET is_available = 1 WHERE id = ?').run(slotId)
-      }
-    }
 
     const result = db.prepare('DELETE FROM bookings WHERE id = ?').run(id)
 

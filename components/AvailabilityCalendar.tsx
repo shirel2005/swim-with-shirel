@@ -6,20 +6,20 @@ import {
   addDays, isSameMonth, isSameDay, isBefore, addMonths, subMonths, parseISO,
 } from 'date-fns'
 import { ChevronLeft, ChevronRight, Clock, RefreshCw, Waves } from 'lucide-react'
-import { AvailabilitySlot } from '@/lib/types'
+import { ComputedSlot } from '@/lib/types'
 
 interface AvailabilityCalendarProps {
-  onSlotsChange: (slots: AvailabilitySlot[]) => void
+  onSlotsChange: (slots: ComputedSlot[]) => void
 }
 
 export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCalendarProps) {
-  const [allSlots, setAllSlots] = useState<AvailabilitySlot[]>([])
+  const [allSlots, setAllSlots] = useState<ComputedSlot[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [selectedSlots, setSelectedSlots] = useState<AvailabilitySlot[]>([])
+  const [selectedSlots, setSelectedSlots] = useState<ComputedSlot[]>([])
 
   const fetchSlots = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true)
@@ -27,7 +27,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
     try {
       const res = await fetch(`/api/availability?t=${Date.now()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('Failed to load')
-      const data: AvailabilitySlot[] = await res.json()
+      const data: ComputedSlot[] = await res.json()
       setAllSlots(data)
       setError('')
     } catch {
@@ -68,7 +68,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
     setSelectedDate(isSameDay(date, selectedDate ?? new Date(0)) ? null : date)
   }
 
-  const toggleSlot = (slot: AvailabilitySlot) => {
+  const toggleSlot = (slot: ComputedSlot) => {
     const next = selectedSlots.some((s) => s.id === slot.id)
       ? selectedSlots.filter((s) => s.id !== slot.id)
       : [...selectedSlots, slot]
@@ -238,7 +238,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
                   >
                     <span className="flex items-center gap-1">
                       <Clock size={13} />
-                      {slot.time_slot}
+                      {slot.start_time}
                     </span>
                     <span className={`text-xs font-normal ${isSlotSelected ? 'text-sky-200' : 'text-slate-400'}`}>
                       {slot.duration} min · ${price}
@@ -259,7 +259,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
               {selectedSlots.length} session{selectedSlots.length !== 1 ? 's' : ''} selected
             </p>
             <p className="text-xs text-sky-600 mt-0.5">
-              {selectedSlots.map((s) => `${s.date} at ${s.time_slot}`).join(' · ')}
+              {selectedSlots.map((s) => `${s.date} at ${s.start_time}`).join(' · ')}
             </p>
           </div>
           <div className="text-right">

@@ -1,3 +1,19 @@
+export interface AvailabilityWindow {
+  id: number
+  date: string
+  start_time: string
+  end_time: string
+  created_at: string
+}
+
+export interface ComputedSlot {
+  id: string          // e.g. "w1_900_30" (windowId_startMinutes_duration)
+  window_id: number
+  date: string
+  start_time: string  // "15:00"
+  duration: 30 | 45
+}
+
 export interface AvailabilitySlot {
   id: number
   date: string         // YYYY-MM-DD
@@ -43,6 +59,7 @@ export interface Booking {
   parent_phone: string
   children: string     // JSON string array
   slot_ids: string     // JSON number array
+  booked_slots: string // JSON array of {window_id, date, start_time, duration}
   total_price: number
   status: 'pending' | 'confirmed' | 'cancelled'
   notes: string | null

@@ -52,6 +52,14 @@ export function getDb(): Database.Database {
       status TEXT DEFAULT 'pending',
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS availability_windows (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `)
 
   // Add new columns if they don't exist (SQLite doesn't support IF NOT EXISTS for columns)
@@ -65,6 +73,7 @@ export function getDb(): Database.Database {
     `ALTER TABLE bookings ADD COLUMN recurring_weeks TEXT`,
     `ALTER TABLE bookings ADD COLUMN recurring_frequency TEXT`,
     `ALTER TABLE bookings ADD COLUMN lesson_format TEXT DEFAULT 'private'`,
+    `ALTER TABLE bookings ADD COLUMN booked_slots TEXT DEFAULT '[]'`,
   ]
   for (const sql of alterCols) {
     try { db.exec(sql) } catch {}

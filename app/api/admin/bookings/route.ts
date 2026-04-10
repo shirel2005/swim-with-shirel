@@ -27,8 +27,10 @@ export async function GET(request: NextRequest) {
         .prepare('SELECT * FROM bookings')
         .all() as Array<{
           slot_ids: string
+          booked_slots: string
           status: string
           lesson_format: string | null
+          total_price: number
         }>
 
       let confirmed_earnings = 0
@@ -37,24 +39,38 @@ export async function GET(request: NextRequest) {
       let confirmed_bookings = 0
 
       for (const booking of bookings) {
-        let slotIds: number[] = []
-        try { slotIds = JSON.parse(booking.slot_ids || '[]') } catch {}
-        const slotCount = slotIds.length || 1
-
-        // Get slot durations to calculate pricing properly
         let slotEarnings = 0
-        if (slotIds.length > 0) {
-          const placeholders = slotIds.map(() => '?').join(',')
-          const slotRows = db
-            .prepare(`SELECT duration FROM availability WHERE id IN (${placeholders})`)
-            .all(...slotIds) as Array<{ duration: number }>
 
-          for (const s of slotRows) {
-            slotEarnings += getPricePerSlot(s.duration, booking.lesson_format)
+        // Try new booked_slots format first
+        try {
+          const bookedSlots = JSON.parse(booking.booked_slots || '[]')
+          if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
+            for (const s of bookedSlots as Array<{ duration: number }>) {
+              slotEarnings += getPricePerSlot(s.duration, booking.lesson_format)
+            }
+          } else {
+            // Fallback to legacy slot_ids
+            const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+            if (slotIds.length > 0) {
+              try {
+                const placeholders = slotIds.map(() => '?').join(',')
+                const slotRows = db
+                  .prepare(`SELECT duration FROM availability WHERE id IN (${placeholders})`)
+                  .all(...slotIds) as Array<{ duration: number }>
+
+                for (const s of slotRows) {
+                  slotEarnings += getPricePerSlot(s.duration, booking.lesson_format)
+                }
+              } catch {
+                slotEarnings = slotIds.length * 50
+              }
+            } else {
+              // Use stored total_price if no slot data available
+              slotEarnings = booking.total_price || 50
+            }
           }
-        } else {
-          // Fallback if slots not found
-          slotEarnings = slotCount * 50
+        } catch {
+          slotEarnings = booking.total_price || 50
         }
 
         if (booking.status === 'confirmed') {
