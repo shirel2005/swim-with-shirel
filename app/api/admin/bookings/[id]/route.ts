@@ -70,39 +70,37 @@ export async function PATCH(
 
     updateBooking()
 
-    // Send confirmation email only when transitioning TO confirmed for the first time
+    // Send confirmation email — fully isolated, never crashes the app
     if (status === 'confirmed' && previousStatus !== 'confirmed') {
-      try {
-        const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-        let slots: Array<{ date: string; time_slot: string; duration: number }> = []
+      setImmediate(async () => {
+        try {
+          const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+          let slots: Array<{ date: string; time_slot: string; duration: number }> = []
+          if (slotIds.length > 0) {
+            const placeholders = slotIds.map(() => '?').join(',')
+            slots = db
+              .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
+              .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
+          }
+          let childrenParsed: Array<{ name: string }> = []
+          try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
+          const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
 
-        if (slotIds.length > 0) {
-          const placeholders = slotIds.map(() => '?').join(',')
-          slots = db
-            .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
-            .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
+          await sendBookingConfirmation({
+            parentName: booking.parent_name,
+            parentEmail: booking.parent_email,
+            lessonFormat: booking.lesson_format || 'private',
+            lessonType: booking.lesson_type || undefined,
+            children: childNames,
+            slots,
+            isWeeklyRequest: booking.is_weekly_request === 1,
+            recurringDay: booking.recurring_day,
+            recurringTime: booking.recurring_time,
+          })
+        } catch (emailError) {
+          console.error('[Email] Failed to send confirmation (booking still confirmed):', emailError)
         }
-
-        // Parse children from JSON
-        let childrenParsed: Array<{ name: string }> = []
-        try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
-        const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
-
-        await sendBookingConfirmation({
-          parentName: booking.parent_name,
-          parentEmail: booking.parent_email,
-          lessonFormat: booking.lesson_format || 'private',
-          lessonType: booking.lesson_type || undefined,
-          children: childNames,
-          slots,
-          isWeeklyRequest: booking.is_weekly_request === 1,
-          recurringDay: booking.recurring_day,
-          recurringTime: booking.recurring_time,
-        })
-      } catch (emailError) {
-        // Log but don't fail the request if email sending fails
-        console.error('Failed to send confirmation email:', emailError)
-      }
+      })
     }
 
     return NextResponse.json({ success: true })
