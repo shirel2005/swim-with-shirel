@@ -125,6 +125,16 @@ export async function DELETE(
     }
 
     const db = getDb()
+
+    // Restore slot availability before deleting
+    const booking = db.prepare('SELECT slot_ids, status FROM bookings WHERE id = ?').get(id) as { slot_ids: string; status: string } | undefined
+    if (booking) {
+      const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+      for (const slotId of slotIds) {
+        db.prepare('UPDATE availability SET is_available = 1 WHERE id = ?').run(slotId)
+      }
+    }
+
     const result = db.prepare('DELETE FROM bookings WHERE id = ?').run(id)
 
     if (result.changes === 0) {

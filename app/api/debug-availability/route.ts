@@ -39,10 +39,10 @@ export async function GET() {
 export async function POST() {
   try {
     const db = getDb()
-    const today = new Date().toISOString().split('T')[0]
-    db.prepare('INSERT INTO availability (date, time_slot, duration) VALUES (?, ?, ?)').run(today, '10:00', 30)
+    // Reset all slots to available (fixes slots stuck as booked after booking deletion)
+    const result = db.prepare('UPDATE availability SET is_available = 1').run()
     const all = db.prepare('SELECT * FROM availability').all()
-    return NextResponse.json({ inserted: true, total: all.length, slots: all }, {
+    return NextResponse.json({ reset: true, slotsReset: result.changes, slots: all }, {
       headers: { 'Cache-Control': 'no-store' }
     })
   } catch (error) {
