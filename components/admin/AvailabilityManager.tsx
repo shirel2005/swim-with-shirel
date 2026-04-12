@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { AvailabilityWindow } from '@/lib/types'
-import { format, parseISO } from 'date-fns'
-import { Trash2, Plus, RefreshCw, Calendar } from 'lucide-react'
+import {
+  format, parseISO, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
+  addDays, isSameMonth, isBefore, addMonths, subMonths, isSameDay,
+} from 'date-fns'
+import { Trash2, Plus, RefreshCw, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 interface Props { adminPassword: string }
 
@@ -13,8 +16,9 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [error, setError] = useState('')
 
-  // Bulk add form state
-  const [dates, setDates] = useState<string[]>([''])
+  // Multi-date calendar state
+  const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set())
+  const [calMonth, setCalMonth] = useState(new Date())
   const [startTime, setStartTime] = useState('09:00')
   const [endTime, setEndTime] = useState('17:00')
   const [addLoading, setAddLoading] = useState(false)
@@ -34,16 +38,36 @@ export default function AvailabilityManager({ adminPassword }: Props) {
 
   useEffect(() => { fetchWindows() }, [adminPassword])
 
-  const addDate = () => setDates([...dates, ''])
-  const removeDate = (i: number) => setDates(dates.filter((_, idx) => idx !== i))
-  const setDate = (i: number, val: string) => { const d = [...dates]; d[i] = val; setDates(d) }
+  // Calendar helpers
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const monthStart = startOfMonth(calMonth)
+  const monthEnd = endOfMonth(calMonth)
+  const calStart = startOfWeek(monthStart, { weekStartsOn: 0 })
+  const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+
+  const calDays: Date[] = []
+  let d = calStart
+  while (d <= calEnd) { calDays.push(new Date(d)); d = addDays(d, 1) }
+
+  const toggleDate = (date: Date) => {
+    if (isBefore(date, today)) return
+    const dateStr = format(date, 'yyyy-MM-dd')
+    const next = new Set(selectedDates)
+    if (next.has(dateStr)) next.delete(dateStr)
+    else next.add(dateStr)
+    setSelectedDates(next)
+  }
+
+  const clearDates = () => setSelectedDates(new Set())
 
   const addWindows = async (e: React.FormEvent) => {
     e.preventDefault()
     setAddError('')
     setAddSuccess('')
-    const validDates = dates.filter(Boolean)
-    if (validDates.length === 0) { setAddError('Please add at least one date.'); return }
+    const validDates = Array.from(selectedDates)
+    if (validDates.length === 0) { setAddError('Please select at least one date.'); return }
     if (!startTime || !endTime) { setAddError('Start and end time required.'); return }
     if (startTime >= endTime) { setAddError('End time must be after start time.'); return }
 
@@ -57,7 +81,7 @@ export default function AvailabilityManager({ adminPassword }: Props) {
       const data = await res.json()
       if (!res.ok) { setAddError(data.error || 'Failed to add.'); return }
       setAddSuccess(`Added availability for ${validDates.length} date${validDates.length !== 1 ? 's' : ''}.`)
-      setDates([''])
+      setSelectedDates(new Set())
       await fetchWindows()
       setTimeout(() => setAddSuccess(''), 3000)
     } catch { setAddError('Unexpected error.') }
@@ -101,12 +125,13 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   const formatDateLabel = (d: string) => { try { return format(parseISO(d), 'EEE, MMM d, yyyy') } catch { return d } }
   const formatTime = (t: string) => { try { const [h, m] = t.split(':').map(Number); const ampm = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2,'0')} ${ampm}` } catch { return t } }
 
-  // Generate time options at 30-min intervals
   const timeOptions: string[] = []
   for (let h = 6; h <= 22; h++) {
     timeOptions.push(`${String(h).padStart(2,'0')}:00`)
     timeOptions.push(`${String(h).padStart(2,'0')}:30`)
   }
+
+  const sortedSelected = Array.from(selectedDates).sort()
 
   if (loading) return (
     <div className="flex items-center justify-center py-16">
@@ -131,38 +156,123 @@ export default function AvailabilityManager({ adminPassword }: Props) {
         </div>
       </div>
 
-      {/* Bulk Add Form */}
+      {/* Add Availability Form */}
       <div className="card p-6 mb-8">
         <h3 className="text-base font-semibold text-slate-800 mb-5 flex items-center gap-2">
           <Plus size={18} className="text-sky-700" />
           Add Availability
         </h3>
         <form onSubmit={addWindows} className="space-y-5">
-          {/* Dates */}
+
+          {/* Inline multi-date calendar */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Dates</label>
-            <div className="space-y-2">
-              {dates.map((d, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="relative">
-                    <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="date"
-                      value={d}
-                      onChange={e => setDate(i, e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400 text-sm"
-                    />
-                  </div>
-                  {dates.length > 1 && (
-                    <button type="button" onClick={() => removeDate(i)} className="text-slate-400 hover:text-red-500 transition-colors text-sm">✕</button>
-                  )}
-                </div>
-              ))}
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-slate-700">
+                Select Dates
+                {selectedDates.size > 0 && (
+                  <span className="ml-2 text-sky-700 font-bold">{selectedDates.size} selected</span>
+                )}
+              </label>
+              {selectedDates.size > 0 && (
+                <button
+                  type="button"
+                  onClick={clearDates}
+                  className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1"
+                >
+                  <X size={12} /> Clear all
+                </button>
+              )}
             </div>
-            <button type="button" onClick={addDate} className="mt-2 text-sm text-sky-600 hover:text-sky-800 font-medium flex items-center gap-1">
-              <Plus size={14} /> Add another date
-            </button>
+
+            {/* Mini calendar */}
+            <div className="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden max-w-sm">
+              {/* Month nav */}
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-sky-50 bg-sky-50/60">
+                <button
+                  type="button"
+                  onClick={() => setCalMonth(subMonths(calMonth, 1))}
+                  className="p-1.5 rounded-lg hover:bg-sky-100 transition-colors text-slate-500"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="text-sm font-bold text-slate-800">{format(calMonth, 'MMMM yyyy')}</span>
+                <button
+                  type="button"
+                  onClick={() => setCalMonth(addMonths(calMonth, 1))}
+                  className="p-1.5 rounded-lg hover:bg-sky-100 transition-colors text-slate-500"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* Weekday headers */}
+              <div className="grid grid-cols-7 border-b border-sky-50">
+                {['Su','Mo','Tu','We','Th','Fr','Sa'].map(wd => (
+                  <div key={wd} className="py-1.5 text-center text-[10px] font-semibold text-slate-400 tracking-wide">
+                    {wd}
+                  </div>
+                ))}
+              </div>
+
+              {/* Days grid */}
+              <div className="grid grid-cols-7 gap-px bg-sky-50/20 p-1.5">
+                {calDays.map((calDay, idx) => {
+                  const dateStr = format(calDay, 'yyyy-MM-dd')
+                  const isPast = isBefore(calDay, today)
+                  const isCurrentMonth = isSameMonth(calDay, calMonth)
+                  const isSelected = selectedDates.has(dateStr)
+                  const isToday = isSameDay(calDay, new Date())
+
+                  let cls = 'h-9 flex items-center justify-center text-xs transition-all duration-150 rounded-lg m-0.5 select-none'
+
+                  if (!isCurrentMonth) {
+                    cls += ' text-slate-200 cursor-default'
+                  } else if (isPast) {
+                    cls += ' text-slate-300 cursor-not-allowed'
+                  } else if (isSelected) {
+                    cls += ' bg-sky-700 text-white font-bold cursor-pointer shadow-sm scale-105'
+                  } else {
+                    cls += ' text-slate-700 hover:bg-sky-100 hover:text-sky-800 cursor-pointer font-medium'
+                    if (isToday) cls += ' underline decoration-sky-600 underline-offset-2'
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cls}
+                      onClick={() => isCurrentMonth && !isPast ? toggleDate(calDay) : undefined}
+                    >
+                      {format(calDay, 'd')}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Selected dates chips */}
+            {sortedSelected.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {sortedSelected.map(dateStr => (
+                  <span
+                    key={dateStr}
+                    className="inline-flex items-center gap-1 text-xs bg-sky-50 border border-sky-200 text-sky-800 font-medium px-2.5 py-1 rounded-full"
+                  >
+                    {format(parseISO(dateStr), 'MMM d')}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = new Set(selectedDates)
+                        next.delete(dateStr)
+                        setSelectedDates(next)
+                      }}
+                      className="text-sky-400 hover:text-red-500 transition-colors ml-0.5"
+                    >
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Time range */}
@@ -179,8 +289,18 @@ export default function AvailabilityManager({ adminPassword }: Props) {
                 {timeOptions.map(t => <option key={t} value={t}>{formatTime(t)}</option>)}
               </select>
             </div>
-            <button type="submit" disabled={addLoading} className="btn-primary py-2.5 text-sm disabled:opacity-60">
-              <Plus size={15} /> {addLoading ? 'Adding...' : `Add to ${dates.filter(Boolean).length || 1} date${dates.filter(Boolean).length !== 1 ? 's' : ''}`}
+            <button
+              type="submit"
+              disabled={addLoading || selectedDates.size === 0}
+              className="btn-primary py-2.5 text-sm disabled:opacity-60"
+            >
+              <Plus size={15} />
+              {addLoading
+                ? 'Adding...'
+                : selectedDates.size === 0
+                  ? 'Select dates first'
+                  : `Add to ${selectedDates.size} date${selectedDates.size !== 1 ? 's' : ''}`
+              }
             </button>
           </div>
 

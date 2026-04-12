@@ -106,6 +106,8 @@ export default function BookingForm() {
   const setField = <K extends keyof BookingFormData>(key: K, value: BookingFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key]) setErrors((prev) => { const e = { ...prev }; delete e[key]; return e })
+    // Clear selected slots when lesson type changes (duration may differ)
+    if (key === 'lesson_type') setSelectedSlots([])
   }
 
   const setRecurring = (key: string, value: string) => {
@@ -428,8 +430,11 @@ export default function BookingForm() {
 
       {/* Section 5: Session Selection */}
       <div className={cardClass}>
-        <StepHeading step={5} title="Session Selection" subtitle="Click a highlighted date to see available time slots." />
-        <AvailabilityCalendar onSlotsChange={handleSlotsChange} />
+        <StepHeading step={5} title="Session Selection" subtitle="Select a date, then pick a start time from the dropdown." />
+        <AvailabilityCalendar
+          onSlotsChange={handleSlotsChange}
+          duration={form.lesson_type.includes('45') ? 45 : 30}
+        />
 
         <div className="mt-5">
           <p className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">

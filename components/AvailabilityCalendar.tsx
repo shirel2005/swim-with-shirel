@@ -3,16 +3,24 @@
 import { useEffect, useState } from 'react'
 import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  addDays, isSameMonth, isSameDay, isBefore, addMonths, subMonths, parseISO,
+  addDays, isSameMonth, isSameDay, isBefore, addMonths, subMonths,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight, Clock, RefreshCw, Waves } from 'lucide-react'
+import { ChevronLeft, ChevronRight, RefreshCw, Waves } from 'lucide-react'
 import { ComputedSlot } from '@/lib/types'
 
 interface AvailabilityCalendarProps {
   onSlotsChange: (slots: ComputedSlot[]) => void
+  duration: 30 | 45
 }
 
-export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCalendarProps) {
+function formatTime(t: string) {
+  const [h, m] = t.split(':').map(Number)
+  const ampm = h < 12 ? 'AM' : 'PM'
+  const hour = h % 12 === 0 ? 12 : h % 12
+  return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`
+}
+
+export default function AvailabilityCalendar({ onSlotsChange, duration }: AvailabilityCalendarProps) {
   const [allSlots, setAllSlots] = useState<ComputedSlot[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -38,14 +46,21 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
     }
   }
 
+  useEffect(() => { fetchSlots() }, [])
+
+  // When duration changes, clear selected slots (they're the wrong length)
   useEffect(() => {
-    fetchSlots()
-  }, [])
+    setSelectedSlots([])
+    onSlotsChange([])
+  }, [duration]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const datesWithSlots = new Set(allSlots.map((s) => s.date))
+  // Only count dates that have slots matching the selected duration
+  const datesWithSlots = new Set(
+    allSlots.filter(s => s.duration === duration).map(s => s.date)
+  )
 
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(currentMonth)
@@ -58,30 +73,32 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
 
   const getSlotsForDate = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd')
-    return allSlots.filter((s) => s.date === dateStr)
+    return allSlots.filter(s => s.date === dateStr && s.duration === duration)
   }
 
   const handleDateClick = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd')
-    if (!datesWithSlots.has(dateStr)) return
-    if (isBefore(date, today)) return
+    if (!datesWithSlots.has(dateStr) || isBefore(date, today)) return
     setSelectedDate(isSameDay(date, selectedDate ?? new Date(0)) ? null : date)
   }
 
-  const toggleSlot = (slot: ComputedSlot) => {
-    const next = selectedSlots.some((s) => s.id === slot.id)
-      ? selectedSlots.filter((s) => s.id !== slot.id)
-      : [...selectedSlots, slot]
+  const addSlot = (slot: ComputedSlot) => {
+    if (selectedSlots.some(s => s.id === slot.id)) return
+    const next = [...selectedSlots, slot]
     setSelectedSlots(next)
     onSlotsChange(next)
   }
 
-  const totalPrice = selectedSlots.reduce((sum, s) => sum + (s.duration === 30 ? 50 : 75), 0)
+  const removeSlot = (slotId: string) => {
+    const next = selectedSlots.filter(s => s.id !== slotId)
+    setSelectedSlots(next)
+    onSlotsChange(next)
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-7 h-7 border-3 border-sky-600 border-t-transparent rounded-full animate-spin border-[3px]" />
+        <div className="w-7 h-7 border-[3px] border-sky-600 border-t-transparent rounded-full animate-spin" />
         <span className="ml-3 text-slate-500 text-sm">Loading availability...</span>
       </div>
     )
@@ -91,17 +108,25 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
     return <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">{error}</div>
   }
 
-  if (allSlots.length === 0) {
+  const hasAnySlots = allSlots.filter(s => s.duration === duration).length > 0
+
+  if (!hasAnySlots) {
     return (
       <div className="card p-10 text-center">
         <Waves className="w-10 h-10 text-sky-200 mx-auto mb-4" />
-        <p className="text-slate-700 font-semibold mb-1">No available lesson times at the moment.</p>
+        <p className="text-slate-700 font-semibold mb-1">No available {duration}-minute lesson times at the moment.</p>
         <p className="text-slate-400 text-sm">Please check back soon or <a href="mailto:swim.with.shirel@gmail.com" className="text-sky-600 hover:underline">contact me</a> directly.</p>
       </div>
     )
   }
 
   const selectedDateSlots = selectedDate ? getSlotsForDate(selectedDate) : []
+  // Slots already selected for the currently viewed date
+  const alreadySelectedForDate = selectedDate
+    ? selectedSlots.filter(s => s.date === format(selectedDate, 'yyyy-MM-dd'))
+    : []
+  // Available slots not yet added
+  const availableToAdd = selectedDateSlots.filter(s => !selectedSlots.some(sel => sel.id === s.id))
 
   return (
     <div className="space-y-5">
@@ -144,10 +169,8 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
 
         {/* Weekday headers */}
         <div className="grid grid-cols-7 bg-white border-b border-sky-50">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-            <div key={d} className="py-2 text-center text-xs font-semibold text-slate-400 tracking-wide">
-              {d}
-            </div>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+            <div key={d} className="py-2 text-center text-xs font-semibold text-slate-400 tracking-wide">{d}</div>
           ))}
         </div>
 
@@ -175,6 +198,8 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
               cellClass += ' text-slate-300 cursor-not-allowed'
             }
 
+            const slotCount = getSlotsForDate(calDay).length
+
             return (
               <div
                 key={idx}
@@ -186,7 +211,7 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
                 </span>
                 {hasSlots && !isPast && isCurrentMonth && (
                   <span className={`text-[9px] ${isSelected ? 'text-sky-200' : 'text-sky-500'}`}>
-                    {getSlotsForDate(calDay).length}
+                    {slotCount}
                   </span>
                 )}
               </div>
@@ -211,60 +236,82 @@ export default function AvailabilityCalendar({ onSlotsChange }: AvailabilityCale
         </span>
       </div>
 
-      {/* Time slots */}
+      {/* Time picker for selected date */}
       {selectedDate && (
         <div className="card p-5">
-          <h4 className="font-bold text-slate-800 mb-4 text-sm">
-            Available slots for{' '}
-            <span className="text-sky-700">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</span>
+          <h4 className="font-bold text-slate-800 mb-3 text-sm">
+            {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+            <span className="ml-2 text-xs font-normal text-sky-600">— {duration}-min slots</span>
           </h4>
+
           {selectedDateSlots.length === 0 ? (
-            <p className="text-slate-400 text-sm">No available slots for this date.</p>
+            <p className="text-slate-400 text-sm">No {duration}-minute slots available for this date.</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {selectedDateSlots.map((slot) => {
-                const isSlotSelected = selectedSlots.some((s) => s.id === slot.id)
-                const price = slot.duration === 30 ? 50 : 75
-                return (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    onClick={() => toggleSlot(slot)}
-                    className={`flex flex-col items-center gap-1 px-4 py-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200 ${
-                      isSlotSelected
-                        ? 'border-sky-700 bg-sky-700 text-white scale-105 shadow-md'
-                        : 'bg-white border-sky-100 text-slate-700 hover:border-sky-400 hover:bg-sky-50 hover:scale-105'
-                    }`}
+            <div className="space-y-3">
+              {/* Dropdown to add a time */}
+              {availableToAdd.length > 0 ? (
+                <div className="flex items-center gap-3">
+                  <select
+                    defaultValue=""
+                    key={`${format(selectedDate, 'yyyy-MM-dd')}-${selectedSlots.length}`}
+                    onChange={e => {
+                      const slot = availableToAdd.find(s => s.id === e.target.value)
+                      if (slot) addSlot(slot)
+                    }}
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400 text-sm bg-white text-slate-700"
                   >
-                    <span className="flex items-center gap-1">
-                      <Clock size={13} />
-                      {slot.start_time}
-                    </span>
-                    <span className={`text-xs font-normal ${isSlotSelected ? 'text-sky-200' : 'text-slate-400'}`}>
-                      {slot.duration} min · ${price}
-                    </span>
-                  </button>
-                )
-              })}
+                    <option value="" disabled>Select a start time...</option>
+                    {availableToAdd.map(slot => (
+                      <option key={slot.id} value={slot.id}>
+                        {formatTime(slot.start_time)}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-slate-400">{availableToAdd.length} time{availableToAdd.length !== 1 ? 's' : ''} available</span>
+                </div>
+              ) : (
+                <p className="text-xs text-sky-700 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2">
+                  All available times for this date have been added.
+                </p>
+              )}
+
+              {/* Already added for this date */}
+              {alreadySelectedForDate.length > 0 && (
+                <div className="space-y-1.5">
+                  {alreadySelectedForDate.map(slot => (
+                    <div key={slot.id} className="flex items-center justify-between bg-sky-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold">
+                      <span>{formatTime(slot.start_time)} <span className="font-normal text-sky-200 text-xs">({duration} min)</span></span>
+                      <button
+                        type="button"
+                        onClick={() => removeSlot(slot.id)}
+                        className="text-sky-300 hover:text-white transition-colors ml-4 text-xs"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Summary */}
+      {/* Summary of all selected sessions */}
       {selectedSlots.length > 0 && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center justify-between">
-          <div>
-            <p className="font-bold text-sky-900 text-sm">
-              {selectedSlots.length} session{selectedSlots.length !== 1 ? 's' : ''} selected
-            </p>
-            <p className="text-xs text-sky-600 mt-0.5">
-              {selectedSlots.map((s) => `${s.date} at ${s.start_time}`).join(' · ')}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] text-sky-500 font-medium uppercase tracking-wide">Total</p>
-            <p className="text-2xl font-bold text-sky-700">${totalPrice}</p>
+        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4">
+          <p className="font-bold text-sky-900 text-sm mb-2">
+            {selectedSlots.length} session{selectedSlots.length !== 1 ? 's' : ''} selected
+          </p>
+          <div className="space-y-1">
+            {selectedSlots.map(s => (
+              <div key={s.id} className="flex items-center justify-between text-xs text-sky-700">
+                <span>{format(new Date(s.date + 'T00:00:00'), 'MMM d')} at {formatTime(s.start_time)}</span>
+                <button type="button" onClick={() => removeSlot(s.id)} className="text-sky-400 hover:text-red-500 transition-colors">
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
