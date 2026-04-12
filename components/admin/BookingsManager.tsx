@@ -270,7 +270,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                     )}
                     {isPack && (
                       <span className="flex items-center gap-1 font-semibold text-purple-700">
-                        <Package size={11} />{booking.pack_used || 0}/{booking.pack_total || 10} sessions used
+                        <Package size={11} />{booking.tp_sessions_used ?? booking.pack_used ?? 0}/{booking.tp_total_sessions ?? booking.pack_total ?? 10} sessions used
                       </span>
                     )}
                     {isPack && booking.ten_pack_id && (
@@ -374,27 +374,29 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                         <div className="bg-white rounded-xl border border-purple-100 p-4">
                           <div className="flex items-center justify-between mb-3">
                             <p className="font-semibold text-slate-800 text-sm">Sessions used</p>
-                            <p className="text-xl font-bold text-purple-700">{booking.pack_used || 0} / {booking.pack_total || 10}</p>
+                            <p className="text-xl font-bold text-purple-700">
+                              {booking.tp_sessions_used ?? booking.pack_used ?? 0} / {booking.tp_total_sessions ?? booking.pack_total ?? 10}
+                            </p>
                           </div>
                           {/* Progress bar */}
                           <div className="w-full bg-slate-100 rounded-full h-2 mb-3">
                             <div
                               className="bg-purple-600 h-2 rounded-full transition-all"
-                              style={{ width: `${((booking.pack_used || 0) / (booking.pack_total || 10)) * 100}%` }}
+                              style={{ width: `${((booking.tp_sessions_used ?? booking.pack_used ?? 0) / (booking.tp_total_sessions ?? booking.pack_total ?? 10)) * 100}%` }}
                             />
                           </div>
                           {/* Increment / decrement */}
                           <div className="flex items-center gap-3">
-                            <button type="button" disabled={isLoading || (booking.pack_used || 0) <= 0}
-                              onClick={() => updatePackUsed(booking.id, (booking.pack_used || 0) - 1)}
+                            <button type="button" disabled={isLoading || (booking.tp_sessions_used ?? booking.pack_used ?? 0) <= 0}
+                              onClick={() => updatePackUsed(booking.id, (booking.tp_sessions_used ?? booking.pack_used ?? 0) - 1)}
                               className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors">
                               <Minus size={14} />
                             </button>
                             <span className="text-sm text-slate-500 flex-1 text-center">
-                              {(booking.pack_total || 10) - (booking.pack_used || 0)} remaining
+                              {(booking.tp_total_sessions ?? booking.pack_total ?? 10) - (booking.tp_sessions_used ?? booking.pack_used ?? 0)} remaining
                             </span>
-                            <button type="button" disabled={isLoading || (booking.pack_used || 0) >= (booking.pack_total || 10)}
-                              onClick={() => updatePackUsed(booking.id, (booking.pack_used || 0) + 1)}
+                            <button type="button" disabled={isLoading || (booking.tp_sessions_used ?? booking.pack_used ?? 0) >= (booking.tp_total_sessions ?? booking.pack_total ?? 10)}
+                              onClick={() => updatePackUsed(booking.id, (booking.tp_sessions_used ?? booking.pack_used ?? 0) + 1)}
                               className="p-2 rounded-lg border border-sky-200 text-sky-700 hover:bg-sky-50 disabled:opacity-40 transition-colors">
                               <Plus size={14} />
                             </button>

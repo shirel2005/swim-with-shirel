@@ -971,7 +971,7 @@ export default function BookingForm() {
                 <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Lesson</p>
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
-                    {LESSON_TYPE_OPTIONS.find(lt => lt.value === lessonType)?.label || lessonType}
+                    {getLessonDuration(lessonType) === 45 ? '45-Minute Lesson' : '30-Minute Lesson'}
                   </span>
                   <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                     lessonFormat === 'semi-private' ? 'bg-sky-50 text-sky-700 border-sky-100' : 'bg-slate-100 text-slate-600 border-slate-200'

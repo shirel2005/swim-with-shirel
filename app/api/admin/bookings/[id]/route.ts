@@ -26,6 +26,12 @@ export async function PATCH(
     // Handle pack_used manual override independently
     if (typeof body.pack_used === 'number') {
       db.prepare('UPDATE bookings SET pack_used = ? WHERE id = ?').run(body.pack_used, id)
+      // Also sync ten_packs.sessions_used so the display stays correct
+      const bk = db.prepare('SELECT ten_pack_id FROM bookings WHERE id = ?').get(id) as { ten_pack_id: number | null } | undefined
+      if (bk?.ten_pack_id) {
+        const clamped = Math.max(0, Math.min(body.pack_used, 10))
+        db.prepare('UPDATE ten_packs SET sessions_used = ? WHERE id = ?').run(clamped, bk.ten_pack_id)
+      }
       return NextResponse.json({ success: true })
     }
 

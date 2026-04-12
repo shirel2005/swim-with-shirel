@@ -90,7 +90,12 @@ export async function GET(request: NextRequest) {
     }
 
     const bookings = db
-      .prepare('SELECT * FROM bookings ORDER BY created_at DESC')
+      .prepare(`
+        SELECT b.*, tp.sessions_used as tp_sessions_used, tp.total_sessions as tp_total_sessions
+        FROM bookings b
+        LEFT JOIN ten_packs tp ON b.ten_pack_id = tp.id
+        ORDER BY b.created_at DESC
+      `)
       .all()
 
     return NextResponse.json(bookings)

@@ -67,8 +67,10 @@ export interface Booking {
   lesson_format: 'private' | 'semi-private' | null
   booking_type: 'one-time' | 'weekly' | '10pack' | null
   pack_total: number         // 10 for 10-packs, 0 otherwise
-  pack_used: number          // sessions used from pack
+  pack_used: number          // sessions used from pack (manual override)
   ten_pack_id: number | null
+  tp_sessions_used?: number  // from LEFT JOIN ten_packs (auto-tracked)
+  tp_total_sessions?: number // from LEFT JOIN ten_packs
   is_weekly_request: number
   recurring_day: string | null
   recurring_time: string | null
