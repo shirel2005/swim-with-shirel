@@ -60,6 +60,20 @@ export function getDb(): Database.Database {
       end_time TEXT NOT NULL,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS ten_packs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      parent_name TEXT NOT NULL,
+      parent_email TEXT NOT NULL,
+      parent_phone TEXT NOT NULL,
+      children TEXT NOT NULL DEFAULT '[]',
+      lesson_type TEXT NOT NULL,
+      lesson_format TEXT NOT NULL DEFAULT 'private',
+      total_sessions INTEGER NOT NULL DEFAULT 10,
+      sessions_used INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `)
 
   // Add new columns if they don't exist (SQLite doesn't support IF NOT EXISTS for columns)
@@ -78,6 +92,7 @@ export function getDb(): Database.Database {
     `ALTER TABLE bookings ADD COLUMN booking_type TEXT DEFAULT 'one-time'`,
     `ALTER TABLE bookings ADD COLUMN pack_total INTEGER DEFAULT 0`,
     `ALTER TABLE bookings ADD COLUMN pack_used INTEGER DEFAULT 0`,
+    `ALTER TABLE bookings ADD COLUMN ten_pack_id INTEGER`,
   ]
   for (const sql of alterCols) {
     try { db.exec(sql) } catch {}

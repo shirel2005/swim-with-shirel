@@ -273,6 +273,11 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                         <Package size={11} />{booking.pack_used || 0}/{booking.pack_total || 10} sessions used
                       </span>
                     )}
+                    {isPack && booking.ten_pack_id && (
+                      <span className="text-xs text-purple-600 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-full">
+                        Pack #{booking.ten_pack_id}
+                      </span>
+                    )}
                     {isWeekly && booking.recurring_day && (
                       <span className="flex items-center gap-1">
                         <Repeat size={11} />{booking.recurring_day}s at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}

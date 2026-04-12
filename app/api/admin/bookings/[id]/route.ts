@@ -18,22 +18,18 @@ export async function PATCH(
 
   try {
     const id = parseInt(params.id, 10)
-    if (isNaN(id)) {
-      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
-    }
+    if (isNaN(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
 
     const body = await request.json()
-
     const db = getDb()
 
-    // Handle pack_used update independently
+    // Handle pack_used manual override independently
     if (typeof body.pack_used === 'number') {
       db.prepare('UPDATE bookings SET pack_used = ? WHERE id = ?').run(body.pack_used, id)
       return NextResponse.json({ success: true })
     }
 
     const { status } = body
-
     if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
@@ -42,11 +38,15 @@ export async function PATCH(
       | {
           slot_ids: string
           booked_slots: string
+          session_assignments: string
           status: string
           parent_name: string
           parent_email: string
           lesson_format: string | null
           lesson_type: string | null
+          booking_type: string | null
+          ten_pack_id: number | null
+          total_price: number
           children: string
           is_weekly_request: number
           recurring_day: string | null
@@ -54,15 +54,35 @@ export async function PATCH(
         }
       | undefined
 
-    if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
-    }
+    if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
     const previousStatus = booking.status
 
     db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id)
 
-    // Send confirmation email — fully isolated, never crashes the app
+    // Auto-track 10-pack sessions on confirm/cancel
+    try {
+      if (booking.booking_type === '10pack' && booking.ten_pack_id) {
+        const packId = booking.ten_pack_id
+        const pack = db.prepare('SELECT sessions_used, total_sessions FROM ten_packs WHERE id = ?').get(packId) as
+          { sessions_used: number; total_sessions: number } | undefined
+
+        if (pack) {
+          if (status === 'confirmed' && previousStatus !== 'confirmed') {
+            const newUsed = Math.min(pack.sessions_used + 1, pack.total_sessions)
+            const newStatus = newUsed >= pack.total_sessions ? 'completed' : 'active'
+            db.prepare('UPDATE ten_packs SET sessions_used = ?, status = ? WHERE id = ?').run(newUsed, newStatus, packId)
+          } else if (previousStatus === 'confirmed' && status !== 'confirmed') {
+            const newUsed = Math.max(pack.sessions_used - 1, 0)
+            db.prepare('UPDATE ten_packs SET sessions_used = ?, status = ? WHERE id = ?').run(newUsed, 'active', packId)
+          }
+        }
+      }
+    } catch (packErr) {
+      console.error('[10-pack] Failed to update ten_pack sessions:', packErr)
+    }
+
+    // Send confirmation email — isolated, never crashes the app
     if (status === 'confirmed' && previousStatus !== 'confirmed') {
       setImmediate(async () => {
         try {
@@ -76,7 +96,6 @@ export async function PATCH(
                 duration: s.duration,
               }))
             } else {
-              // Legacy: try to look up from old availability table
               const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
               if (slotIds.length > 0) {
                 try {
@@ -89,7 +108,7 @@ export async function PATCH(
             }
           } catch {}
 
-          let childrenParsed: Array<{ name: string }> = []
+          let childrenParsed: Array<{ name: string; age?: string; experience?: string }> = []
           try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
           const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
 
@@ -98,8 +117,10 @@ export async function PATCH(
             parentEmail: booking.parent_email,
             lessonFormat: booking.lesson_format || 'private',
             lessonType: booking.lesson_type || undefined,
+            bookingType: (booking.booking_type || 'one-time') as 'one-time' | 'weekly' | '10pack',
             children: childNames,
             slots,
+            totalPrice: booking.total_price,
             isWeeklyRequest: booking.is_weekly_request === 1,
             recurringDay: booking.recurring_day,
             recurringTime: booking.recurring_time,
@@ -127,17 +148,12 @@ export async function DELETE(
 
   try {
     const id = parseInt(params.id, 10)
-    if (isNaN(id)) {
-      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
-    }
+    if (isNaN(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
 
     const db = getDb()
-
     const result = db.prepare('DELETE FROM bookings WHERE id = ?').run(id)
 
-    if (result.changes === 0) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
-    }
+    if (result.changes === 0) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
     return NextResponse.json({ success: true })
   } catch (error) {

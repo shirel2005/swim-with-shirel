@@ -162,6 +162,8 @@ export default function BookingForm() {
 
   // Step 3 — Lesson config
   const [bookingType, setBookingType] = useState<'one-time' | 'weekly' | '10pack'>('one-time')
+  const [existingTenPacks, setExistingTenPacks] = useState<Array<{ id: number; lesson_type: string; lesson_format: string; sessions_used: number; total_sessions: number }>>([])
+  const [selectedTenPackId, setSelectedTenPackId] = useState<number | null>(null)
   const [lessonType, setLessonTypeState] = useState('30min')
   const [lessonFormat, setLessonFormat] = useState<'private' | 'semi-private'>('private')
   const [semiPairName, setSemiPairName] = useState('')
@@ -219,6 +221,18 @@ export default function BookingForm() {
     setChildren(savedClient.children.map((c, i) => ({ ...c, id: `c${i}_${Date.now()}` })))
     setQuickFilled(true)
   }
+
+  useEffect(() => {
+    if (bookingType !== '10pack' || !parent.email.includes('@')) { setExistingTenPacks([]); return }
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/ten-packs/lookup?email=${encodeURIComponent(parent.email)}`)
+        const data = await res.json()
+        setExistingTenPacks(data.packs || [])
+      } catch { setExistingTenPacks([]) }
+    }, 500)
+    return () => clearTimeout(t)
+  }, [parent.email, bookingType])
 
   const setLessonType = (lt: string) => {
     setLessonTypeState(lt)
@@ -360,6 +374,7 @@ export default function BookingForm() {
         session_assignments: buildAssignments(),
         notes: notes.trim() || null,
         slot_ids: [],
+        ten_pack_id: selectedTenPackId || undefined,
         is_weekly_request: isWeekly ? 1 : 0,
         recurring: isWeekly ? {
           day: weeklyDay,
@@ -653,6 +668,29 @@ export default function BookingForm() {
               ))}
             </div>
           </div>
+
+          {/* Existing 10-pack lookup */}
+          {bookingType === '10pack' && existingTenPacks.length > 0 && (
+            <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4">
+              <p className="text-sm font-bold text-purple-900 mb-3">Existing 10-Pack Found</p>
+              {existingTenPacks.map(pack => (
+                <label key={pack.id}
+                  className={`flex items-center justify-between cursor-pointer rounded-xl border px-4 py-3 mb-2 transition-all ${selectedTenPackId === pack.id ? 'border-purple-500 bg-purple-100' : 'border-purple-200 bg-white hover:border-purple-400'}`}
+                >
+                  <div>
+                    <p className="font-semibold text-slate-800 text-sm">{pack.lesson_type} · {pack.lesson_format}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{pack.sessions_used} of {pack.total_sessions} sessions used · {pack.total_sessions - pack.sessions_used} remaining</p>
+                  </div>
+                  <input type="radio" name="ten_pack_select" checked={selectedTenPackId === pack.id}
+                    onChange={() => setSelectedTenPackId(pack.id)} className="accent-purple-600" />
+                </label>
+              ))}
+              <button type="button" onClick={() => setSelectedTenPackId(null)}
+                className="text-xs text-slate-400 hover:text-slate-600 transition-colors mt-1">
+                + Use a new 10-pack instead
+              </button>
+            </div>
+          )}
 
           {/* Lesson duration */}
           <div className={card}>

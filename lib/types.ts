@@ -68,6 +68,7 @@ export interface Booking {
   booking_type: 'one-time' | 'weekly' | '10pack' | null
   pack_total: number         // 10 for 10-packs, 0 otherwise
   pack_used: number          // sessions used from pack
+  ten_pack_id: number | null
   is_weekly_request: number
   recurring_day: string | null
   recurring_time: string | null
@@ -75,6 +76,20 @@ export interface Booking {
   recurring_end_date: string | null
   recurring_weeks: string | null
   recurring_frequency: string | null
+}
+
+export interface TenPack {
+  id: number
+  parent_name: string
+  parent_email: string
+  parent_phone: string
+  children: string      // JSON
+  lesson_type: string
+  lesson_format: string
+  total_sessions: number
+  sessions_used: number
+  status: 'active' | 'completed' | 'cancelled'
+  created_at: string
 }
 
 export interface Review {
