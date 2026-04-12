@@ -5,7 +5,6 @@ import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
 import PricingSection from '@/components/PricingSection'
 import ReviewsSection from '@/components/ReviewsSection'
-import ReviewForm from '@/components/ReviewForm'
 import PoliciesSection from '@/components/PoliciesSection'
 import { Review } from '@/lib/types'
 import { Mail, Phone, Check } from 'lucide-react'
@@ -135,18 +134,6 @@ export default function HomePage() {
         </div>
       </section>
       <ReviewsSection reviews={reviews} />
-
-      {/* Share your experience */}
-      <section className="bg-white py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-          <div className="max-w-2xl">
-            <p className="section-label">Your turn</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Share Your Experience</h2>
-            <p className="text-slate-500 mb-10">Had a great lesson? We&apos;d love to hear about it.</p>
-            <ReviewForm />
-          </div>
-        </div>
-      </section>
 
       <PoliciesSection />
 
