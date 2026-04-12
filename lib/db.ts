@@ -74,6 +74,10 @@ export function getDb(): Database.Database {
     `ALTER TABLE bookings ADD COLUMN recurring_frequency TEXT`,
     `ALTER TABLE bookings ADD COLUMN lesson_format TEXT DEFAULT 'private'`,
     `ALTER TABLE bookings ADD COLUMN booked_slots TEXT DEFAULT '[]'`,
+    `ALTER TABLE bookings ADD COLUMN session_assignments TEXT DEFAULT '[]'`,
+    `ALTER TABLE bookings ADD COLUMN booking_type TEXT DEFAULT 'one-time'`,
+    `ALTER TABLE bookings ADD COLUMN pack_total INTEGER DEFAULT 0`,
+    `ALTER TABLE bookings ADD COLUMN pack_used INTEGER DEFAULT 0`,
   ]
   for (const sql of alterCols) {
     try { db.exec(sql) } catch {}

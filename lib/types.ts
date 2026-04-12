@@ -23,33 +23,31 @@ export interface AvailabilitySlot {
   created_at: string
 }
 
+// Updated Child — experience replaces skill_level, age is required
 export interface Child {
+  id: string           // temp client-side ID
   name: string
-  age: string
-  skill_level: string
+  age: string          // REQUIRED
+  experience: string   // REQUIRED: 'beginner' | 'some-comfort' | 'basic-skills' | 'independent' | 'advanced'
   notes: string
+}
+
+// Assignment of a session to specific children
+export interface SessionAssignment {
+  window_id: number
+  date: string
+  start_time: string
+  duration: 30 | 45
+  assigned_children: string[]  // child names
 }
 
 export interface RecurringRequest {
-  day: string         // e.g. "Monday"
-  time: string        // e.g. "09:00"
-  start_date: string  // YYYY-MM-DD
-  end_date: string    // YYYY-MM-DD (optional, can be empty)
-  weeks: string       // number of weeks (optional, can be empty)
+  day: 'Sunday' | 'Monday'     // RESTRICTED to Sun/Mon only
+  time: string
+  start_date: string
+  end_date: string
+  weeks: string
   frequency: 'weekly' | 'biweekly'
-}
-
-export interface BookingFormData {
-  parent_name: string
-  parent_email: string
-  parent_phone: string
-  children: Child[]
-  slot_ids: number[]
-  lesson_type: string
-  lesson_format: 'private' | 'semi-private'
-  is_weekly_request: boolean
-  recurring?: RecurringRequest
-  notes: string
 }
 
 export interface Booking {
@@ -57,22 +55,26 @@ export interface Booking {
   parent_name: string
   parent_email: string
   parent_phone: string
-  children: string     // JSON string array
-  slot_ids: string     // JSON number array
-  booked_slots: string // JSON array of {window_id, date, start_time, duration}
+  children: string           // JSON
+  slot_ids: string           // JSON (legacy)
+  booked_slots: string       // JSON array of {window_id, date, start_time, duration}
+  session_assignments: string // JSON array of SessionAssignment
   total_price: number
   status: 'pending' | 'confirmed' | 'cancelled'
   notes: string | null
   created_at: string
   lesson_type: string | null
-  is_weekly_request: number   // 0 or 1
+  lesson_format: 'private' | 'semi-private' | null
+  booking_type: 'one-time' | 'weekly' | '10pack' | null
+  pack_total: number         // 10 for 10-packs, 0 otherwise
+  pack_used: number          // sessions used from pack
+  is_weekly_request: number
   recurring_day: string | null
   recurring_time: string | null
   recurring_start_date: string | null
   recurring_end_date: string | null
   recurring_weeks: string | null
   recurring_frequency: string | null
-  lesson_format: 'private' | 'semi-private' | null
 }
 
 export interface Review {

@@ -5,10 +5,11 @@ import AdminLogin from '@/components/admin/AdminLogin'
 import BookingsManager from '@/components/admin/BookingsManager'
 import ReviewsManager from '@/components/admin/ReviewsManager'
 import AvailabilityManager from '@/components/admin/AvailabilityManager'
-import { LogOut, Calendar, BookOpen, Star, Mail, Phone, DollarSign, Clock, Users } from 'lucide-react'
+import ScheduleView from '@/components/admin/ScheduleView'
+import { LogOut, Calendar, BookOpen, Star, Mail, Phone, DollarSign, Clock, Users, CalendarDays } from 'lucide-react'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from '@/lib/contact'
 
-type Tab = 'bookings' | 'reviews' | 'availability'
+type Tab = 'bookings' | 'reviews' | 'availability' | 'schedule'
 
 interface EarningsStats {
   confirmed_earnings: number
@@ -58,6 +59,7 @@ export default function AdminPage() {
     { key: 'bookings', label: 'Bookings', icon: <BookOpen size={16} /> },
     { key: 'reviews', label: 'Reviews', icon: <Star size={16} /> },
     { key: 'availability', label: 'Availability', icon: <Calendar size={16} /> },
+    { key: 'schedule', label: 'Schedule', icon: <CalendarDays size={16} /> },
   ]
 
   return (
@@ -166,6 +168,7 @@ export default function AdminPage() {
         {activeTab === 'bookings' && <BookingsManager adminPassword={adminPassword} />}
         {activeTab === 'reviews' && <ReviewsManager adminPassword={adminPassword} />}
         {activeTab === 'availability' && <AvailabilityManager adminPassword={adminPassword} />}
+        {activeTab === 'schedule' && <ScheduleView adminPassword={adminPassword} />}
       </div>
     </div>
   )

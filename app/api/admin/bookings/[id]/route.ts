@@ -23,13 +23,20 @@ export async function PATCH(
     }
 
     const body = await request.json()
+
+    const db = getDb()
+
+    // Handle pack_used update independently
+    if (typeof body.pack_used === 'number') {
+      db.prepare('UPDATE bookings SET pack_used = ? WHERE id = ?').run(body.pack_used, id)
+      return NextResponse.json({ success: true })
+    }
+
     const { status } = body
 
     if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
-
-    const db = getDb()
 
     const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(id) as
       | {
