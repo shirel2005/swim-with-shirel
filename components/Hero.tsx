@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 
 export default function Hero() {
   return (
@@ -35,8 +34,8 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-16 w-full flex flex-col sm:flex-row items-center justify-between gap-10 lg:gap-12">
-        <div className="max-w-2xl flex-shrink-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-20 w-full">
+        <div className="max-w-3xl">
 
           {/* Location badge */}
           <div className="inline-flex items-center gap-2 bg-sky-400/20 backdrop-blur-sm border border-sky-400/30 text-sky-200 text-xs font-semibold px-4 py-2 rounded-full mb-8 tracking-widest uppercase">
@@ -92,27 +91,6 @@ export default function Hero() {
 
         </div>
 
-        {/* Shirel in pool — smaller on mobile, full size on desktop */}
-        <div className="flex-shrink-0 relative mx-auto lg:mx-0 w-44 sm:w-56 lg:w-72 xl:w-80">
-          {/* Soft glow behind the photo */}
-          <div className="absolute -inset-4 rounded-3xl bg-sky-300/20 blur-2xl" />
-          <div
-            className="relative w-full rounded-3xl overflow-hidden border border-white/25"
-            style={{ aspectRatio: '3/4', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}
-          >
-            <Image
-              src="/shirel-in-pool.jpg"
-              alt="Shirel teaching in the pool"
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 640px) 176px, (max-width: 1024px) 224px, (max-width: 1280px) 288px, 320px"
-              priority
-              quality={90}
-            />
-            {/* Subtle dark-to-transparent gradient overlay to blend with hero */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
-          </div>
-        </div>
 
       </div>
     </section>
