@@ -56,7 +56,7 @@ const LESSON_TYPE_OPTIONS = [
   { value: '30min',        label: '30-Minute Lesson',  duration: 30 as const, pack: false, hint: 'Great for young beginners',      pvtSession: 50,  semiSession: 100, pvtPack: 0,   semiPack: 0    },
   { value: '45min',        label: '45-Minute Lesson',  duration: 45 as const, pack: false, hint: 'More depth and real progress',   pvtSession: 75,  semiSession: 150, pvtPack: 0,   semiPack: 0    },
   { value: '10pack-30min', label: '10-Pack · 30 min',  duration: 30 as const, pack: true,  hint: 'Best value — save $50',          pvtSession: 50,  semiSession: 100, pvtPack: 450, semiPack: 900  },
-  { value: '10pack-45min', label: '10-Pack · 45 min',  duration: 45 as const, pack: true,  hint: 'Best value — save $150',         pvtSession: 75,  semiSession: 150, pvtPack: 650, semiPack: 1200 },
+  { value: '10pack-45min', label: '10-Pack · 45 min',  duration: 45 as const, pack: true,  hint: 'Best value — save $100',         pvtSession: 75,  semiSession: 150, pvtPack: 650, semiPack: 1200 },
 ]
 
 const STEPS = [
