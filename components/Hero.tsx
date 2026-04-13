@@ -93,17 +93,24 @@ export default function Hero() {
         </div>
 
         {/* Shirel in pool — smaller on mobile, full size on desktop */}
-        <div className="flex-shrink-0 relative mx-auto lg:mx-0 w-40 sm:w-52 lg:w-72 xl:w-80">
-          <div className="absolute -inset-3 rounded-3xl bg-sky-400/15 blur-xl" />
-          <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-white/20" style={{ aspectRatio: '3/4' }}>
+        <div className="flex-shrink-0 relative mx-auto lg:mx-0 w-44 sm:w-56 lg:w-72 xl:w-80">
+          {/* Soft glow behind the photo */}
+          <div className="absolute -inset-4 rounded-3xl bg-sky-300/20 blur-2xl" />
+          <div
+            className="relative w-full rounded-3xl overflow-hidden border border-white/25"
+            style={{ aspectRatio: '3/4', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}
+          >
             <Image
               src="/shirel-in-pool.jpg"
               alt="Shirel teaching in the pool"
               fill
-              className="object-cover object-center"
-              sizes="(max-width: 640px) 160px, (max-width: 1024px) 208px, (max-width: 1280px) 288px, 320px"
+              className="object-cover object-top"
+              sizes="(max-width: 640px) 176px, (max-width: 1024px) 224px, (max-width: 1280px) 288px, 320px"
               priority
+              quality={90}
             />
+            {/* Subtle dark-to-transparent gradient overlay to blend with hero */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
           </div>
         </div>
 
