@@ -44,8 +44,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Please select at least one session or submit a weekly request' }, { status: 400 })
     }
 
-    if (isWeeklyReq && recurring?.day && !['Sunday', 'Monday'].includes(recurring.day)) {
-      return NextResponse.json({ error: 'Weekly lessons are only available on Sundays and Mondays' }, { status: 400 })
+    if (isWeeklyReq && recurring?.days && Array.isArray(recurring.days)) {
+      const allowedDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+      const invalidDays = recurring.days.filter((d: string) => !allowedDays.includes(d))
+      if (invalidDays.length > 0) {
+        return NextResponse.json({ error: 'Weekly lessons are only available Sunday through Friday' }, { status: 400 })
+      }
     }
 
     const isPack = booking_type === '10pack'
@@ -89,7 +93,7 @@ export async function POST(request: NextRequest) {
         isPack ? 10 : (pack_total || 0),
         0,
         isWeeklyReq ? 1 : 0,
-        rec.day || null,
+        rec.days ? JSON.stringify(rec.days) : null,
         rec.time || null,
         rec.start_date || null,
         rec.end_date || null,

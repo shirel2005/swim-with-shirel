@@ -168,7 +168,7 @@ export default function BookingForm() {
   const [lessonFormat, setLessonFormat] = useState<'private' | 'semi-private'>('private')
   const [semiPairName, setSemiPairName] = useState('')
   // Weekly request
-  const [weeklyDay, setWeeklyDay] = useState<'Sunday' | 'Monday'>('Monday')
+  const [weeklyDays, setWeeklyDays] = useState<string[]>([])
   const [weeklyTime, setWeeklyTime] = useState('15:00')
   const [weeklyStart, setWeeklyStart] = useState('')
   const [weeklyDurType, setWeeklyDurType] = useState<'weeks' | 'end_date'>('weeks')
@@ -299,6 +299,7 @@ export default function BookingForm() {
     }
 
     if (s === 3 && isWeekly) {
+      if (weeklyDays.length === 0) errs.weekly_day = 'Please select at least one preferred day'
       if (!weeklyStart) errs.weekly_start = 'Start date is required'
       if (weeklyDurType === 'weeks' && !weeklyWeeks) errs.weekly_duration = 'Number of weeks is required'
       if (weeklyDurType === 'end_date' && !weeklyEndDate) errs.weekly_duration = 'End date is required'
@@ -377,7 +378,7 @@ export default function BookingForm() {
         ten_pack_id: selectedTenPackId || undefined,
         is_weekly_request: isWeekly ? 1 : 0,
         recurring: isWeekly ? {
-          day: weeklyDay,
+          days: weeklyDays,
           time: weeklyTime,
           start_date: weeklyStart,
           end_date: weeklyDurType === 'end_date' ? weeklyEndDate : '',
@@ -644,7 +645,7 @@ export default function BookingForm() {
             <div className="space-y-3">
               {[
                 { value: 'one-time' as const, label: 'One-time lesson', desc: 'Book a specific date and time', icon: <Check size={15} /> },
-                { value: 'weekly' as const,   label: 'Weekly recurring request', desc: 'Request a regular weekly slot — Sundays or Mondays only', icon: <Repeat size={15} /> },
+                { value: 'weekly' as const,   label: 'Weekly recurring request', desc: 'Request a regular weekly slot — Sun–Fri', icon: <Repeat size={15} /> },
                 { value: '10pack' as const,   label: 'Using a 10-pack', desc: 'Already purchased — book your next session(s)', icon: <Package size={15} /> },
               ].map(opt => (
                 <button key={opt.value} type="button" onClick={() => onBookingTypeChange(opt.value)}
@@ -783,17 +784,27 @@ export default function BookingForm() {
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-2">Preferred Day</label>
-                  <div className="flex gap-3">
-                    {(['Sunday', 'Monday'] as const).map(day => (
-                      <button key={day} type="button" onClick={() => setWeeklyDay(day)}
-                        className={`flex-1 py-3 rounded-xl border-2 text-sm font-bold transition-all ${
-                          weeklyDay === day ? 'border-sky-700 bg-sky-700 text-white' : 'border-sky-100 text-slate-700 hover:border-sky-300'
-                        }`}
-                      >{day}</button>
-                    ))}
+                  <label className="block text-xs font-semibold text-slate-500 mb-2">Preferred Day(s)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
+                      const selected = weeklyDays.includes(day)
+                      return (
+                        <button key={day} type="button"
+                          onClick={() => setWeeklyDays(prev =>
+                            selected ? prev.filter(d => d !== day) : [...prev, day]
+                          )}
+                          className={`px-4 py-2 rounded-full border-2 text-sm font-bold transition-all ${
+                            selected
+                              ? 'border-sky-700 bg-sky-700 text-white'
+                              : 'border-sky-700 bg-white text-sky-700 hover:bg-sky-50'
+                          }`}
+                        >{day}</button>
+                      )
+                    })}
                   </div>
-                  <p className="text-xs text-slate-400 mt-1.5">Weekly lessons are available on Sundays and Mondays only.</p>
+                  {errors.weekly_day && (
+                    <p className="text-xs text-red-500 mt-1.5">{errors.weekly_day}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5">Preferred Time</label>
@@ -872,7 +883,7 @@ export default function BookingForm() {
 
           {isWeekly ? (
             <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-slate-500">Day</span><span className="font-semibold text-slate-800">{weeklyDay}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Day(s)</span><span className="font-semibold text-slate-800">{weeklyDays.join(', ') || '—'}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Time</span><span className="font-semibold text-slate-800">{formatTime(weeklyTime)}</span></div>
               {weeklyStart && <div className="flex justify-between"><span className="text-slate-500">Starting</span><span className="font-semibold text-slate-800">{weeklyStart}</span></div>}
               <div className="flex justify-between"><span className="text-slate-500">Frequency</span><span className="font-semibold text-slate-800">{weeklyFreq === 'biweekly' ? 'Every 2 weeks' : 'Weekly'}</span></div>
@@ -1025,7 +1036,7 @@ export default function BookingForm() {
               {isWeekly && (
                 <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4">
                   <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Weekly Request</p>
-                  <p className="font-semibold text-slate-800 text-sm">{weeklyDay}s at {formatTime(weeklyTime)}</p>
+                  <p className="font-semibold text-slate-800 text-sm">Preferred Days: {weeklyDays.join(', ')} at {formatTime(weeklyTime)}</p>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Starting {weeklyStart}
                     {weeklyDurType === 'weeks' && weeklyWeeks && ` · ${weeklyWeeks} weeks`}

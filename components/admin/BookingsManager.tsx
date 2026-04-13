@@ -280,7 +280,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                     )}
                     {isWeekly && booking.recurring_day && (
                       <span className="flex items-center gap-1">
-                        <Repeat size={11} />{booking.recurring_day}s at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}
+                        <Repeat size={11} />{(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()} at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}
                       </span>
                     )}
                   </div>
@@ -357,7 +357,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                       <div>
                         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Weekly Request</p>
                         <div className="bg-white rounded-xl border border-sky-100 p-3 space-y-1.5 text-sm">
-                          {booking.recurring_day && <div className="flex gap-3"><span className="text-slate-400 w-20">Day</span><span className="font-semibold text-slate-800">{booking.recurring_day}</span></div>}
+                          {booking.recurring_day && <div className="flex gap-3"><span className="text-slate-400 w-20">Day(s)</span><span className="font-semibold text-slate-800">{(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()}</span></div>}
                           {booking.recurring_time && <div className="flex gap-3"><span className="text-slate-400 w-20">Time</span><span className="font-semibold text-slate-800">{formatTime(booking.recurring_time)}</span></div>}
                           {booking.recurring_start_date && <div className="flex gap-3"><span className="text-slate-400 w-20">Starts</span><span className="font-semibold text-slate-800">{booking.recurring_start_date}</span></div>}
                           {booking.recurring_end_date && <div className="flex gap-3"><span className="text-slate-400 w-20">Ends</span><span className="font-semibold text-slate-800">{booking.recurring_end_date}</span></div>}
