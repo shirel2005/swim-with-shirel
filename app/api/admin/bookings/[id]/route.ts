@@ -116,7 +116,9 @@ export async function PATCH(
 
           let childrenParsed: Array<{ name: string; age?: string; experience?: string }> = []
           try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
-          const childNames = childrenParsed.map((c) => c.name).filter(Boolean)
+          const childInfoList = childrenParsed
+            .filter((c) => c?.name?.trim())
+            .map((c) => ({ name: c.name, age: c.age, experience: c.experience }))
 
           await sendBookingConfirmation({
             parentName: booking.parent_name,
@@ -124,7 +126,7 @@ export async function PATCH(
             lessonFormat: booking.lesson_format || 'private',
             lessonType: booking.lesson_type || undefined,
             bookingType: (booking.booking_type || 'one-time') as 'one-time' | 'weekly' | '10pack',
-            children: childNames,
+            children: childInfoList,
             slots,
             totalPrice: booking.total_price,
             isWeeklyRequest: booking.is_weekly_request === 1,
