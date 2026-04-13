@@ -35,7 +35,7 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-20 w-full flex items-center justify-between gap-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-16 w-full flex flex-col sm:flex-row items-center justify-between gap-10 lg:gap-12">
         <div className="max-w-2xl flex-shrink-0">
 
           {/* Location badge */}
@@ -92,16 +92,16 @@ export default function Hero() {
 
         </div>
 
-        {/* Shirel in pool — visible on large screens only */}
-        <div className="hidden lg:block flex-shrink-0 relative">
+        {/* Shirel in pool — smaller on mobile, full size on desktop */}
+        <div className="flex-shrink-0 relative mx-auto lg:mx-0 w-40 sm:w-52 lg:w-72 xl:w-80">
           <div className="absolute -inset-3 rounded-3xl bg-sky-400/15 blur-xl" />
-          <div className="relative w-72 xl:w-80 rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-white/20" style={{ aspectRatio: '3/4' }}>
+          <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-white/20" style={{ aspectRatio: '3/4' }}>
             <Image
               src="/shirel-in-pool.jpg"
               alt="Shirel teaching in the pool"
               fill
               className="object-cover object-center"
-              sizes="(max-width: 1280px) 288px, 320px"
+              sizes="(max-width: 640px) 160px, (max-width: 1024px) 208px, (max-width: 1280px) 288px, 320px"
               priority
             />
           </div>
