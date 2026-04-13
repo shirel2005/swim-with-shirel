@@ -51,23 +51,42 @@ export default function HomePage() {
       <section className="bg-white py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            {/* Photo */}
-            <div className="relative flex-shrink-0 self-start mx-auto lg:mx-0">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-200 via-sky-100 to-white opacity-70 blur-sm" />
-              <div className="relative w-64 sm:w-72 lg:w-80" style={{ aspectRatio: '3/4' }}>
-                <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-sky-200/60">
-                  <Image
-                    src="/shirel.jpg"
-                    alt="Shirel – swim instructor"
-                    fill
-                    className="object-cover object-center"
-                    style={{ objectPosition: 'center 15%' }}
-                    sizes="(max-width: 640px) 256px, (max-width: 1024px) 288px, 320px"
-                    priority
-                  />
+            {/* Photos */}
+            <div className="relative flex-shrink-0 mx-auto lg:mx-0 flex gap-4 items-end">
+              {/* Portrait */}
+              <div className="relative">
+                <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-sky-200 via-sky-100 to-white opacity-70 blur-sm" />
+                <div className="relative w-44 sm:w-52" style={{ aspectRatio: '3/4' }}>
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-xl shadow-sky-200/50">
+                    <Image
+                      src="/shirel.jpg"
+                      alt="Shirel – swim instructor"
+                      fill
+                      className="object-cover object-center"
+                      style={{ objectPosition: 'center 15%' }}
+                      sizes="(max-width: 640px) 176px, 208px"
+                      priority
+                    />
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/90 backdrop-blur-sm text-sky-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border border-sky-100">
-                  Teaching since 2020
+              </div>
+              {/* In-pool action shot */}
+              <div className="relative">
+                <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-sky-100 to-white opacity-60 blur-sm" />
+                <div className="relative w-52 sm:w-64" style={{ aspectRatio: '4/5' }}>
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-xl shadow-sky-200/50">
+                    <Image
+                      src="/shirel-in-pool.jpg"
+                      alt="Shirel teaching in the pool"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 640px) 208px, 256px"
+                      priority
+                    />
+                  </div>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/90 backdrop-blur-sm text-sky-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border border-sky-100">
+                    Teaching since 2020
+                  </div>
                 </div>
               </div>
             </div>
