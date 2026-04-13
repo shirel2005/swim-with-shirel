@@ -17,7 +17,7 @@ async function getAccessToken(): Promise<string> {
   return data.access_token
 }
 
-// RFC 2047 Base64 encoding for email subject — required for emojis & non-ASCII
+// RFC 2047 Base64 encoding — required for emojis & non-ASCII in email subject headers
 function encodeSubject(text: string): string {
   return `=?UTF-8?B?${Buffer.from(text, 'utf-8').toString('base64')}?=`
 }
@@ -55,6 +55,38 @@ export interface ChildInfo {
   age?: string
   experience?: string
 }
+
+// ─── Website design tokens (exact Tailwind values) ───────────────────────────
+// Fonts: Playfair Display is the site font — Georgia is the closest email-safe serif
+const serif    = `'Playfair Display', Georgia, 'Times New Roman', serif`
+const sans     = `Arial, -apple-system, Helvetica, sans-serif`
+
+// Colors from tailwind.config + globals.css
+const sky700   = '#0369a1'   // primary blue — btn-primary, section headings
+const sky600   = '#0284c7'   // section-label color
+const sky100   = '#e0f2fe'   // card border
+const sky50    = '#f0f9ff'   // card/highlight background
+const slate900 = '#0f172a'   // body text dark
+const slate600 = '#475569'   // body text mid
+const slate500 = '#64748b'   // body text lighter
+const slate400 = '#94a3b8'   // muted text
+const slate200 = '#e2e8f0'   // divider
+const slate50  = '#f8fafc'   // page / outer background
+
+// ─── Section label — matches .section-label in globals.css ───────────────────
+const sectionLabel = (text: string) =>
+  `<p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${sky600};font-weight:600;font-family:${sans};">${text}</p>`
+
+// ─── Card wrapper — matches .card (rounded-2xl border border-sky-100 shadow-sm) ─
+const cardOpen  = `<div style="background:#ffffff;border:1px solid ${sky100};border-radius:16px;padding:20px 24px;margin-bottom:20px;">`
+const cardClose = `</div>`
+
+// ─── Detail row ───────────────────────────────────────────────────────────────
+const detailRow = (label: string, value: string) => `
+  <tr>
+    <td style="padding:8px 0;border-bottom:1px solid ${slate200};color:${slate400};font-size:13px;font-family:${sans};width:108px;vertical-align:top;">${label}</td>
+    <td style="padding:8px 0;border-bottom:1px solid ${slate200};color:${slate900};font-size:13px;font-family:${sans};font-weight:600;vertical-align:top;">${value}</td>
+  </tr>`
 
 export async function sendBookingConfirmation({
   parentName,
@@ -98,164 +130,133 @@ export async function sendBookingConfirmation({
   )
 
   // Labels
-  const formatLabel = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const formatLabel    = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const durationLabel  = lessonType?.includes('45') ? '45-Minute Lesson' : '30-Minute Lesson'
+  const bookingLabel   = bookingType === '10pack' ? '10-Pack' : bookingType === 'weekly' ? 'Weekly Recurring' : 'One-Time'
+  const priceLabel     = bookingType === '10pack' ? 'Package Total' : slots.length > 1 ? `Total (${slots.length} sessions)` : 'Session Price'
 
-  const durationLabel = lessonType?.includes('45') ? '45-Minute Lesson' : '30-Minute Lesson'
+  // ── Price card ─────────────────────────────────────────────────────────────
+  // Matches the sky-50 / sky-100 highlighted sections on the website
+  const priceCard = (totalPrice !== undefined && totalPrice > 0) ? `
+    ${cardOpen}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="font-size:13px;color:${slate500};font-family:${sans};">${priceLabel}</td>
+          <td align="right" style="font-size:26px;font-weight:700;color:${sky700};font-family:${serif};letter-spacing:-0.02em;">$${totalPrice}</td>
+        </tr>
+      </table>
+    ${cardClose}` : ''
 
-  const bookingTypeLabel =
-    bookingType === '10pack' ? '10-Pack' :
-    bookingType === 'weekly' ? 'Weekly Recurring' :
-    'One-Time'
-
-  const priceLabel =
-    bookingType === '10pack' ? 'Package Total' :
-    slots.length > 1 ? `Total (${slots.length} sessions)` :
-    'Session Price'
-
-  // ── Shared style tokens ────────────────────────────────────────────────────
-  const blue = '#2e6fa3'
-  const blueMid = '#e8f2fb'
-  const blueLight = '#f0f7ff'
-  const textDark = '#1a2332'
-  const textMid = '#4a5568'
-  const textLight = '#718096'
-  const divider = '#e8edf2'
-
-  // ── Row helper for detail table ────────────────────────────────────────────
-  const row = (label: string, value: string) => `
-    <tr>
-      <td style="padding:9px 0;border-bottom:1px solid ${divider};color:${textLight};font-size:13px;font-family:Arial,sans-serif;width:110px;vertical-align:top;">${label}</td>
-      <td style="padding:9px 0;border-bottom:1px solid ${divider};color:${textDark};font-size:13px;font-family:Arial,sans-serif;font-weight:600;vertical-align:top;">${value}</td>
-    </tr>`
-
-  // ── Lesson detail rows ─────────────────────────────────────────────────────
-  const lessonRows = [
-    lessonType ? row('Duration', durationLabel) : '',
-    row('Format', formatLabel),
-    row('Booking', bookingTypeLabel),
-  ].join('')
-
-  // ── Price highlight ────────────────────────────────────────────────────────
-  const priceSection = (totalPrice !== undefined && totalPrice > 0) ? `
-    <div style="background:${blueLight};border:1px solid ${blueMid};border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:13px;color:${textMid};font-family:Arial,sans-serif;">${priceLabel}</span>
-      <span style="font-size:22px;font-weight:700;color:${blue};font-family:Arial,sans-serif;">$${totalPrice}</span>
-    </div>` : ''
-
-  // ── Children section ───────────────────────────────────────────────────────
-  const childrenSection = childList.length > 0 ? `
-    <div style="margin-bottom:24px;">
-      <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${textLight};font-family:Arial,sans-serif;">
-        ${childList.length === 1 ? 'Swimmer' : 'Swimmers'}
-      </p>
-      ${childList.map(c => `
-        <div style="background:#fafbfc;border:1px solid ${divider};border-radius:8px;padding:12px 16px;margin-bottom:8px;">
-          <p style="margin:0 0 3px 0;font-size:14px;font-weight:700;color:${textDark};font-family:Arial,sans-serif;">${c.name}</p>
-          ${(c.age || c.experience) ? `
-            <p style="margin:0;font-size:12px;color:${textLight};font-family:Arial,sans-serif;">
-              ${[c.age ? `Age ${c.age}` : '', c.experience ? experienceLabel(c.experience) : ''].filter(Boolean).join(' · ')}
-            </p>` : ''}
-        </div>`).join('')}
-    </div>` : ''
-
-  // ── Sessions section ───────────────────────────────────────────────────────
-  let sessionsSection = ''
-  if (slots.length > 0) {
-    sessionsSection = `
-      <div style="margin-bottom:24px;">
-        <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${textLight};font-family:Arial,sans-serif;">
-          Confirmed Session${slots.length > 1 ? 's' : ''}
-        </p>
-        ${slots.map(s => `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:${blueLight};border:1px solid ${blueMid};border-radius:8px;padding:11px 16px;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:600;color:${textDark};font-family:Arial,sans-serif;">${formatDate(s.date)}</span>
-            <span style="font-size:13px;color:${blue};font-weight:600;font-family:Arial,sans-serif;white-space:nowrap;margin-left:12px;">${formatTime(s.time_slot)}&nbsp;<span style="color:${textLight};font-weight:400;">(${s.duration}&nbsp;min)</span></span>
-          </div>`).join('')}
-      </div>`
-  } else if (isWeeklyRequest && recurringDay && recurringTime) {
-    sessionsSection = `
-      <div style="margin-bottom:24px;">
-        <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${textLight};font-family:Arial,sans-serif;">Weekly Schedule</p>
-        <div style="background:${blueLight};border:1px solid ${blueMid};border-radius:8px;padding:12px 16px;">
-          <span style="font-size:13px;font-weight:600;color:${textDark};font-family:Arial,sans-serif;">Every ${recurringDay} at ${formatTime(recurringTime)}</span>
-        </div>
-      </div>`
-  }
+  // ── Lesson detail card ─────────────────────────────────────────────────────
+  const lessonCard = `
+    ${cardOpen}
+      ${sectionLabel('Lesson Details')}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${lessonType ? detailRow('Duration', durationLabel) : ''}
+        ${detailRow('Format', formatLabel)}
+        ${detailRow('Booking', bookingLabel)}
+      </table>
+    ${cardClose}`
 
   // ── 10-pack note ───────────────────────────────────────────────────────────
   const packNote = bookingType === '10pack' ? `
-    <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;padding:12px 16px;margin-bottom:24px;">
-      <p style="margin:0;font-size:13px;color:#6b21a8;font-family:Arial,sans-serif;line-height:1.6;">
-        <strong>10-Pack active.</strong> Your pack covers 10 lessons total. Book sessions one or two at a time — your remaining credits are always saved.
+    <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:14px 18px;margin-bottom:20px;">
+      <p style="margin:0;font-size:13px;color:#6b21a8;font-family:${sans};line-height:1.65;">
+        <strong>10-Pack active.</strong>&nbsp; Your pack covers 10 lessons. Book one or two sessions at a time — remaining credits are always saved.
       </p>
     </div>` : ''
+
+  // ── Children card ──────────────────────────────────────────────────────────
+  const childrenCard = childList.length > 0 ? `
+    ${cardOpen}
+      ${sectionLabel(childList.length === 1 ? 'Swimmer' : 'Swimmers')}
+      ${childList.map((c, i) => `
+        <div style="${i > 0 ? `border-top:1px solid ${slate200};padding-top:12px;margin-top:12px;` : ''}">
+          <p style="margin:0 0 2px 0;font-size:15px;font-weight:700;color:${slate900};font-family:${serif};">${c.name}</p>
+          ${(c.age || c.experience) ? `<p style="margin:0;font-size:12px;color:${slate500};font-family:${sans};">${[c.age ? `Age ${c.age}` : '', c.experience ? experienceLabel(c.experience) : ''].filter(Boolean).join(' &middot; ')}</p>` : ''}
+        </div>`).join('')}
+    ${cardClose}` : ''
+
+  // ── Sessions card ──────────────────────────────────────────────────────────
+  let sessionsCard = ''
+  if (slots.length > 0) {
+    sessionsCard = `
+      ${cardOpen}
+        ${sectionLabel(`Confirmed Session${slots.length > 1 ? 's' : ''}`)}
+        ${slots.map((s, i) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:${sky50};border:1px solid ${sky100};border-radius:10px;padding:10px 14px;${i > 0 ? 'margin-top:6px;' : ''}">
+            <span style="font-size:13px;font-weight:600;color:${slate900};font-family:${serif};">${formatDate(s.date)}</span>
+            <span style="font-size:13px;color:${sky700};font-weight:600;font-family:${sans};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${slate400};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
+          </div>`).join('')}
+      ${cardClose}`
+  } else if (isWeeklyRequest && recurringDay && recurringTime) {
+    sessionsCard = `
+      ${cardOpen}
+        ${sectionLabel('Weekly Schedule')}
+        <div style="background:${sky50};border:1px solid ${sky100};border-radius:10px;padding:10px 14px;">
+          <span style="font-size:13px;font-weight:600;color:${slate900};font-family:${serif};">Every ${recurringDay} at ${formatTime(recurringTime)}</span>
+        </div>
+      ${cardClose}`
+  }
 
   // ── Full HTML ──────────────────────────────────────────────────────────────
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f0f4f8;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f4f8;padding:32px 16px;">
-  <tr><td align="center">
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;">
+<body style="margin:0;padding:0;background:${slate50};font-family:${serif};">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${slate50};padding:32px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;">
 
-    <!-- Header -->
-    <tr><td style="background:${blue};border-radius:14px 14px 0 0;padding:28px 36px 24px;">
-      <p style="margin:0 0 8px 0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a8cce8;font-family:Arial,sans-serif;">Swim with Shirel &middot; C&ocirc;te Saint-Luc</p>
-      <h1 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;font-family:Georgia,serif;line-height:1.3;">Your lesson is confirmed &#127881;</h1>
-    </td></tr>
-
-    <!-- Body -->
-    <tr><td style="background:#ffffff;border-radius:0 0 14px 14px;padding:32px 36px;">
-
-      <p style="margin:0 0 6px 0;font-size:15px;color:${textDark};font-family:Georgia,serif;">Hi <strong>${parentName}</strong>,</p>
-      <p style="margin:0 0 28px 0;font-size:14px;color:${textMid};font-family:Arial,sans-serif;line-height:1.65;">Shirel has confirmed your booking. Here&rsquo;s everything you need.</p>
-
-      ${priceSection}
-
-      <!-- Lesson details -->
-      <div style="margin-bottom:24px;">
-        <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${textLight};font-family:Arial,sans-serif;">Lesson Details</p>
-        <table width="100%" cellpadding="0" cellspacing="0">
-          ${lessonRows}
-        </table>
-      </div>
-
-      ${packNote}
-      ${childrenSection}
-      ${sessionsSection}
-
-      <!-- Payment -->
-      <div style="background:#fafbfc;border:1px solid ${divider};border-radius:8px;padding:13px 16px;margin-bottom:28px;">
-        <p style="margin:0;font-size:13px;color:${textMid};font-family:Arial,sans-serif;line-height:1.6;">
-          &#128179;&nbsp; Payment is due <strong>within 2 hours of the lesson</strong> &mdash; cash or e-transfer accepted.
-        </p>
-      </div>
-
-      <!-- Closing -->
-      <p style="margin:0 0 4px 0;font-size:14px;color:${textMid};font-family:Arial,sans-serif;line-height:1.7;">To cancel or reschedule, please reach out at least <strong>2 hours before</strong> your lesson.</p>
-      <p style="margin:0 0 28px 0;font-size:14px;color:${textMid};font-family:Arial,sans-serif;line-height:1.7;">Looking forward to seeing you in the pool!</p>
-      <p style="margin:0 0 0 0;font-size:14px;color:${textDark};font-family:Georgia,serif;font-style:italic;">&mdash; Shirel</p>
-
-      <!-- Divider -->
-      <div style="border-top:1px solid ${divider};margin:28px 0 16px;"></div>
-
-      <!-- Footer -->
-      <p style="margin:0 0 3px 0;font-size:11px;color:${textLight};font-family:Arial,sans-serif;">Swim with Shirel &middot; Private Pool &middot; C&ocirc;te Saint-Luc, Qu&eacute;bec</p>
-      <p style="margin:0;font-size:11px;font-family:Arial,sans-serif;">
-        <a href="mailto:${CONTACT_EMAIL}" style="color:${blue};text-decoration:none;">${CONTACT_EMAIL}</a>
-        <span style="color:${textLight};">&nbsp;&middot;&nbsp;</span>
-        <a href="tel:${CONTACT_PHONE_TEL}" style="color:${blue};text-decoration:none;">${CONTACT_PHONE}</a>
-      </p>
-
-    </td></tr>
-  </table>
+  <!-- Header — matches sky-700 sections on site (stats strip, contact CTA) -->
+  <tr><td style="background:${sky700};border-radius:16px 16px 0 0;padding:30px 36px 26px;">
+    <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#bae6fd;font-family:${sans};font-weight:600;">Swim with Shirel &middot; C&ocirc;te Saint-Luc</p>
+    <h1 style="margin:0;font-size:26px;font-weight:700;color:#ffffff;font-family:${serif};line-height:1.25;letter-spacing:-0.01em;">Your lesson is confirmed &#127881;</h1>
   </td></tr>
+
+  <!-- Body -->
+  <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:32px 36px 36px;">
+
+    <p style="margin:0 0 6px 0;font-size:16px;color:${slate900};font-family:${serif};">Hi <strong>${parentName}</strong>,</p>
+    <p style="margin:0 0 28px 0;font-size:14px;color:${slate600};font-family:${sans};line-height:1.7;">Shirel has confirmed your booking. Here&rsquo;s everything you need to know.</p>
+
+    ${priceCard}
+    ${lessonCard}
+    ${packNote}
+    ${childrenCard}
+    ${sessionsCard}
+
+    <!-- Payment note — matches the soft info cards on the site -->
+    <div style="background:${sky50};border:1px solid ${sky100};border-radius:12px;padding:13px 18px;margin-bottom:28px;">
+      <p style="margin:0;font-size:13px;color:${slate600};font-family:${sans};line-height:1.65;">
+        &#128179;&nbsp; Payment is due <strong>within 2 hours of the lesson</strong> &mdash; cash or e-transfer accepted.
+      </p>
+    </div>
+
+    <!-- Closing -->
+    <p style="margin:0 0 4px 0;font-size:14px;color:${slate600};font-family:${sans};line-height:1.7;">To cancel or reschedule, please reach out at least <strong>2 hours before</strong> your lesson.</p>
+    <p style="margin:0 0 4px 0;font-size:14px;color:${slate600};font-family:${sans};line-height:1.7;">Looking forward to seeing you in the pool!</p>
+    <p style="margin:6px 0 0 0;font-size:15px;color:${slate900};font-family:${serif};font-style:italic;">&mdash; Shirel</p>
+
+    <!-- Divider -->
+    <div style="border-top:1px solid ${slate200};margin:28px 0 18px;"></div>
+
+    <!-- Footer -->
+    <p style="margin:0 0 3px 0;font-size:11px;color:${slate400};font-family:${sans};">Swim with Shirel &middot; Private Pool &middot; C&ocirc;te Saint-Luc, Qu&eacute;bec</p>
+    <p style="margin:0;font-size:11px;font-family:${sans};">
+      <a href="mailto:${CONTACT_EMAIL}" style="color:${sky700};text-decoration:none;">${CONTACT_EMAIL}</a>
+      <span style="color:${slate400};">&nbsp;&middot;&nbsp;</span>
+      <a href="tel:${CONTACT_PHONE_TEL}" style="color:${sky700};text-decoration:none;">${CONTACT_PHONE}</a>
+    </p>
+
+  </td></tr>
+</table>
+</td></tr>
 </table>
 </body>
 </html>`
 
-  // Subject encoded as RFC 2047 Base64 to handle emojis & special chars correctly
+  // Subject: RFC 2047 Base64 encoded so emoji renders correctly in Gmail
   const subject = encodeSubject('Your swim lesson is confirmed \u{1F389} | Swim with Shirel')
 
   const messageParts = [
