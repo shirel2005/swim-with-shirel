@@ -32,11 +32,11 @@ const pricingPlans = [
   {
     title: '10-Pack',
     subtitle: '45 min lessons',
-    price: '$600',
+    price: '$650',
     per: '10 sessions',
-    features: ['Ten 45-min sessions', 'Save $150 vs single price', 'Priority scheduling'],
+    features: ['Ten 45-min sessions', 'Save $100 vs single price', 'Priority scheduling'],
     popular: false,
-    savings: 'Save $150',
+    savings: 'Save $100',
   },
 ]
 
