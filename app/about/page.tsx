@@ -8,7 +8,7 @@ import { GraduationCap, Waves, Clock, Heart, Star, Shield } from 'lucide-react'
 const stats = [
   { value: '5+',        label: 'Years Teaching'        },
   { value: '6mo–12yr', label: 'Age Range'              },
-  { value: '100+',      label: 'Students Taught'        },
+  { value: '20+',        label: 'Students Taught Privately' },
   { value: 'Private',   label: 'Pool in Côte Saint-Luc' },
 ]
 

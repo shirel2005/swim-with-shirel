@@ -1,27 +1,23 @@
 import Link from 'next/link'
-import { Calendar, ClipboardList, CheckCircle } from 'lucide-react'
 
 const steps = [
   {
     number: '01',
-    icon: Calendar,
     title: 'Browse Availability',
     description:
-      'Check the calendar to find open lesson slots that fit your schedule. Morning and afternoon sessions available Sunday through Friday.',
+      'Check open lesson slots that fit your schedule — mornings and afternoons, Sunday through Friday.',
   },
   {
     number: '02',
-    icon: ClipboardList,
-    title: 'Submit Your Request',
+    title: 'Submit a Request',
     description:
-      "Fill out the booking form with your contact details and your child's information. Select as many slots as you need.",
+      "Fill in your details and your child's information. Takes under 3 minutes.",
   },
   {
     number: '03',
-    icon: CheckCircle,
     title: 'Get Confirmed',
     description:
-      "Shirel will review your request and confirm within 24 hours. You'll receive a confirmation email. Payment is collected in person.",
+      "Shirel confirms within 24 hours. You'll get an email with all the details. Payment is in person.",
   },
 ]
 
@@ -30,39 +26,47 @@ export default function HowItWorks() {
     <section className="bg-white py-16 lg:py-24">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
 
-        <div className="text-center mb-14">
-          <p className="section-label">How it works</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Three Simple Steps</h2>
-          <p className="text-slate-500 max-w-md mx-auto">
-            Getting started is easy. From browsing to booking, we keep things simple.
-          </p>
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
+          <div>
+            <p className="section-label">How it works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">Three simple steps.</h2>
+          </div>
+          <Link href="/book" className="btn-primary shrink-0 self-start lg:self-auto">
+            Book a Lesson
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {steps.map((step) => {
-            const Icon = step.icon
-            return (
-              <div key={step.number} className="relative card p-8 group hover:shadow-md hover:border-sky-200 transition-all duration-200">
-                {/* Step number */}
-                <div className="text-6xl font-bold text-sky-50 leading-none mb-4 select-none">{step.number}</div>
-                <div className="w-12 h-12 bg-sky-50 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-sky-100 transition-colors">
-                  <Icon size={22} className="text-sky-700" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-3">{step.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{step.description}</p>
-                {/* Connector dot */}
-                <div className="absolute top-1/2 -right-3 w-6 h-6 bg-sky-100 rounded-full border-2 border-white hidden md:last:hidden md:flex items-center justify-center">
-                  <div className="w-2 h-2 bg-sky-400 rounded-full" />
+        {/* Steps — horizontal on desktop, vertical on mobile */}
+        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-0">
+
+          {/* Connecting line (desktop only) */}
+          <div className="hidden md:block absolute top-9 left-[16.67%] right-[16.67%] h-px bg-sky-100" aria-hidden="true" />
+
+          {steps.map((step, i) => (
+            <div key={step.number} className="relative flex md:flex-col gap-6 md:gap-0 pb-10 md:pb-0 md:px-8 first:md:pl-0 last:md:pr-0">
+              {/* Vertical line (mobile only) */}
+              {i < steps.length - 1 && (
+                <div className="md:hidden absolute left-5 top-12 bottom-0 w-px bg-sky-100" aria-hidden="true" />
+              )}
+
+              {/* Number bubble */}
+              <div className="relative z-10 flex-shrink-0 w-10 h-10 md:w-auto md:h-auto md:mb-6">
+                <div className="w-10 h-10 rounded-full bg-sky-700 flex items-center justify-center md:mx-0">
+                  <span className="text-white text-xs font-bold">{step.number}</span>
                 </div>
               </div>
-            )
-          })}
-        </div>
 
-        <div className="text-center mt-10">
-          <Link href="/book" className="btn-primary">
-            Book Your First Lesson
-          </Link>
+              {/* Content */}
+              <div className="md:mt-0">
+                {/* Large decorative number */}
+                <div className="hidden md:block text-7xl font-bold text-sky-50 leading-none mb-2 select-none -ml-1">
+                  {step.number}
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{step.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>

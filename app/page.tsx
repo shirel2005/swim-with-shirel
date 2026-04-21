@@ -4,10 +4,8 @@ import { useEffect, useState } from 'react'
 import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
 import PricingSection from '@/components/PricingSection'
-import ReviewsSection from '@/components/ReviewsSection'
-import PoliciesSection from '@/components/PoliciesSection'
 import { Review } from '@/lib/types'
-import { Mail, Phone, Check } from 'lucide-react'
+import { Mail, Phone, Star, ArrowRight } from 'lucide-react'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from '@/lib/contact'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -22,40 +20,44 @@ export default function HomePage() {
       .catch(() => {})
   }, [])
 
+  const featured = reviews.find(r => r.rating === 5) ?? reviews[0]
+
   return (
     <>
       <Hero />
 
-      {/* Stats strip */}
+      {/* ── Stats strip ──────────────────────────────────────────────────────── */}
       <div className="bg-sky-700">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+          <div className="flex flex-wrap divide-x divide-sky-600/50">
             {[
-              { value: '5+', label: 'Years Teaching' },
-              { value: '6mo–12yr', label: 'Age Range' },
-              { value: '100+', label: 'Students Taught' },
-              { value: 'Private Pool', label: 'Côte Saint-Luc' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</p>
-                <p className="text-sky-200 text-xs sm:text-sm mt-1 font-medium">{stat.label}</p>
+              { value: '5+',          label: 'Years teaching'   },
+              { value: '6mo – 12yr',  label: 'Ages welcomed'    },
+              { value: '20+',         label: 'Private students' },
+              { value: 'Private pool',label: 'Côte Saint-Luc'   },
+            ].map((s) => (
+              <div key={s.label} className="flex-1 min-w-[120px] text-center py-7 px-4">
+                <p className="text-xl sm:text-2xl font-bold text-white tracking-tight">{s.value}</p>
+                <p className="text-sky-300 text-xs mt-1 font-medium tracking-wide">{s.label}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* ── How it works ─────────────────────────────────────────────────────── */}
       <HowItWorks />
 
-      {/* Meet Shirel */}
-      <section className="bg-white py-16 lg:py-24">
+      {/* ── Meet Shirel — editorial layout ───────────────────────────────────── */}
+      <section className="bg-slate-50 py-16 lg:py-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+
             {/* Photo */}
             <div className="relative flex-shrink-0 self-start mx-auto lg:mx-0">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-200 via-sky-100 to-white opacity-70 blur-sm" />
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-sky-200 via-sky-100 to-slate-50 opacity-80 blur-sm" />
               <div className="relative w-64 sm:w-72 lg:w-80" style={{ aspectRatio: '3/4' }}>
-                <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-sky-200/60">
+                <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-sky-200/50">
                   <Image
                     src="/shirel.jpg"
                     alt="Shirel – swim instructor"
@@ -66,7 +68,7 @@ export default function HomePage() {
                     priority
                   />
                 </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/90 backdrop-blur-sm text-sky-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border border-sky-100">
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/95 text-sky-800 text-xs font-bold px-3 py-1.5 rounded-full shadow border border-sky-100">
                   Teaching since 2020
                 </div>
               </div>
@@ -75,105 +77,88 @@ export default function HomePage() {
             {/* Text */}
             <div className="flex-1 min-w-0">
               <p className="section-label">Your instructor</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Meet Shirel</h2>
-              <p className="text-slate-600 text-lg leading-relaxed mb-4">
-                I&apos;m a certified swim instructor based in Côte Saint-Luc, passionate about helping children build real water confidence — safely and at their own pace.
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-5 leading-tight">
+                Meet Shirel
+              </h2>
+
+              {/* Pull quote */}
+              <blockquote className="border-l-2 border-sky-300 pl-4 mb-6 italic text-slate-500 text-base leading-relaxed">
+                &ldquo;Every child learns differently. I take the time to understand how yours ticks — and build their confidence from there.&rdquo;
+              </blockquote>
+
+              <p className="text-slate-600 leading-relaxed mb-8">
+                Certified lifeguard and private swim instructor based in Côte Saint-Luc. Five years working with children from 6 months to 12 years old — from first splashes to stroke refinement. Lessons are calm, personalised, and held at a private pool.
               </p>
-              <p className="text-slate-500 leading-relaxed mb-8">
-                With 5+ years of experience teaching swimmers from 6 months to 12 years old, I tailor every lesson to the child&apos;s personality and skill level. Private pool, small groups, and a calm, encouraging environment.
-              </p>
-              <Link href="/about" className="inline-flex items-center gap-2 text-sky-700 font-semibold hover:text-sky-800 transition-colors group">
-                Learn more about my approach
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+
+              <Link href="/about" className="inline-flex items-center gap-2 text-sky-700 font-semibold hover:text-sky-800 transition-colors group text-sm">
+                More about Shirel
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ── Pricing ──────────────────────────────────────────────────────────── */}
       <PricingSection />
 
-      {/* 10-Pack explained */}
-      <section className="bg-sky-50 py-16 lg:py-24 border-y border-sky-100">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <p className="section-label">Best value</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">How the 10-Pack Works</h2>
-            <p className="text-slate-500 text-lg">Buy once, book sessions whenever you&apos;re ready. No rigid schedules, no pressure to plan everything upfront.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { step: '1', title: 'Purchase your pack', desc: 'Choose 30- or 45-minute sessions. Pay once, save up to $150 vs. individual bookings.' },
-              { step: '2', title: 'Book your first session', desc: 'Pick a date and time that works now. You only need to schedule 1–2 sessions to get started.' },
-              { step: '3', title: 'Come back at your pace', desc: 'Return anytime to book the next session. Your remaining credits are always saved.' },
-              { step: '4', title: 'Track your progress', desc: 'No expiry pressure — use your sessions over weeks or months, whatever fits your family.' },
-            ].map(item => (
-              <div key={item.step} className="bg-white rounded-2xl border border-sky-100 p-6 shadow-sm">
-                <div className="w-9 h-9 bg-sky-700 text-white rounded-xl flex items-center justify-center font-bold text-sm mb-4">
-                  {item.step}
-                </div>
-                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600">
-              {['10 sessions total', 'Flexible scheduling', '30 or 45 minutes', 'Private or semi-private'].map(f => (
-                <span key={f} className="flex items-center gap-1.5">
-                  <Check size={14} className="text-sky-600 flex-shrink-0" />{f}
-                </span>
+      {/* ── Testimonial — single editorial pullquote ─────────────────────────── */}
+      {featured && (
+        <section className="bg-sky-700 py-16 lg:py-20">
+          <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
+            <div className="flex justify-center gap-1 mb-6">
+              {Array.from({ length: featured.rating }).map((_, i) => (
+                <Star key={i} size={18} className="text-sky-300 fill-sky-300" />
               ))}
             </div>
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/book" className="btn-primary px-8 py-3">
-              Book a 10-Pack
+            <blockquote className="text-2xl sm:text-3xl font-bold text-white leading-snug mb-6 italic">
+              &ldquo;{featured.review_text}&rdquo;
+            </blockquote>
+            <p className="text-sky-200 text-sm font-medium">
+              — {featured.parent_name}
+              {featured.child_name && <span className="text-sky-400"> · parent of {featured.child_name}</span>}
+            </p>
+            <Link href="/reviews" className="inline-flex items-center gap-2 mt-8 text-sky-200 hover:text-white text-sm font-semibold transition-colors group">
+              Read all reviews
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-        </div>
-      </section>
-      <ReviewsSection reviews={reviews} />
+        </section>
+      )}
 
-      <PoliciesSection />
-
-      {/* Contact CTA */}
-      <section className="bg-sky-700 py-14 lg:py-20">
+      {/* ── Final CTA ─────────────────────────────────────────────────────────── */}
+      <section className="bg-white py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div>
-              <p className="text-sky-200 text-xs tracking-widest uppercase font-semibold mb-2">Get in touch</p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Have questions before booking?</h2>
-              <p className="text-sky-200">Feel free to reach out — I&apos;m happy to help with scheduling, pricing, or anything else.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-sky-700 font-semibold rounded-xl hover:bg-sky-50 transition-colors text-sm"
-              >
-                <Mail size={16} />
-                {CONTACT_EMAIL}
-              </a>
-              <a
-                href={`tel:${CONTACT_PHONE_TEL}`}
-                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-white/50 text-white font-semibold rounded-xl hover:bg-white/15 transition-colors text-sm"
-              >
-                <Phone size={16} />
-                {CONTACT_PHONE}
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
 
-      {/* Final CTA */}
-      <section className="bg-white py-16">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Ready to dive in?</h2>
-          <p className="text-slate-500 mb-8 text-lg">Spots fill up fast. Book your lesson today and start building water confidence.</p>
-          <Link href="/book" className="btn-primary text-base px-10 py-4">
-            Book a Lesson with Shirel
-          </Link>
+            {/* Left — headline */}
+            <div className="max-w-xl">
+              <p className="section-label">Ready to start?</p>
+              <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-4">
+                Book a lesson<br />
+                <em className="not-italic text-sky-600">with Shirel.</em>
+              </h2>
+              <p className="text-slate-500 text-lg">
+                Spots fill up — book early to secure your preferred time.
+              </p>
+            </div>
+
+            {/* Right — actions */}
+            <div className="flex flex-col gap-4 shrink-0">
+              <Link href="/book" className="btn-primary text-base px-10 py-4">
+                Book a Lesson
+              </Link>
+              <div className="flex flex-col sm:flex-row gap-3 text-sm">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 text-slate-500 hover:text-sky-700 transition-colors">
+                  <Mail size={14} />{CONTACT_EMAIL}
+                </a>
+                <a href={`tel:${CONTACT_PHONE_TEL}`} className="inline-flex items-center gap-2 text-slate-500 hover:text-sky-700 transition-colors">
+                  <Phone size={14} />{CONTACT_PHONE}
+                </a>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
     </>
