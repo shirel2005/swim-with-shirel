@@ -4,67 +4,76 @@ const steps = [
   {
     number: '01',
     title: 'Browse Availability',
-    description:
-      'Check open lesson slots that fit your schedule — mornings and afternoons, Sunday through Friday.',
+    description: 'Check open slots that fit your schedule — mornings and afternoons, Sunday through Friday.',
   },
   {
     number: '02',
     title: 'Submit a Request',
-    description:
-      "Fill in your details and your child's information. Takes under 3 minutes.",
+    description: "Fill in your details and your child's info. The whole form takes under 3 minutes.",
   },
   {
     number: '03',
     title: 'Get Confirmed',
-    description:
-      "Shirel confirms within 24 hours. You'll get an email with all the details. Payment is in person.",
+    description: "Shirel confirms within 24 hours. You'll get an email with all the details. Payment is in person.",
   },
 ]
 
 export default function HowItWorks() {
   return (
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-[#060f1e] py-20 lg:py-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
 
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
+        {/* Header row */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16 lg:mb-20">
           <div>
-            <p className="section-label">How it works</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">Three simple steps.</h2>
+            <p className="text-[11px] tracking-[0.28em] uppercase font-semibold text-sky-400 mb-3">
+              How it works
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-white leading-tight">
+              Three simple steps.
+            </h2>
           </div>
-          <Link href="/book" className="btn-primary shrink-0 self-start lg:self-auto">
-            Book a Lesson
+          <Link
+            href="/book"
+            className="text-sky-400 font-semibold text-sm hover:text-sky-300 transition-colors inline-flex items-center gap-2 group shrink-0 self-start sm:self-auto"
+          >
+            Book a lesson
+            <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
           </Link>
         </div>
 
-        {/* Steps — horizontal on desktop, vertical on mobile */}
-        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-0">
-
-          {/* Connecting line (desktop only) */}
-          <div className="hidden md:block absolute top-9 left-[16.67%] right-[16.67%] h-px bg-sky-100" aria-hidden="true" />
-
+        {/* Steps grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
           {steps.map((step, i) => (
-            <div key={step.number} className="relative flex md:flex-col gap-6 md:gap-0 pb-10 md:pb-0 md:px-8 first:md:pl-0 last:md:pr-0">
-              {/* Vertical line (mobile only) */}
-              {i < steps.length - 1 && (
-                <div className="md:hidden absolute left-5 top-12 bottom-0 w-px bg-sky-100" aria-hidden="true" />
-              )}
+            <div key={step.number} className="relative group">
 
-              {/* Number bubble */}
-              <div className="relative z-10 flex-shrink-0 w-10 h-10 md:w-auto md:h-auto md:mb-6">
-                <div className="w-10 h-10 rounded-full bg-sky-700 flex items-center justify-center md:mx-0">
-                  <span className="text-white text-xs font-bold">{step.number}</span>
-                </div>
+              {/* Ghost number behind content */}
+              <div
+                className="absolute -top-3 -left-1 font-bold leading-none select-none pointer-events-none text-white/[0.025]"
+                style={{ fontSize: 'clamp(80px, 10vw, 120px)' }}
+                aria-hidden="true"
+              >
+                {step.number}
               </div>
 
-              {/* Content */}
-              <div className="md:mt-0">
-                {/* Large decorative number */}
-                <div className="hidden md:block text-7xl font-bold text-sky-50 leading-none mb-2 select-none -ml-1">
+              {/* Step badge */}
+              <div className="relative z-10 mb-6">
+                <span className="inline-flex items-center bg-sky-400/10 border border-sky-400/20 text-sky-400 text-xs font-bold px-3 py-1.5 rounded-full tracking-widest">
                   {step.number}
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{step.description}</p>
+                </span>
               </div>
+
+              <h3 className="relative z-10 text-lg font-bold text-white mb-3 group-hover:text-sky-100 transition-colors">
+                {step.title}
+              </h3>
+              <p className="relative z-10 text-sm text-slate-400 leading-relaxed">
+                {step.description}
+              </p>
+
+              {/* Subtle separator line between steps (desktop) */}
+              {i < steps.length - 1 && (
+                <div className="hidden md:block absolute top-5 -right-5 lg:-right-6 w-px h-20 bg-white/5" aria-hidden="true" />
+              )}
             </div>
           ))}
         </div>

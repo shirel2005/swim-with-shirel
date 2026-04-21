@@ -2,97 +2,89 @@ import Link from 'next/link'
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[92vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[94vh] flex items-end overflow-hidden">
 
-      {/* Pool photo background */}
+      {/* Pool background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
         style={{ backgroundImage: `url('/pool-bg.jpg')` }}
         aria-hidden="true"
       />
 
-      {/* Rich coastal overlay — dark blue-teal with depth */}
+      {/* Layered overlay — deep at bottom for text legibility */}
       <div
         className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(7,89,133,0.75) 50%, rgba(15,23,42,0.85) 100%)'
-        }}
+        style={{ background: 'linear-gradient(170deg, rgba(4,15,30,0.65) 0%, rgba(4,40,80,0.60) 45%, rgba(4,15,30,0.92) 100%)' }}
         aria-hidden="true"
       />
 
-      {/* Subtle shimmer accents */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-sky-400/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 left-1/5 w-96 h-96 bg-sky-300/6 rounded-full blur-3xl" />
+      {/* Subtle shimmer */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-sky-400/6 rounded-full blur-3xl" />
       </div>
 
-      {/* Wave bottom */}
+      {/* Content — anchored to bottom-left */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pt-28 pb-16">
+
+        {/* Location badge */}
+        <div className="inline-flex items-center bg-white/8 backdrop-blur-sm border border-white/12 text-sky-200/90 text-[10px] font-semibold px-4 py-2 rounded-full mb-12 tracking-[0.2em] uppercase">
+          Private Pool · Côte Saint-Luc, Québec
+        </div>
+
+        {/* Headline — the centrepiece */}
+        <div className="mb-10">
+          <p className="text-base sm:text-lg text-white/40 font-light tracking-wide mb-1 ml-1">
+            Learn to
+          </p>
+          <h1
+            className="font-bold text-sky-400 leading-[0.88] tracking-tighter mb-3"
+            style={{ fontSize: 'clamp(72px, 13vw, 160px)' }}
+          >
+            swim.
+          </h1>
+          <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight ml-1">
+            with Shirel.
+          </p>
+        </div>
+
+        {/* Subtitle */}
+        <p className="text-white/55 text-base sm:text-lg max-w-sm leading-relaxed mb-10 ml-1 font-light">
+          Private &amp; semi-private lessons for children
+          aged <span className="text-sky-300/90 font-medium">6 months – 12 years</span>.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap gap-3 mb-14 ml-1">
+          <Link
+            href="/book"
+            className="px-8 py-3.5 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow-xl shadow-sky-900/40 text-sm tracking-wide"
+          >
+            Book a Lesson
+          </Link>
+          <Link
+            href="/#pricing"
+            className="px-8 py-3.5 border border-white/25 text-white/90 font-semibold rounded-full hover:bg-white/8 transition-all duration-200 backdrop-blur-sm text-sm tracking-wide"
+          >
+            View Pricing
+          </Link>
+        </div>
+
+        {/* Trust — clean inline text, no pill containers */}
+        <div className="flex flex-wrap gap-x-7 gap-y-2 ml-1">
+          {['5+ years teaching', 'Ages 6mo – 12yr', 'Private · Semi-private', '⭐ 5-star rated'].map(l => (
+            <span key={l} className="text-white/35 text-xs font-medium tracking-wide">{l}</span>
+          ))}
+        </div>
+
+      </div>
+
+      {/* Wave to white */}
       <div className="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
-        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-          <path d="M0 40 C360 0 720 80 1080 40 C1260 20 1380 50 1440 40 L1440 80 L0 80 Z" fill="white" fillOpacity="1" />
+        <svg viewBox="0 0 1440 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
+          <path d="M0 32 C360 0 720 64 1080 32 C1260 16 1380 44 1440 32 L1440 64 L0 64 Z" fill="white" />
         </svg>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-20 w-full">
-        <div className="max-w-3xl">
-
-          {/* Location badge */}
-          <div className="inline-flex items-center gap-2 bg-sky-400/20 backdrop-blur-sm border border-sky-400/30 text-sky-200 text-xs font-semibold px-4 py-2 rounded-full mb-8 tracking-widest uppercase">
-            Private Pool · Côte Saint-Luc, Québec
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.02] tracking-tight">
-            Learn to{' '}
-            <em className="not-italic text-sky-400">swim</em>
-            <br />
-            with Shirel.
-          </h1>
-
-          <p className="text-xl sm:text-2xl text-white/80 max-w-xl mb-10 leading-relaxed font-light">
-            Private &amp; semi-private lessons for children ages{' '}
-            <span className="text-sky-300 font-medium">6 months – 12 years</span>.
-            Building water confidence, one stroke at a time.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-14">
-            <Link
-              href="/book"
-              className="inline-flex items-center justify-center px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white font-bold text-base rounded-2xl transition-all duration-200 shadow-xl shadow-sky-900/30 hover:scale-105 active:scale-95"
-            >
-              Book a Lesson
-            </Link>
-            <Link
-              href="/#pricing"
-              className="inline-flex items-center justify-center px-8 py-4 border-2 border-white/50 text-white font-bold text-base rounded-2xl hover:bg-white/15 hover:border-white/80 transition-all duration-200 backdrop-blur-sm hover:scale-105 active:scale-95"
-            >
-              View Pricing
-            </Link>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: '5+ years teaching' },
-              { label: 'Ages 6 months – 12 years' },
-              { label: 'Private · Semi-private' },
-              { label: '⭐ 5-star rated' },
-            ].map(({ label }) => (
-              <span
-                key={label}
-                className="text-sm text-white/85 bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full font-medium"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-        </div>
-
-
-      </div>
     </section>
   )
 }

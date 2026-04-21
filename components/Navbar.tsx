@@ -19,8 +19,8 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-sky-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-base font-bold text-slate-900 tracking-tight">
-            Swim with Shirel
+          <Link href="/" className="text-base font-bold text-slate-900 tracking-tight hover:text-sky-700 transition-colors">
+            Swim with <em className="not-italic text-sky-600">Shirel</em>
           </Link>
 
           {/* Desktop Nav */}
@@ -34,10 +34,7 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/book"
-              className="btn-primary text-sm py-2 px-5 rounded-lg"
-            >
+            <Link href="/book" className="btn-primary text-sm py-2 px-5">
               Book Now
             </Link>
           </div>
@@ -68,7 +65,7 @@ export default function Navbar() {
             <Link
               href="/book"
               onClick={() => setMenuOpen(false)}
-              className="mt-3 py-3 text-sm font-semibold bg-sky-700 text-white hover:bg-sky-800 transition-colors text-center rounded-xl"
+              className="mt-3 py-3 text-sm font-semibold bg-sky-700 text-white hover:bg-sky-800 transition-colors text-center rounded-full"
             >
               Book Now
             </Link>

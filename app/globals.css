@@ -2,35 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
-body {
-  @apply bg-white text-slate-800;
-}
+body { @apply bg-white text-slate-800; }
 
-/* Design system tokens */
 @layer components {
+
+  /* ── Buttons ──────────────────────────────────────────────────────────── */
   .btn-primary {
-    @apply px-7 py-3 bg-sky-700 text-white font-semibold rounded-xl hover:bg-sky-800 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+    @apply px-7 py-3.5 bg-sky-700 text-white font-semibold rounded-full
+           hover:bg-sky-800 active:scale-[0.97] transition-all duration-200
+           inline-flex items-center justify-center gap-2 tracking-wide;
   }
   .btn-secondary {
-    @apply px-7 py-3 border-2 border-sky-700 text-sky-700 font-semibold rounded-xl hover:bg-sky-50 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+    @apply px-7 py-3.5 border-2 border-sky-700 text-sky-700 font-semibold rounded-full
+           hover:bg-sky-50 active:scale-[0.97] transition-all duration-200
+           inline-flex items-center justify-center gap-2 tracking-wide;
   }
   .btn-ghost {
-    @apply px-7 py-3 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/15 transition-colors duration-200 inline-flex items-center justify-center gap-2;
+    @apply px-7 py-3.5 border border-white/40 text-white font-semibold rounded-full
+           hover:bg-white/15 active:scale-[0.97] transition-all duration-200
+           inline-flex items-center justify-center gap-2;
   }
+
+  /* ── Cards ────────────────────────────────────────────────────────────── */
   .card {
-    @apply bg-white rounded-2xl border border-sky-100 shadow-sm;
+    @apply bg-white rounded-3xl border border-slate-100
+           shadow-[0_4px_24px_-4px_rgba(14,165,233,0.08)];
   }
+
+  /* ── Section label ────────────────────────────────────────────────────── */
   .section-label {
-    @apply text-xs tracking-[0.25em] uppercase text-sky-600 font-semibold mb-3;
+    @apply text-[11px] tracking-[0.28em] uppercase text-sky-600 font-semibold mb-3;
   }
+
+  /* ── Inputs ───────────────────────────────────────────────────────────── */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400 text-sm bg-white text-slate-900 placeholder:text-slate-300 transition-colors;
+    @apply w-full px-4 py-3 rounded-2xl border border-slate-200
+           focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400
+           text-sm bg-white text-slate-900 placeholder:text-slate-300 transition-colors;
   }
   .input-error {
-    @apply w-full px-4 py-3 rounded-xl border border-red-300 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 text-sm bg-white;
+    @apply w-full px-4 py-3 rounded-2xl border border-red-300
+           focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 text-sm bg-white;
   }
 }
