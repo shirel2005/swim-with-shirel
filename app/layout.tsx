@@ -1,11 +1,23 @@
 import type { Metadata } from 'next'
-import { Playfair_Display } from 'next/font/google'
+import { Fraunces, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import AvailabilityBanner from '@/components/AvailabilityBanner'
 
-const playfair = Playfair_Display({ subsets: ['latin'] })
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+})
 
 const BASE_URL = 'https://swim-with-shirel-production.up.railway.app'
 
@@ -47,7 +59,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${playfair.className} flex flex-col min-h-screen`}>
+      <body className={`${fraunces.variable} ${dmSans.variable} flex flex-col min-h-screen`}>
         <AvailabilityBanner />
         <Navbar />
         <main className="flex-1">{children}</main>

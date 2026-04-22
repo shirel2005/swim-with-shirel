@@ -1,113 +1,301 @@
+'use client'
+
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="bg-white py-20 lg:py-28">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    <section id="pricing" style={{ backgroundColor: '#F8F4ED', paddingTop: '6rem', paddingBottom: '7rem' }}>
+      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
 
-        <div className="mb-16">
-          <p className="section-label">Pricing</p>
-          <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-3">
-            Transparent pricing.
-          </h2>
-          <p className="text-slate-400 text-base max-w-sm">
-            No hidden fees. Semi-private lessons are double the private rate and require exactly 2 children.
+        {/* ── Header ── */}
+        <div className="flex flex-col lg:flex-row lg:items-end gap-10 lg:gap-24 mb-16 lg:mb-20">
+          <div className="flex-1">
+            <p className="section-label">Pricing</p>
+            <h2
+              style={{
+                fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                fontSize: 'clamp(38px, 6vw, 68px)',
+                color: '#0D1F3C',
+                fontWeight: 800,
+                lineHeight: 1.0,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Clear pricing.{' '}
+              <em style={{ color: '#4A7FA5', fontStyle: 'italic' }}>No surprises.</em>
+            </h2>
+          </div>
+          <p
+            className="lg:max-w-[260px]"
+            style={{
+              fontFamily: 'var(--font-dm-sans, sans-serif)',
+              fontSize: '13px',
+              color: 'rgba(13,31,60,0.46)',
+              lineHeight: 1.75,
+            }}
+          >
+            Payment in person — cash or e-transfer. Semi-private (exactly 2 children) is double the private rate.
           </p>
         </div>
 
-        {/* Row 1 — Single sessions */}
-        <div className="mb-6">
-          <p className="text-[11px] tracking-[0.28em] uppercase text-slate-400 font-semibold mb-4">
+        {/* ── Per-session ── */}
+        <div className="mb-5">
+          <p
+            style={{
+              fontFamily: 'var(--font-dm-sans, sans-serif)',
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color: 'rgba(13,31,60,0.28)',
+              marginBottom: '1.25rem',
+            }}
+          >
             Per session
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { duration: '30 min', price: '$50', desc: 'Great for beginners and younger swimmers. Focused and effective.' },
-              { duration: '45 min', price: '$75', desc: 'More time for technique, practice, and deeper progress.' },
-            ].map(p => (
-              <div key={p.duration} className="card p-7 flex items-center justify-between gap-6 group hover:shadow-[0_8px_40px_-8px_rgba(14,165,233,0.14)] hover:border-sky-100 transition-all duration-300">
+              {
+                duration: '30 min',
+                price: '$50',
+                desc: 'Focused and effective. Great for beginners and younger swimmers.',
+              },
+              {
+                duration: '45 min',
+                price: '$75',
+                desc: 'More room for technique, play, and deeper skill-building.',
+              },
+            ].map(tier => (
+              <div
+                key={tier.duration}
+                className="flex items-center justify-between gap-6 transition-all duration-300 group"
+                style={{
+                  padding: '1.375rem 1.625rem',
+                  background: 'white',
+                  borderRadius: '18px',
+                  border: '1.5px solid rgba(13,31,60,0.07)',
+                  cursor: 'default',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLDivElement
+                  el.style.borderColor = 'rgba(74,127,165,0.25)'
+                  el.style.boxShadow = '0 8px 36px -8px rgba(74,127,165,0.14)'
+                  el.style.transform = 'translateY(-1px)'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLDivElement
+                  el.style.borderColor = 'rgba(13,31,60,0.07)'
+                  el.style.boxShadow = 'none'
+                  el.style.transform = 'translateY(0)'
+                }}
+              >
                 <div>
-                  <p className="text-xs font-semibold text-sky-600 tracking-widest uppercase mb-1">{p.duration}</p>
-                  <p className="font-bold text-slate-900 text-lg mb-2">Single Lesson</p>
-                  <p className="text-sm text-slate-400 leading-relaxed max-w-xs">{p.desc}</p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-dm-sans, sans-serif)',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: '#4A7FA5',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {tier.duration}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                      fontSize: '15px',
+                      fontWeight: 700,
+                      color: '#0D1F3C',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Single Lesson
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-dm-sans, sans-serif)',
+                      fontSize: '12px',
+                      color: 'rgba(13,31,60,0.42)',
+                      lineHeight: 1.5,
+                      maxWidth: '220px',
+                    }}
+                  >
+                    {tier.desc}
+                  </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-4xl font-bold text-slate-900 leading-none">{p.price}</p>
-                  <p className="text-xs text-slate-400 mt-1">per session</p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                      fontSize: '38px',
+                      fontWeight: 900,
+                      color: '#0D1F3C',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {tier.price}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-dm-sans, sans-serif)',
+                      fontSize: '10px',
+                      color: 'rgba(13,31,60,0.30)',
+                      marginTop: '3px',
+                    }}
+                  >
+                    per session
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Row 2 — 10-Pack */}
+        {/* ── 10-Pack Bundle ── */}
         <div>
-          <p className="text-[11px] tracking-[0.28em] uppercase text-slate-400 font-semibold mb-4">
-            10-Pack bundle <span className="text-sky-500 ml-2 normal-case tracking-normal text-[11px]">— best value</span>
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { duration: '30 min', price: '$450', save: 'Save $50', sessions: 10 },
-              { duration: '45 min', price: '$650', save: 'Save $100', sessions: 10, featured: true },
-            ].map(p => (
-              <div
-                key={p.duration}
-                className={`rounded-3xl p-7 flex flex-col gap-6 transition-all duration-300 ${
-                  p.featured
-                    ? 'bg-[#060f1e] text-white'
-                    : 'card hover:shadow-[0_8px_40px_-8px_rgba(14,165,233,0.14)] hover:border-sky-100'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className={`text-xs font-semibold tracking-widest uppercase mb-1 ${p.featured ? 'text-sky-400' : 'text-sky-600'}`}>
-                      {p.duration} · {p.sessions} sessions
-                    </p>
-                    <p className={`font-bold text-xl mb-1 ${p.featured ? 'text-white' : 'text-slate-900'}`}>
-                      10-Pack
-                    </p>
-                    <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full ${p.featured ? 'bg-sky-400/15 text-sky-300' : 'bg-sky-50 text-sky-700'}`}>
-                      {p.save}
-                    </span>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className={`text-4xl font-bold leading-none ${p.featured ? 'text-white' : 'text-slate-900'}`}>
-                      {p.price}
-                    </p>
-                    <p className={`text-xs mt-1 ${p.featured ? 'text-sky-300/60' : 'text-slate-400'}`}>
-                      10 sessions
-                    </p>
-                  </div>
+          <div className="flex items-center gap-3 mb-5">
+            <p
+              style={{
+                fontFamily: 'var(--font-dm-sans, sans-serif)',
+                fontSize: '10px',
+                fontWeight: 700,
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color: 'rgba(13,31,60,0.28)',
+              }}
+            >
+              10-Pack bundle
+            </p>
+            <span
+              style={{
+                fontFamily: 'var(--font-dm-sans, sans-serif)',
+                fontSize: '10px',
+                fontWeight: 600,
+                color: '#4A7FA5',
+              }}
+            >
+              — best value
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+            {/* 30-min pack */}
+            <div
+              className="flex flex-col gap-5 transition-all duration-300"
+              style={{
+                padding: '1.75rem',
+                background: 'white',
+                borderRadius: '20px',
+                border: '1.5px solid rgba(13,31,60,0.07)',
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLDivElement
+                el.style.boxShadow = '0 12px 40px -10px rgba(74,127,165,0.14)'
+                el.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLDivElement
+                el.style.boxShadow = 'none'
+                el.style.transform = 'translateY(0)'
+              }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4A7FA5', marginBottom: '4px' }}>
+                    30 min · 10 sessions
+                  </p>
+                  <p style={{ fontFamily: 'var(--font-fraunces)', fontSize: '17px', fontWeight: 700, color: '#0D1F3C', marginBottom: '8px' }}>
+                    10-Pack
+                  </p>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', fontWeight: 700, color: '#4A7FA5', background: 'rgba(74,127,165,0.10)', padding: '3px 10px', borderRadius: '9999px' }}>
+                    Save $50
+                  </span>
                 </div>
-
-                <ul className="space-y-2">
-                  {[`Book flexibly — no need to schedule all at once`, 'Credits never expire', 'Priority scheduling'].map(f => (
-                    <li key={f} className={`flex items-start gap-2.5 text-sm ${p.featured ? 'text-sky-100/70' : 'text-slate-500'}`}>
-                      <Check size={13} className={`mt-0.5 flex-shrink-0 ${p.featured ? 'text-sky-400' : 'text-sky-600'}`} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/book"
-                  className={`mt-auto block text-center py-3 rounded-full text-sm font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] tracking-wide ${
-                    p.featured
-                      ? 'bg-sky-500 text-white hover:bg-sky-400'
-                      : 'bg-slate-900 text-white hover:bg-slate-800'
-                  }`}
-                >
-                  Book a 10-Pack
-                </Link>
+                <div className="text-right shrink-0">
+                  <p style={{ fontFamily: 'var(--font-fraunces)', fontSize: '38px', fontWeight: 900, color: '#0D1F3C', lineHeight: 1 }}>$450</p>
+                  <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', color: 'rgba(13,31,60,0.30)', marginTop: '3px' }}>10 sessions</p>
+                </div>
               </div>
-            ))}
+
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {['Book flexibly — no need to schedule all at once', 'Credits never expire', 'Priority scheduling'].map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontFamily: 'var(--font-dm-sans)', fontSize: '12px', color: 'rgba(13,31,60,0.45)' }}>
+                    <Check size={12} style={{ color: '#4A7FA5', marginTop: '2px', flexShrink: 0 }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/book" className="btn-secondary" style={{ marginTop: 'auto', textAlign: 'center', padding: '0.75rem', fontSize: '13px' }}>
+                Book a 10-Pack
+              </Link>
+            </div>
+
+            {/* 45-min pack — dark featured */}
+            <div
+              className="flex flex-col gap-5 relative overflow-hidden transition-all duration-300"
+              style={{
+                padding: '1.75rem',
+                background: '#0D1F3C',
+                borderRadius: '20px',
+              }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLDivElement
+                el.style.transform = 'translateY(-1px)'
+                el.style.boxShadow = '0 16px 48px -12px rgba(13,31,60,0.40)'
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLDivElement
+                el.style.transform = 'translateY(0)'
+                el.style.boxShadow = 'none'
+              }}
+            >
+              {/* Glow accent */}
+              <div
+                className="absolute top-0 right-0 pointer-events-none"
+                style={{ width: '65%', height: '65%', background: 'radial-gradient(ellipse at top right, rgba(74,127,165,0.18) 0%, transparent 70%)' }}
+                aria-hidden="true"
+              />
+
+              <div className="relative flex items-start justify-between gap-4">
+                <div>
+                  <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.70)', marginBottom: '4px' }}>
+                    45 min · 10 sessions
+                  </p>
+                  <p style={{ fontFamily: 'var(--font-fraunces)', fontSize: '17px', fontWeight: 700, color: '#F8F4ED', marginBottom: '8px' }}>
+                    10-Pack
+                  </p>
+                  <span style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', fontWeight: 700, color: '#6AAFD4', background: 'rgba(106,175,212,0.14)', padding: '3px 10px', borderRadius: '9999px' }}>
+                    Save $100
+                  </span>
+                </div>
+                <div className="text-right shrink-0">
+                  <p style={{ fontFamily: 'var(--font-fraunces)', fontSize: '38px', fontWeight: 900, color: '#F8F4ED', lineHeight: 1 }}>$650</p>
+                  <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', color: 'rgba(106,175,212,0.40)', marginTop: '3px' }}>10 sessions</p>
+                </div>
+              </div>
+
+              <ul className="relative" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {['Book flexibly — no need to schedule all at once', 'Credits never expire', 'Priority scheduling'].map(f => (
+                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontFamily: 'var(--font-dm-sans)', fontSize: '12px', color: 'rgba(248,244,237,0.40)' }}>
+                    <Check size={12} style={{ color: '#6AAFD4', marginTop: '2px', flexShrink: 0 }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/book" className="btn-blue relative" style={{ marginTop: 'auto', textAlign: 'center', padding: '0.75rem', fontSize: '13px' }}>
+                Book a 10-Pack
+              </Link>
+            </div>
           </div>
         </div>
-
-        <p className="text-center text-xs text-slate-400 mt-8">
-          Payment in person via cash or e-transfer · Semi-private = double the private rate
-        </p>
 
       </div>
     </section>

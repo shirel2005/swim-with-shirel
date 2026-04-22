@@ -1,87 +1,328 @@
+'use client'
+
 import Link from 'next/link'
+import Image from 'next/image'
+
+/* Small decorative star used as accent */
+const Star = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M7 0L8.5 5.5H14L9.5 8.5L11 14L7 11L3 14L4.5 8.5L0 5.5H5.5L7 0Z" fill="#4A7FA5" opacity="0.6" />
+  </svg>
+)
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[94vh] flex items-end overflow-hidden">
-
-      {/* Pool background */}
+    <section
+      className="relative overflow-hidden"
+      style={{ backgroundColor: '#F8F4ED', minHeight: '94vh' }}
+    >
+      {/* ── Decorative blobs — background depth ── */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
-        style={{ backgroundImage: `url('/pool-bg.jpg')` }}
+        className="absolute pointer-events-none"
+        style={{
+          top: '-10%',
+          right: '-8%',
+          width: '55%',
+          height: '70%',
+          background: 'radial-gradient(ellipse, rgba(74,127,165,0.08) 0%, transparent 70%)',
+          borderRadius: '60% 40% 55% 45% / 50% 60% 40% 50%',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '0%',
+          left: '-5%',
+          width: '35%',
+          height: '40%',
+          background: 'radial-gradient(ellipse, rgba(74,127,165,0.05) 0%, transparent 70%)',
+          borderRadius: '50% 50% 60% 40% / 45% 55% 45% 55%',
+        }}
         aria-hidden="true"
       />
 
-      {/* Layered overlay — deep at bottom for text legibility */}
+      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 h-full">
+        <div
+          className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center"
+          style={{ minHeight: '94vh', paddingTop: '5rem', paddingBottom: '4rem' }}
+        >
+
+          {/* ── LEFT: Text ── */}
+          <div className="order-2 lg:order-1">
+
+            {/* Eyebrow */}
+            <div className="flex items-center gap-2.5 mb-8">
+              <Star />
+              <span
+                style={{
+                  fontFamily: 'var(--font-dm-sans, sans-serif)',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.28em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(74,127,165,0.75)',
+                }}
+              >
+                Côte Saint-Luc · Private Pool
+              </span>
+            </div>
+
+            {/* Main heading */}
+            <div className="mb-6">
+              <p
+                style={{
+                  fontFamily: 'var(--font-dm-sans, sans-serif)',
+                  fontSize: 'clamp(14px, 1.5vw, 17px)',
+                  color: 'rgba(13,31,60,0.38)',
+                  fontWeight: 300,
+                  letterSpacing: '0.06em',
+                  marginBottom: '0.25rem',
+                }}
+              >
+                Learn to
+              </p>
+              <h1
+                style={{
+                  fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                  fontSize: 'clamp(84px, 14.5vw, 176px)',
+                  color: '#0D1F3C',
+                  lineHeight: '0.84',
+                  letterSpacing: '-0.03em',
+                  fontStyle: 'italic',
+                  fontWeight: 900,
+                }}
+              >
+                swim.
+              </h1>
+              <p
+                style={{
+                  fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                  fontSize: 'clamp(28px, 4.5vw, 52px)',
+                  color: '#4A7FA5',
+                  fontWeight: 600,
+                  lineHeight: 1.1,
+                  marginTop: '0.4rem',
+                }}
+              >
+                with Shirel.
+              </p>
+            </div>
+
+            {/* Description */}
+            <p
+              className="max-w-sm leading-relaxed mb-9"
+              style={{
+                fontFamily: 'var(--font-dm-sans, sans-serif)',
+                fontSize: 'clamp(13px, 1.2vw, 15px)',
+                color: 'rgba(13,31,60,0.50)',
+                lineHeight: 1.75,
+              }}
+            >
+              Private &amp; semi-private swim lessons for children
+              aged{' '}
+              <span style={{ color: '#4A7FA5', fontWeight: 600 }}>6 months – 12 years</span>.
+              Lessons are calm, personalised, and held at a beautiful private pool.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-3 mb-10">
+              <Link href="/book" className="btn-primary">
+                Book a Lesson
+              </Link>
+              <Link href="/#pricing" className="btn-secondary">
+                View Pricing
+              </Link>
+            </div>
+
+            {/* Trust bar */}
+            <div
+              className="flex flex-wrap gap-x-5 gap-y-2"
+              style={{ borderTop: '1px solid rgba(13,31,60,0.07)', paddingTop: '1.25rem' }}
+            >
+              {[
+                '5+ years teaching',
+                'Ages 6mo – 12yr',
+                'Private pool',
+                '⭐ 5-star rated',
+              ].map(l => (
+                <span
+                  key={l}
+                  style={{
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontSize: '11px',
+                    color: 'rgba(13,31,60,0.28)',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {l}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* ── RIGHT: Photo composition ── */}
+          <div className="order-1 lg:order-2 relative flex justify-center lg:justify-end">
+
+            {/* Blob background accent layer 1 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                inset: '-12%',
+                background: 'rgba(74,127,165,0.08)',
+                borderRadius: '44% 56% 52% 48% / 56% 44% 56% 44%',
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            />
+
+            {/* Blob background accent layer 2 */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                inset: '-5%',
+                background: 'rgba(200,224,240,0.25)',
+                borderRadius: '56% 44% 44% 56% / 44% 56% 44% 56%',
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            />
+
+            {/* Pool photo in organic blob */}
+            <div
+              className="relative"
+              style={{
+                width: 'clamp(260px, 40vw, 480px)',
+                aspectRatio: '4/5',
+                zIndex: 1,
+              }}
+            >
+              <div
+                className="w-full h-full overflow-hidden"
+                style={{
+                  borderRadius: '48% 52% 56% 44% / 54% 48% 52% 46%',
+                  boxShadow: '0 24px 80px -16px rgba(13,31,60,0.20)',
+                }}
+              >
+                <Image
+                  src="/pool-bg.jpg"
+                  alt="Private pool — swim lessons with Shirel"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: 'center center' }}
+                  sizes="(max-width: 1024px) 340px, 480px"
+                  priority
+                />
+              </div>
+
+              {/* Shirel portrait — circle, bottom-left corner, overlapping */}
+              <div
+                className="absolute"
+                style={{
+                  bottom: '-12px',
+                  left: '-16px',
+                  width: 'clamp(80px, 8vw, 112px)',
+                  height: 'clamp(80px, 8vw, 112px)',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '4px solid #F8F4ED',
+                  boxShadow: '0 8px 28px rgba(13,31,60,0.18)',
+                  zIndex: 2,
+                }}
+              >
+                <Image
+                  src="/shirel.jpg"
+                  alt="Shirel – swim instructor"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: 'center 15%' }}
+                  sizes="112px"
+                  priority
+                />
+              </div>
+
+              {/* Floating stats badge — top right */}
+              <div
+                className="absolute"
+                style={{
+                  top: '10%',
+                  right: '-20px',
+                  background: '#0D1F3C',
+                  color: '#F8F4ED',
+                  borderRadius: '16px',
+                  padding: '0.875rem 1.1rem',
+                  boxShadow: '0 12px 32px rgba(13,31,60,0.30)',
+                  zIndex: 2,
+                  minWidth: '90px',
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(200,224,240,0.55)',
+                    marginBottom: '2px',
+                  }}
+                >
+                  Students
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                    fontSize: '28px',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    color: '#F8F4ED',
+                  }}
+                >
+                  20+
+                </p>
+              </div>
+
+              {/* "Teaching since" floating badge — bottom right */}
+              <div
+                className="absolute"
+                style={{
+                  bottom: '12%',
+                  right: '-16px',
+                  background: 'rgba(248,244,237,0.96)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '9999px',
+                  padding: '0.5rem 1rem',
+                  boxShadow: '0 4px 16px rgba(13,31,60,0.12)',
+                  border: '1px solid rgba(13,31,60,0.06)',
+                  zIndex: 2,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#0D1F3C',
+                  }}
+                >
+                  Teaching since 2020
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Wavy bottom divider → navy ── */}
       <div
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(170deg, rgba(4,15,30,0.65) 0%, rgba(4,40,80,0.60) 45%, rgba(4,15,30,0.92) 100%)' }}
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{ lineHeight: 0 }}
         aria-hidden="true"
-      />
-
-      {/* Subtle shimmer */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-sky-400/6 rounded-full blur-3xl" />
-      </div>
-
-      {/* Content — anchored to bottom-left */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pt-28 pb-16">
-
-        {/* Location badge */}
-        <div className="inline-flex items-center bg-white/8 backdrop-blur-sm border border-white/12 text-sky-200/90 text-[10px] font-semibold px-4 py-2 rounded-full mb-12 tracking-[0.2em] uppercase">
-          Private Pool · Côte Saint-Luc, Québec
-        </div>
-
-        {/* Headline — the centrepiece */}
-        <div className="mb-10">
-          <p className="text-base sm:text-lg text-white/40 font-light tracking-wide mb-1 ml-1">
-            Learn to
-          </p>
-          <h1
-            className="font-bold text-sky-400 leading-[0.88] tracking-tighter mb-3"
-            style={{ fontSize: 'clamp(72px, 13vw, 160px)' }}
-          >
-            swim.
-          </h1>
-          <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight ml-1">
-            with Shirel.
-          </p>
-        </div>
-
-        {/* Subtitle */}
-        <p className="text-white/55 text-base sm:text-lg max-w-sm leading-relaxed mb-10 ml-1 font-light">
-          Private &amp; semi-private lessons for children
-          aged <span className="text-sky-300/90 font-medium">6 months – 12 years</span>.
-        </p>
-
-        {/* CTAs */}
-        <div className="flex flex-wrap gap-3 mb-14 ml-1">
-          <Link
-            href="/book"
-            className="px-8 py-3.5 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow-xl shadow-sky-900/40 text-sm tracking-wide"
-          >
-            Book a Lesson
-          </Link>
-          <Link
-            href="/#pricing"
-            className="px-8 py-3.5 border border-white/25 text-white/90 font-semibold rounded-full hover:bg-white/8 transition-all duration-200 backdrop-blur-sm text-sm tracking-wide"
-          >
-            View Pricing
-          </Link>
-        </div>
-
-        {/* Trust — clean inline text, no pill containers */}
-        <div className="flex flex-wrap gap-x-7 gap-y-2 ml-1">
-          {['5+ years teaching', 'Ages 6mo – 12yr', 'Private · Semi-private', '⭐ 5-star rated'].map(l => (
-            <span key={l} className="text-white/35 text-xs font-medium tracking-wide">{l}</span>
-          ))}
-        </div>
-
-      </div>
-
-      {/* Wave to white */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
-        <svg viewBox="0 0 1440 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-          <path d="M0 32 C360 0 720 64 1080 32 C1260 16 1380 44 1440 32 L1440 64 L0 64 Z" fill="white" />
+      >
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block" preserveAspectRatio="none">
+          <path d="M0 40 C200 10 400 70 600 40 C800 10 1050 68 1200 42 C1310 24 1380 56 1440 40 L1440 80 L0 80 Z" fill="#0D1F3C" />
         </svg>
       </div>
 
