@@ -126,38 +126,13 @@ export default function Hero() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            <div className="flex flex-wrap gap-3">
               <Link href="/book" className="btn-primary">
                 Book a Lesson
               </Link>
               <Link href="/pricing" className="btn-secondary">
                 View Pricing
               </Link>
-            </div>
-
-            {/* Trust bar */}
-            <div
-              className="flex flex-wrap gap-x-5 gap-y-2"
-              style={{ borderTop: '1px solid rgba(13,31,60,0.07)', paddingTop: '1.25rem' }}
-            >
-              {[
-                '5+ years teaching',
-                'Ages 6mo – 12yr',
-                'Private pool',
-                '⭐ 5-star rated',
-              ].map(l => (
-                <span
-                  key={l}
-                  style={{
-                    fontFamily: 'var(--font-dm-sans, sans-serif)',
-                    fontSize: '11px',
-                    color: 'rgba(13,31,60,0.28)',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {l}
-                </span>
-              ))}
             </div>
           </div>
 
@@ -213,73 +188,6 @@ export default function Hero() {
                   sizes="(max-width: 1024px) 340px, 480px"
                   priority
                 />
-              </div>
-
-              {/* Shirel portrait — circle, bottom-left corner, overlapping — larger + better crop */}
-              <div
-                className="absolute"
-                style={{
-                  bottom: '-18px',
-                  left: '-22px',
-                  width: 'clamp(100px, 10vw, 140px)',
-                  height: 'clamp(100px, 10vw, 140px)',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  border: '4px solid #F8F4ED',
-                  boxShadow: '0 10px 32px rgba(13,31,60,0.22)',
-                  zIndex: 2,
-                }}
-              >
-                <Image
-                  src="/shirel.jpg"
-                  alt="Shirel – swim instructor"
-                  fill
-                  className="object-cover"
-                  style={{ objectPosition: '50% 12%' }}
-                  sizes="140px"
-                  priority
-                />
-              </div>
-
-              {/* Floating stats badge — top right */}
-              <div
-                className="absolute"
-                style={{
-                  top: '10%',
-                  right: '-20px',
-                  background: '#0D1F3C',
-                  color: '#F8F4ED',
-                  borderRadius: '16px',
-                  padding: '0.875rem 1.1rem',
-                  boxShadow: '0 12px 32px rgba(13,31,60,0.30)',
-                  zIndex: 2,
-                  minWidth: '90px',
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: 'var(--font-dm-sans, sans-serif)',
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(200,224,240,0.55)',
-                    marginBottom: '2px',
-                  }}
-                >
-                  Students
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-fraunces, Georgia, serif)',
-                    fontSize: '28px',
-                    fontWeight: 800,
-                    lineHeight: 1,
-                    color: '#F8F4ED',
-                  }}
-                >
-                  20+
-                </p>
               </div>
 
               {/* "Teaching since" floating badge — bottom right */}
