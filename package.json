@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
-    "postbuild": "cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static",
-    "start": "node .next/standalone/server.js",
+    "start": "next start -p ${PORT:-3000}",
     "lint": "next lint"
   },
   "dependencies": {
