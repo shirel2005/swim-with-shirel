@@ -74,7 +74,11 @@ export default function PricingPage() {
       </section>
 
       {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
-      <PricingSection />
+      {/* Extra blob accent between header and cards */}
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <div className="absolute pointer-events-none" style={{ top: '-20px', right: '-6%', width: '28vw', height: '35vh', background: 'radial-gradient(ellipse, rgba(74,127,165,0.06) 0%, transparent 65%)', borderRadius: '52% 48% 44% 56% / 48% 56% 44% 52%' }} aria-hidden="true" />
+        <PricingSection />
+      </div>
 
       {/* ── WHAT'S INCLUDED — informational band ─────────────────────────── */}
       <section
@@ -143,7 +147,7 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) are available at double the private rate — $100 / session or $900 for a 10-pack of 45-min sessions.' },
+              { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) have their own rate — $75/session (30 min) or $115/session (45 min). 10-packs: $650 (30 min) or $1,000 (45 min).' },
               { q: 'How do 10-packs work?', a: 'Buy 10 sessions upfront at a discounted rate. Book each one individually — no need to schedule all at once. Credits never expire.' },
               { q: 'When do I pay?', a: 'Payment is due in person on the day of each lesson — cash or e-transfer. No pre-payment required when booking online.' },
             ].map(item => (

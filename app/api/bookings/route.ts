@@ -56,11 +56,13 @@ export async function POST(request: NextRequest) {
     let totalPrice = 0
     if (isPack) {
       const is45 = lesson_type?.includes('45')
-      totalPrice = lesson_format === 'semi-private' ? (is45 ? 1200 : 900) : (is45 ? 650 : 450)
+      totalPrice = lesson_format === 'semi-private' ? (is45 ? 1000 : 650) : (is45 ? 700 : 450)
     } else if (hasBookedSlots) {
       totalPrice = booked_slots.reduce((sum: number, s: { duration: number }) => {
-        const base = s.duration === 45 ? 75 : 50
-        return sum + (lesson_format === 'semi-private' ? base * 2 : base)
+        const base = lesson_format === 'semi-private'
+          ? (s.duration === 45 ? 115 : 75)
+          : (s.duration === 45 ? 75 : 50)
+        return sum + base
       }, 0)
     }
 

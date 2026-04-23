@@ -115,7 +115,10 @@ export default function HomePage() {
       <HowItWorks />
 
       {/* ── MEET SHIREL — asymmetric, editorial, organic photo ───────────── */}
-      <section style={{ backgroundColor: '#F8F4ED', paddingTop: '7rem', paddingBottom: '7rem', overflow: 'hidden' }}>
+      <section style={{ backgroundColor: '#F8F4ED', paddingTop: '7rem', paddingBottom: '7rem', overflow: 'hidden', position: 'relative' }}>
+        {/* Cream-section blobs */}
+        <div className="absolute pointer-events-none" style={{ top: '5%', right: '-8%', width: '32vw', height: '55vh', background: 'radial-gradient(ellipse, rgba(74,127,165,0.07) 0%, transparent 65%)', borderRadius: '42% 58% 54% 46% / 48% 52% 48% 52%' }} aria-hidden="true" />
+        <div className="absolute pointer-events-none" style={{ bottom: '8%', left: '-6%', width: '24vw', height: '38vh', background: 'radial-gradient(ellipse, rgba(13,31,60,0.04) 0%, transparent 65%)', borderRadius: '58% 42% 46% 54% / 52% 48% 52% 48%' }} aria-hidden="true" />
         <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-16 lg:gap-28 items-center">
 
@@ -233,7 +236,7 @@ export default function HomePage() {
                 fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em',
               }}>
                 Sessions from <em style={{ color: '#6AAFD4' }}>$50.</em>
-                <br />10-packs available.
+                <br />10-packs from $450.
               </h2>
             </div>
             <div className="flex flex-col gap-4 shrink-0">
@@ -257,7 +260,9 @@ export default function HomePage() {
 
       {/* ── FEATURED TESTIMONIAL ─────────────────────────────────────────── */}
       {featured && (
-        <section style={{ backgroundColor: '#F8F4ED', paddingTop: '6rem', paddingBottom: '7rem' }}>
+        <section style={{ backgroundColor: '#F8F4ED', paddingTop: '6rem', paddingBottom: '7rem', position: 'relative', overflow: 'hidden' }}>
+          <div className="absolute pointer-events-none" style={{ top: '-10%', left: '-5%', width: '28vw', height: '50vh', background: 'radial-gradient(ellipse, rgba(74,127,165,0.06) 0%, transparent 65%)', borderRadius: '60% 40% 55% 45% / 48% 58% 42% 52%' }} aria-hidden="true" />
+          <div className="absolute pointer-events-none" style={{ bottom: '-5%', right: '-4%', width: '22vw', height: '40vh', background: 'radial-gradient(ellipse, rgba(13,31,60,0.04) 0%, transparent 65%)', borderRadius: '44% 56% 50% 50% / 54% 46% 54% 46%' }} aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-8 sm:px-10 text-center">
             <div className="flex justify-center gap-1.5 mb-7">
               {Array.from({ length: featured.rating }).map((_, i) => (

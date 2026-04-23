@@ -9,8 +9,8 @@ function checkAdminAuth(request: NextRequest): boolean {
 
 function getPricePerSlot(duration: number, format: string | null): number {
   const isPrivate = !format || format === 'private'
-  if (duration === 30) return isPrivate ? 50 : 100
-  return isPrivate ? 75 : 150
+  if (duration === 30) return isPrivate ? 50 : 75
+  return isPrivate ? 75 : 115
 }
 
 export async function GET(request: NextRequest) {

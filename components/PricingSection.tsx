@@ -28,8 +28,8 @@ const tiers: PricingTier[] = [
   {
     duration: '45 min',
     singlePrice: '$75',
-    packPrice: '$650',
-    packSave: 'Save $100',
+    packPrice: '$700',
+    packSave: 'Save $50',
     desc: 'More room for technique, play, and deeper skill-building.',
   },
 ]
@@ -67,7 +67,7 @@ export default function PricingSection() {
                 maxWidth: '260px',
               }}
             >
-              Payment in person — cash or e-transfer. Semi-private (exactly 2 children) is double the private rate.
+              Payment in person — cash or e-transfer. Semi-private: $75/session (30 min) or $115/session (45 min).
             </p>
           </div>
         </div>
