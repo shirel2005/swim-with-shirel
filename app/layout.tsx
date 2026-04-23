@@ -32,34 +32,27 @@ export const metadata: Metadata = {
       'Private and semi-private swimming lessons in Côte Saint-Luc for children of all levels.',
     url: BASE_URL,
     siteName: 'Swim with Shirel',
-    images: [
-      {
-        url: '/pool-bg.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Private pool in Côte Saint-Luc – Swim with Shirel',
-      },
-    ],
+    images: [{ url: '/pool-bg.jpg', width: 1200, height: 630, alt: 'Private pool – Swim with Shirel' }],
     locale: 'en_CA',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Swim with Shirel',
-    description:
-      'Private and semi-private swimming lessons in Côte Saint-Luc for children of all levels.',
+    description: 'Private and semi-private swimming lessons in Côte Saint-Luc for children of all levels.',
     images: ['/pool-bg.jpg'],
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${fraunces.variable} ${dmSans.variable} flex flex-col min-h-screen`}>
+    // suppressHydrationWarning prevents hydration mismatches from browser extensions
+    // or dynamic values (e.g. date) that differ between server and client renders.
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${fraunces.variable} ${dmSans.variable} flex flex-col min-h-screen`}
+        suppressHydrationWarning
+      >
         <AvailabilityBanner />
         <Navbar />
         <main className="flex-1">{children}</main>

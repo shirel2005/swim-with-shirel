@@ -130,7 +130,7 @@ export default function Hero() {
               <Link href="/book" className="btn-primary">
                 Book a Lesson
               </Link>
-              <Link href="/#pricing" className="btn-secondary">
+              <Link href="/pricing" className="btn-secondary">
                 View Pricing
               </Link>
             </div>
@@ -215,18 +215,18 @@ export default function Hero() {
                 />
               </div>
 
-              {/* Shirel portrait — circle, bottom-left corner, overlapping */}
+              {/* Shirel portrait — circle, bottom-left corner, overlapping — larger + better crop */}
               <div
                 className="absolute"
                 style={{
-                  bottom: '-12px',
-                  left: '-16px',
-                  width: 'clamp(80px, 8vw, 112px)',
-                  height: 'clamp(80px, 8vw, 112px)',
+                  bottom: '-18px',
+                  left: '-22px',
+                  width: 'clamp(100px, 10vw, 140px)',
+                  height: 'clamp(100px, 10vw, 140px)',
                   borderRadius: '50%',
                   overflow: 'hidden',
                   border: '4px solid #F8F4ED',
-                  boxShadow: '0 8px 28px rgba(13,31,60,0.18)',
+                  boxShadow: '0 10px 32px rgba(13,31,60,0.22)',
                   zIndex: 2,
                 }}
               >
@@ -235,8 +235,8 @@ export default function Hero() {
                   alt="Shirel – swim instructor"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: 'center 15%' }}
-                  sizes="112px"
+                  style={{ objectPosition: '50% 12%' }}
+                  sizes="140px"
                   priority
                 />
               </div>

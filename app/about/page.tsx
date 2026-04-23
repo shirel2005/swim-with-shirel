@@ -79,7 +79,7 @@ export default function AboutPage() {
                   maxWidth: '500px',
                 }}
               >
-                Swim instructor, certified lifeguard, and McGill student who genuinely loves seeing kids fall in love with the water.
+                Swim instructor, former certified lifeguard, and McGill student who genuinely loves seeing kids fall in love with the water.
               </p>
             </div>
 
@@ -249,7 +249,7 @@ export default function AboutPage() {
               <p>
                 I started out as a{' '}
                 <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>
-                  certified lifeguard and public swim instructor
+                  former certified lifeguard and public swim instructor
                 </strong>
                 , teaching group lessons to kids of all ages. But I quickly realized something: children make the most progress — and have the most <em>fun</em> — when they have someone&apos;s complete, undivided attention.
               </p>
@@ -337,8 +337,8 @@ export default function AboutPage() {
               },
               {
                 num: '02',
-                title: 'Genuinely certified',
-                body: 'Certified lifeguard with years of real-world experience in both public and private settings. Safety is never an afterthought.',
+                title: 'Formally trained',
+                body: 'Former certified lifeguard with years of real-world experience in both public and private settings. Safety is never an afterthought.',
               },
               {
                 num: '03',
