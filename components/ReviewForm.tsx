@@ -63,17 +63,20 @@ export default function ReviewForm({ onSuccess }: ReviewFormProps) {
 
   if (success) {
     return (
-      <div className="bg-sky-50 border border-sky-200 rounded-2xl p-8 text-center">
-        <div className="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Send size={20} className="text-sky-700" />
+      <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(74,127,165,0.07)', border: '1px solid rgba(74,127,165,0.2)' }}>
+        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(74,127,165,0.12)', border: '1px solid rgba(74,127,165,0.2)' }}>
+          <Send size={20} style={{ color: '#4A7FA5' }} />
         </div>
-        <p className="font-bold text-sky-900 text-lg mb-2">Thank you for your review!</p>
-        <p className="text-sky-700 text-sm">
+        <p className="font-bold text-lg mb-2" style={{ color: '#0D1F3C' }}>Thank you for your review!</p>
+        <p className="text-sm" style={{ color: '#4A7FA5' }}>
           Your review has been submitted and will appear once approved.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="mt-5 text-sm text-sky-600 hover:text-sky-800 underline transition-colors"
+          className="mt-5 text-sm underline transition-colors"
+          style={{ color: '#4A7FA5' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#0D1F3C')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#4A7FA5')}
         >
           Submit another review
         </button>
@@ -116,7 +119,7 @@ export default function ReviewForm({ onSuccess }: ReviewFormProps) {
         </label>
         <StarRating rating={rating} interactive onRatingChange={setRating} size="lg" />
         {rating > 0 && (
-          <p className="text-xs text-sky-600 mt-1 font-medium">
+          <p className="text-xs mt-1 font-medium" style={{ color: '#4A7FA5' }}>
             {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][rating]}
           </p>
         )}

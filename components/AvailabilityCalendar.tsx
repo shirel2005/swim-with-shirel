@@ -98,7 +98,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-7 h-7 border-[3px] border-sky-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-7 h-7 border-[3px] border-[#4A7FA5] border-t-transparent rounded-full animate-spin" />
         <span className="ml-3 text-slate-500 text-sm">Loading availability...</span>
       </div>
     )
@@ -113,9 +113,9 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
   if (!hasAnySlots) {
     return (
       <div className="card p-10 text-center">
-        <Waves className="w-10 h-10 text-sky-200 mx-auto mb-4" />
+        <Waves className="w-10 h-10 mx-auto mb-4" style={{ color: 'rgba(74,127,165,0.3)' }} />
         <p className="text-slate-700 font-semibold mb-1">No available {duration}-minute lesson times at the moment.</p>
-        <p className="text-slate-400 text-sm">Please check back soon or <a href="mailto:swim.with.shirel@gmail.com" className="text-sky-600 hover:underline">contact me</a> directly.</p>
+        <p className="text-slate-400 text-sm">Please check back soon or <a href="mailto:swim.with.shirel@gmail.com" className="text-[#4A7FA5] hover:underline">contact me</a> directly.</p>
       </div>
     )
   }
@@ -131,13 +131,19 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
   return (
     <div className="space-y-5">
       {/* Calendar */}
-      <div className="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden" style={{ border: '1.5px solid rgba(13,31,60,0.07)' }}>
         {/* Month nav */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-sky-50 bg-sky-50/50">
+        <div
+          className="flex items-center justify-between px-5 py-3.5"
+          style={{ borderBottom: '1px solid rgba(13,31,60,0.06)', background: 'rgba(248,244,237,0.6)' }}
+        >
           <button
             type="button"
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="p-2 rounded-xl hover:bg-sky-100 transition-colors text-slate-500 hover:text-sky-700"
+            className="p-2 rounded-xl transition-colors text-slate-500"
+            style={{ ['--hover-bg' as string]: 'rgba(74,127,165,0.1)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,127,165,0.1)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             aria-label="Previous month"
           >
             <ChevronLeft size={18} />
@@ -150,7 +156,9 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
               type="button"
               onClick={() => fetchSlots(true)}
               disabled={refreshing}
-              className="p-1.5 rounded-lg hover:bg-sky-100 transition-colors text-slate-400 hover:text-sky-700"
+              className="p-1.5 rounded-lg transition-colors text-slate-400"
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,127,165,0.1)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               aria-label="Refresh availability"
               title="Refresh availability"
             >
@@ -160,7 +168,9 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
           <button
             type="button"
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="p-2 rounded-xl hover:bg-sky-100 transition-colors text-slate-500 hover:text-sky-700"
+            className="p-2 rounded-xl transition-colors text-slate-500"
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,127,165,0.1)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             aria-label="Next month"
           >
             <ChevronRight size={18} />
@@ -168,14 +178,14 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
         </div>
 
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 bg-white border-b border-sky-50">
+        <div className="grid grid-cols-7 bg-white" style={{ borderBottom: '1px solid rgba(13,31,60,0.05)' }}>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
             <div key={d} className="py-2 text-center text-xs font-semibold text-slate-400 tracking-wide">{d}</div>
           ))}
         </div>
 
         {/* Calendar days */}
-        <div className="grid grid-cols-7 gap-px bg-sky-50/30 p-2">
+        <div className="grid grid-cols-7 gap-px p-2" style={{ background: 'rgba(248,244,237,0.4)' }}>
           {calDays.map((calDay, idx) => {
             const dateStr = format(calDay, 'yyyy-MM-dd')
             const hasSlots = datesWithSlots.has(dateStr)
@@ -184,18 +194,34 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
             const isSelected = selectedDate ? isSameDay(calDay, selectedDate) : false
             const isToday = isSameDay(calDay, new Date())
 
-            let cellClass = 'relative h-11 sm:h-12 flex flex-col items-center justify-center text-sm transition-all duration-200 rounded-xl m-0.5'
+            const baseClass = 'relative h-11 sm:h-12 flex flex-col items-center justify-center text-sm transition-all duration-200 rounded-xl m-0.5'
+
+            let style: React.CSSProperties = {}
+            let extraClass = ''
 
             if (!isCurrentMonth) {
-              cellClass += ' text-slate-200'
+              extraClass = ' text-slate-200'
             } else if (isPast) {
-              cellClass += ' text-slate-300 cursor-not-allowed'
+              extraClass = ' text-slate-300 cursor-not-allowed'
             } else if (isSelected) {
-              cellClass += ' bg-sky-700 text-white cursor-pointer font-bold shadow-lg shadow-sky-200 scale-105'
+              style = {
+                background: '#0D1F3C',
+                color: '#F8F4ED',
+                boxShadow: '0 4px 12px rgba(13,31,60,0.20)',
+                transform: 'scale(1.05)',
+                fontWeight: 700,
+              }
+              extraClass = ' cursor-pointer'
             } else if (hasSlots) {
-              cellClass += ' bg-sky-50 text-sky-800 hover:bg-sky-100 cursor-pointer font-semibold border border-sky-200 hover:scale-105 hover:shadow-sm'
+              style = {
+                background: 'rgba(74,127,165,0.09)',
+                color: '#0D1F3C',
+                border: '1px solid rgba(74,127,165,0.25)',
+                fontWeight: 600,
+              }
+              extraClass = ' cursor-pointer hover:scale-105'
             } else {
-              cellClass += ' text-slate-300 cursor-not-allowed'
+              extraClass = ' text-slate-300 cursor-not-allowed'
             }
 
             const slotCount = getSlotsForDate(calDay).length
@@ -203,14 +229,15 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
             return (
               <div
                 key={idx}
-                className={cellClass}
+                className={baseClass + extraClass}
+                style={style}
                 onClick={() => isCurrentMonth && !isPast ? handleDateClick(calDay) : undefined}
               >
-                <span className={isToday && !isSelected ? 'underline decoration-sky-600 underline-offset-2' : ''}>
+                <span style={isToday && !isSelected ? { textDecoration: 'underline', textDecorationColor: '#4A7FA5', textUnderlineOffset: '2px' } : {}}>
                   {format(calDay, 'd')}
                 </span>
                 {hasSlots && !isPast && isCurrentMonth && (
-                  <span className={`text-[9px] ${isSelected ? 'text-sky-200' : 'text-sky-500'}`}>
+                  <span style={{ fontSize: '9px', color: isSelected ? 'rgba(106,175,212,0.8)' : '#4A7FA5' }}>
                     {slotCount}
                   </span>
                 )}
@@ -223,11 +250,11 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
       {/* Legend */}
       <div className="flex flex-wrap gap-4 text-xs text-slate-400">
         <span className="flex items-center gap-1.5">
-          <span className="w-4 h-4 rounded-lg bg-sky-50 border border-sky-200 inline-block" />
+          <span className="w-4 h-4 rounded-lg inline-block" style={{ background: 'rgba(74,127,165,0.09)', border: '1px solid rgba(74,127,165,0.25)' }} />
           Available
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-4 h-4 rounded-lg bg-sky-700 inline-block" />
+          <span className="w-4 h-4 rounded-lg inline-block" style={{ background: '#0D1F3C' }} />
           Selected
         </span>
         <span className="flex items-center gap-1.5">
@@ -241,7 +268,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
         <div className="card p-5">
           <h4 className="font-bold text-slate-800 mb-3 text-sm">
             {format(selectedDate, 'EEEE, MMMM d, yyyy')}
-            <span className="ml-2 text-xs font-normal text-sky-600">— {duration}-min slots</span>
+            <span className="ml-2 text-xs font-normal" style={{ color: '#4A7FA5' }}>— {duration}-min slots</span>
           </h4>
 
           {selectedDateSlots.length === 0 ? (
@@ -258,7 +285,10 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
                       const slot = availableToAdd.find(s => s.id === e.target.value)
                       if (slot) addSlot(slot)
                     }}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400 text-sm bg-white text-slate-700"
+                    className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-white text-slate-700 focus:outline-none"
+                    style={{ border: '1px solid rgba(74,127,165,0.3)', outline: 'none' }}
+                    onFocus={e => (e.target.style.borderColor = '#4A7FA5')}
+                    onBlur={e => (e.target.style.borderColor = 'rgba(74,127,165,0.3)')}
                   >
                     <option value="" disabled>Select a start time...</option>
                     {availableToAdd.map(slot => (
@@ -270,7 +300,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
                   <span className="text-xs text-slate-400">{availableToAdd.length} time{availableToAdd.length !== 1 ? 's' : ''} available</span>
                 </div>
               ) : (
-                <p className="text-xs text-sky-700 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2">
+                <p className="text-xs rounded-xl px-3 py-2" style={{ color: '#0D1F3C', background: 'rgba(74,127,165,0.08)', border: '1px solid rgba(74,127,165,0.15)' }}>
                   All available times for this date have been added.
                 </p>
               )}
@@ -279,12 +309,15 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
               {alreadySelectedForDate.length > 0 && (
                 <div className="space-y-1.5">
                   {alreadySelectedForDate.map(slot => (
-                    <div key={slot.id} className="flex items-center justify-between bg-sky-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold">
-                      <span>{formatTime(slot.start_time)} <span className="font-normal text-sky-200 text-xs">({duration} min)</span></span>
+                    <div key={slot.id} className="flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold" style={{ background: '#0D1F3C', color: '#F8F4ED' }}>
+                      <span>{formatTime(slot.start_time)} <span className="font-normal text-xs" style={{ color: 'rgba(106,175,212,0.8)' }}>({duration} min)</span></span>
                       <button
                         type="button"
                         onClick={() => removeSlot(slot.id)}
-                        className="text-sky-300 hover:text-white transition-colors ml-4 text-xs"
+                        className="transition-colors ml-4 text-xs"
+                        style={{ color: '#6AAFD4' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#F8F4ED')}
+                        onMouseLeave={e => (e.currentTarget.style.color = '#6AAFD4')}
                       >
                         Remove
                       </button>
@@ -299,15 +332,22 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
 
       {/* Summary of all selected sessions */}
       {selectedSlots.length > 0 && (
-        <div className="bg-sky-50 border border-sky-200 rounded-2xl p-4">
-          <p className="font-bold text-sky-900 text-sm mb-2">
+        <div className="rounded-2xl p-4" style={{ background: 'rgba(74,127,165,0.07)', border: '1px solid rgba(74,127,165,0.2)' }}>
+          <p className="font-bold text-sm mb-2" style={{ color: '#0D1F3C' }}>
             {selectedSlots.length} session{selectedSlots.length !== 1 ? 's' : ''} selected
           </p>
           <div className="space-y-1">
             {selectedSlots.map(s => (
-              <div key={s.id} className="flex items-center justify-between text-xs text-sky-700">
+              <div key={s.id} className="flex items-center justify-between text-xs" style={{ color: '#4A7FA5' }}>
                 <span>{format(new Date(s.date + 'T00:00:00'), 'MMM d')} at {formatTime(s.start_time)}</span>
-                <button type="button" onClick={() => removeSlot(s.id)} className="text-sky-400 hover:text-red-500 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => removeSlot(s.id)}
+                  className="transition-colors"
+                  style={{ color: 'rgba(74,127,165,0.6)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(74,127,165,0.6)')}
+                >
                   ✕
                 </button>
               </div>

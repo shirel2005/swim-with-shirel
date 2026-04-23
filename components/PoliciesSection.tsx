@@ -24,7 +24,7 @@ const policies = [
 
 export default function PoliciesSection() {
   return (
-    <section className="bg-sky-50 py-16 lg:py-24">
+    <section style={{ backgroundColor: '#F8F4ED' }} className="py-16 lg:py-24">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
 
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
@@ -32,7 +32,7 @@ export default function PoliciesSection() {
             <p className="section-label">Policies</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">Simple &amp; Fair</h2>
           </div>
-          <Link href="/policies" className="text-sm font-medium text-sky-700 hover:text-sky-800 transition-colors shrink-0">
+          <Link href="/policies" className="text-sm font-medium transition-colors shrink-0" style={{ color: '#4A7FA5' }}>
             View full policies →
           </Link>
         </div>
@@ -41,9 +41,12 @@ export default function PoliciesSection() {
           {policies.map((policy, idx) => {
             const Icon = policy.icon
             return (
-              <div key={idx} className="card p-7 hover:shadow-md hover:border-sky-200 transition-all duration-200">
-                <div className="w-11 h-11 bg-sky-50 border border-sky-100 rounded-xl flex items-center justify-center mb-5">
-                  <Icon size={20} className="text-sky-700" />
+              <div key={idx} className="card p-7 transition-all duration-200 hover:shadow-md">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+                  style={{ background: 'rgba(74,127,165,0.09)', border: '1px solid rgba(74,127,165,0.18)' }}
+                >
+                  <Icon size={20} style={{ color: '#4A7FA5' }} />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-3">{policy.title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">{policy.description}</p>

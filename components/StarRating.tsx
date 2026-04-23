@@ -30,7 +30,7 @@ export default function StarRating({ rating, interactive = false, onRatingChange
             onMouseLeave={interactive ? () => setHovered(0) : undefined}
             className={`transition-all duration-150 ease-in-out ${
               interactive
-                ? 'cursor-pointer hover:scale-125 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-1 rounded'
+                ? 'cursor-pointer hover:scale-125 focus:outline-none focus:ring-2 focus:ring-[#4A7FA5]/40 focus:ring-offset-1 rounded'
                 : 'cursor-default'
             }`}
             aria-label={interactive ? `Rate ${star} out of 5 stars` : undefined}
