@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-import { sendBookingConfirmation } from '@/lib/email'
+import { sendBookingConfirmation, sendBookingRejection } from '@/lib/email'
 
 function checkAdminAuth(request: NextRequest): boolean {
   const password = request.headers.get('x-admin-password') || ''
@@ -135,6 +135,20 @@ export async function PATCH(
           })
         } catch (emailError) {
           console.error('[Email] Failed to send confirmation (booking still confirmed):', emailError)
+        }
+      })
+    }
+
+    // Send cancellation/rejection email — only when newly cancelled, not if already was cancelled
+    if (status === 'cancelled' && previousStatus !== 'cancelled') {
+      setImmediate(async () => {
+        try {
+          await sendBookingRejection({
+            parentName: booking.parent_name,
+            parentEmail: booking.parent_email,
+          })
+        } catch (emailError) {
+          console.error('[Email] Failed to send cancellation notice (booking still cancelled):', emailError)
         }
       })
     }

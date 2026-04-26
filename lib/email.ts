@@ -299,3 +299,114 @@ export async function sendBookingConfirmation({
 
   console.log('[Email] Sent successfully via Gmail API to:', parentEmail)
 }
+
+export async function sendBookingRejection({
+  parentName,
+  parentEmail,
+}: {
+  parentName: string
+  parentEmail: string
+}) {
+  const clientId = process.env.GMAIL_CLIENT_ID
+  const clientSecret = process.env.GMAIL_CLIENT_SECRET
+  const refreshToken = process.env.GMAIL_REFRESH_TOKEN
+
+  if (!clientId || !clientSecret || !refreshToken) {
+    console.warn('[Email] Gmail credentials not set — skipping.')
+    return
+  }
+
+  console.log('[Email] Sending cancellation notice to:', parentEmail)
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');</style>
+</head>
+<body style="margin:0;padding:0;background:${slate50};font-family:${serif};">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${slate50};padding:32px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;">
+
+  <!-- Header -->
+  <tr><td style="background:${slate900};border-radius:16px 16px 0 0;padding:30px 36px 26px;">
+    <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${slate400};font-family:${serif};font-weight:600;">Swim with Shirel &middot; C&ocirc;te Saint-Luc</p>
+    <h1 style="margin:0;font-size:26px;font-weight:700;color:#ffffff;font-family:${serif};line-height:1.25;letter-spacing:-0.01em;">Booking Update</h1>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:32px 36px 36px;">
+
+    <p style="margin:0 0 6px 0;font-size:16px;color:${slate900};font-family:${serif};">Hi <strong>${parentName}</strong>,</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:${slate600};font-family:${serif};line-height:1.7;">
+      Unfortunately, I&rsquo;m unable to accommodate your requested booking at this time. This may be due to a scheduling conflict or unavailability on the requested date.
+    </p>
+
+    <div style="background:${sky50};border:1px solid ${sky100};border-radius:12px;padding:16px 20px;margin-bottom:28px;">
+      <p style="margin:0 0 6px 0;font-size:13px;font-weight:700;color:${slate900};font-family:${serif};">Still want to book?</p>
+      <p style="margin:0;font-size:13px;color:${slate600};font-family:${serif};line-height:1.65;">
+        Head back to the booking page to choose a different date or time, or reply to this email and I&rsquo;ll help you find a slot that works.
+      </p>
+    </div>
+
+    <p style="margin:0 0 4px 0;font-size:14px;color:${slate600};font-family:${serif};line-height:1.7;">Sorry for any inconvenience, and I hope to see you in the pool soon!</p>
+    <p style="margin:6px 0 0 0;font-size:15px;color:${slate900};font-family:${serif};font-style:italic;">&mdash; Shirel</p>
+
+    <!-- Divider -->
+    <div style="border-top:1px solid ${slate200};margin:28px 0 18px;"></div>
+
+    <!-- Footer -->
+    <p style="margin:0 0 3px 0;font-size:11px;color:${slate400};font-family:${serif};">Swim with Shirel &middot; Private Pool &middot; C&ocirc;te Saint-Luc, Qu&eacute;bec</p>
+    <p style="margin:0;font-size:11px;font-family:${serif};">
+      <a href="mailto:${CONTACT_EMAIL}" style="color:${sky700};text-decoration:none;">${CONTACT_EMAIL}</a>
+      <span style="color:${slate400};">&nbsp;&middot;&nbsp;</span>
+      <a href="tel:${CONTACT_PHONE_TEL}" style="color:${sky700};text-decoration:none;">${CONTACT_PHONE}</a>
+    </p>
+
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
+
+  const subject = encodeSubject('Booking update | Swim with Shirel')
+
+  const messageParts = [
+    `From: "Swim with Shirel" <${CONTACT_EMAIL}>`,
+    `To: ${parentEmail}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset=utf-8`,
+    `Content-Transfer-Encoding: 8bit`,
+    ``,
+    html,
+  ]
+  const raw = Buffer.from(messageParts.join('\r\n'))
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+
+  const accessToken = await getAccessToken()
+
+  const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ raw }),
+  })
+
+  if (!sendRes.ok) {
+    const err = await sendRes.text()
+    throw new Error(`Gmail API send failed: ${err}`)
+  }
+
+  console.log('[Email] Cancellation notice sent to:', parentEmail)
+}
