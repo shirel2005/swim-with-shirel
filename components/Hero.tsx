@@ -121,7 +121,7 @@ export default function Hero() {
             >
               Private &amp; semi-private swim lessons for children
               aged{' '}
-              <span style={{ color: '#4A7FA5', fontWeight: 600 }}>6 months – 12 years</span>.
+              <span style={{ color: '#4A7FA5', fontWeight: 600 }}>6 months to 12 years</span>.
               Lessons are calm, personalised, and held at a beautiful private pool.
             </p>
 

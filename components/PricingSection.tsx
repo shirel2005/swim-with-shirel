@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Check } from 'lucide-react'
 
 const features = [
-  'Book flexibly — no need to schedule all at once',
+  'Book flexibly, no need to schedule all at once',
   'Credits never expire',
   'Priority scheduling',
 ]
@@ -67,7 +67,7 @@ export default function PricingSection() {
                 maxWidth: '260px',
               }}
             >
-              Payment in person — cash or e-transfer. Semi-private: $75/session (30 min) or $115/session (45 min).
+              Payment in person, cash or e-transfer. Semi-private: $75/session (30 min) or $115/session (45 min).
             </p>
           </div>
         </div>

@@ -131,10 +131,10 @@ export default function ReviewForm({ onSuccess }: ReviewFormProps) {
         </label>
         <select value={lessonType} onChange={(e) => setLessonType(e.target.value)} className="input-field">
           <option value="">Select lesson type...</option>
-          <option value="30 min">Single – 30 min</option>
-          <option value="45 min">Single – 45 min</option>
-          <option value="10-pack 30 min">10-Pack – 30 min</option>
-          <option value="10-pack 45 min">10-Pack – 45 min</option>
+          <option value="30 min">Single 30 min</option>
+          <option value="45 min">Single 45 min</option>
+          <option value="10-pack 30 min">10-Pack 30 min</option>
+          <option value="10-pack 45 min">10-Pack 45 min</option>
         </select>
       </div>
 

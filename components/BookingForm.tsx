@@ -27,8 +27,8 @@ const EXPERIENCE_OPTIONS = [
 const LESSON_TYPE_OPTIONS = [
   { value: '30min',        label: '30-Minute Lesson', duration: 30 as const, pack: false, hint: 'Great for young beginners',    pvtSession: 50,  semiSession: 75,  pvtPack: 0,   semiPack: 0    },
   { value: '45min',        label: '45-Minute Lesson', duration: 45 as const, pack: false, hint: 'More depth and real progress', pvtSession: 75,  semiSession: 115, pvtPack: 0,   semiPack: 0    },
-  { value: '10pack-30min', label: '10-Pack · 30 min', duration: 30 as const, pack: true,  hint: 'Best value — save $50',        pvtSession: 50,  semiSession: 75,  pvtPack: 450, semiPack: 650  },
-  { value: '10pack-45min', label: '10-Pack · 45 min', duration: 45 as const, pack: true,  hint: 'Best value — save $50',        pvtSession: 75,  semiSession: 115, pvtPack: 700, semiPack: 1000 },
+  { value: '10pack-30min', label: '10-Pack · 30 min', duration: 30 as const, pack: true,  hint: 'Best value, save $50',        pvtSession: 50,  semiSession: 75,  pvtPack: 450, semiPack: 650  },
+  { value: '10pack-45min', label: '10-Pack · 45 min', duration: 45 as const, pack: true,  hint: 'Best value, save $50',        pvtSession: 75,  semiSession: 115, pvtPack: 700, semiPack: 1000 },
 ]
 
 const STEPS = [{ num: 1, label: 'You' }, { num: 2, label: 'Children' }, { num: 3, label: 'Lesson' }, { num: 4, label: 'Schedule' }, { num: 5, label: 'Review' }]
@@ -216,7 +216,7 @@ export default function BookingForm() {
     if (s === 4 && !isWeekly) {
       if (sessions.length === 0) errs.sessions = 'Please select at least one session'
       else if (!isPack && lessonFormat === 'private' && sessions.length < validChildren.length) {
-        errs.sessions = `Select ${validChildren.length} sessions — one per child (${sessions.length}/${validChildren.length} selected)`
+        errs.sessions = `Select ${validChildren.length} sessions, one per child (${sessions.length}/${validChildren.length} selected)`
       }
     }
     if (s === 5 && needsAssignment) {
@@ -288,7 +288,7 @@ export default function BookingForm() {
           </div>
           <div style={{ background: 'rgba(74,127,165,0.05)', border: '1px solid rgba(74,127,165,0.12)', borderRadius: '14px', padding: '1.125rem 1.25rem', textAlign: 'left', marginBottom: '1.5rem' }}>
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: 'rgba(13,31,60,0.65)', marginBottom: '4px' }}>✓ A confirmation will be sent to <strong>{parent.email}</strong></p>
-            <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: 'rgba(13,31,60,0.65)' }}>✓ Payment due within 2 hours of lesson — cash or e-transfer</p>
+            <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: 'rgba(13,31,60,0.65)' }}>✓ Payment due within 2 hours of lesson, cash or e-transfer</p>
           </div>
           <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: 'rgba(13,31,60,0.38)', marginBottom: '1.5rem' }}>
             Questions?{' '}
@@ -331,7 +331,7 @@ export default function BookingForm() {
           )}
           {quickFilled && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#4A7FA5', fontFamily: 'var(--font-dm-sans)', background: 'rgba(74,127,165,0.06)', border: '1px solid rgba(74,127,165,0.15)', borderRadius: '10px', padding: '0.5rem 0.875rem', marginBottom: '1.25rem' }}>
-              <Check size={13} /> Pre-filled from your last booking — review and update if needed.
+              <Check size={13} /> Pre-filled from your last booking. Review and update if needed.
             </div>
           )}
 
@@ -439,8 +439,8 @@ export default function BookingForm() {
             <div className="space-y-3">
               {([
                 { value: 'one-time' as const, label: 'One-time lesson',          desc: 'Book a specific date and time',               icon: <Check size={15} /> },
-                { value: 'weekly' as const,   label: 'Weekly recurring request', desc: 'Request a regular weekly slot — Sun–Fri',     icon: <Repeat size={15} /> },
-                { value: '10pack' as const,   label: 'Using a 10-pack',          desc: 'Already purchased — book your next session(s)', icon: <Package size={15} /> },
+                { value: 'weekly' as const,   label: 'Weekly recurring request', desc: 'Request a regular weekly slot, Sun to Fri',     icon: <Repeat size={15} /> },
+                { value: '10pack' as const,   label: 'Using a 10-pack',          desc: 'Already purchased. Book your next session(s).', icon: <Package size={15} /> },
               ] as const).map(opt => {
                 const sel = bookingType === opt.value
                 return (
@@ -533,7 +533,7 @@ export default function BookingForm() {
             <div style={card}>
               <h2 style={{ fontFamily: 'var(--font-fraunces, Georgia, serif)', fontSize: '22px', fontWeight: 800, color: '#0D1F3C', marginBottom: '0.625rem' }}>Weekly Request Details</h2>
               <div style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: '#92400E', background: '#FFFBEB', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '12px', padding: '0.625rem 0.875rem', marginBottom: '1.25rem' }}>
-                This is a request only — not automatically confirmed. Shirel will follow up within 24 hours.
+                This is a request only, not automatically confirmed. Shirel will follow up within 24 hours.
               </div>
               <div className="space-y-4">
                 <div>
@@ -599,12 +599,12 @@ export default function BookingForm() {
           </h2>
           {!isWeekly && (
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '13px', color: 'rgba(13,31,60,0.42)', marginBottom: '1rem' }}>
-              {lessonFormat === 'private' && validChildren.length > 1 ? `Select ${validChildren.length} sessions — one per child.` : 'Pick a date, then choose a start time from the dropdown.'}
+              {lessonFormat === 'private' && validChildren.length > 1 ? `Select ${validChildren.length} sessions, one per child.` : 'Pick a date, then choose a start time from the dropdown.'}
             </p>
           )}
           {isPack && !isWeekly && (
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '12px', color: '#4A7FA5', background: 'rgba(74,127,165,0.06)', border: '1px solid rgba(74,127,165,0.15)', borderRadius: '10px', padding: '0.5rem 0.75rem', marginBottom: '1rem' }}>
-              You don&apos;t need to schedule all 10 sessions now — book 1–2 to get started.
+              You don&apos;t need to schedule all 10 sessions now. Book 1 or 2 to get started.
             </p>
           )}
           {isWeekly ? (

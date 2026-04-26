@@ -45,7 +45,7 @@ export default function ContactPage() {
             Get in <em style={{ color: '#6AAFD4' }}>touch.</em>
           </h1>
           <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '15px', color: 'rgba(248,244,237,0.42)', lineHeight: 1.75, maxWidth: '420px' }}>
-            Questions about lessons, scheduling, or anything else — I&apos;m happy to help find the right fit for your child.
+            Questions about lessons, scheduling, or anything else. I&apos;m happy to help find the right fit for your child.
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export default function ContactPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 {[
                   { icon: MapPin, label: 'Location', value: 'Côte Saint-Luc', sub: 'Québec · Private pool' },
-                  { icon: Clock, label: 'Availability', value: 'Sun – Fri', sub: 'Morning & afternoon' },
+                  { icon: Clock, label: 'Availability', value: 'Sun to Fri', sub: 'Morning & afternoon' },
                 ].map(item => {
                   const Icon = item.icon
                   return (

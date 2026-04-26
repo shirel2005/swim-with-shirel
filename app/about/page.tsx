@@ -251,7 +251,7 @@ export default function AboutPage() {
                 <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>
                   former certified lifeguard and public swim instructor
                 </strong>
-                , teaching group lessons to kids of all ages. But I quickly realized something: children make the most progress — and have the most <em>fun</em> — when they have someone&apos;s complete, undivided attention.
+                , teaching group lessons to kids of all ages. But I quickly realized something: children make the most progress, and have the most <em>fun</em>, when they have someone&apos;s complete, undivided attention.
               </p>
 
               <p>
@@ -264,7 +264,7 @@ export default function AboutPage() {
                 Over the past{' '}
                 <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>5 years</strong>, I&apos;ve worked
                 with children ranging from{' '}
-                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>6 months to 12 years old</strong> — from
+                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>6 months to 12 years old</strong>, from
                 fearful first-timers to kids refining their stroke for competitive swim. Every child I&apos;ve
                 taught has made real, visible progress.
               </p>
@@ -333,7 +333,7 @@ export default function AboutPage() {
               {
                 num: '01',
                 title: 'Fully personalised',
-                body: 'No two children learn the same way. I read each child\'s confidence, pace, and personality — and teach accordingly. No script, no rush.',
+                body: 'No two children learn the same way. I read each child\'s confidence, pace, and personality, and teach accordingly. No script, no rush.',
               },
               {
                 num: '02',
@@ -427,7 +427,7 @@ export default function AboutPage() {
               marginBottom: '2.5rem',
             }}
           >
-            Spots fill up fast — book early to secure your preferred time.
+            Spots fill up fast. Book early to secure your preferred time.
           </p>
           <Link href="/book" className="btn-primary" style={{ fontSize: '15px', padding: '1rem 2.5rem' }}>
             Book a Lesson with Shirel

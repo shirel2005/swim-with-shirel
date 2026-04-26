@@ -9,7 +9,7 @@ const policies = [
   {
     icon: CreditCard,
     title: 'Payment Policy',
-    body: 'Payment is due within 2 hours of the lesson. Cash or e-transfer accepted. No pre-payment required — pay on the day.',
+    body: 'Payment is due within 2 hours of the lesson. Cash or e-transfer accepted. No pre-payment required. Pay on the day.',
   },
   {
     icon: Clock,
@@ -124,7 +124,7 @@ export default function PoliciesPage() {
                 Ready to book?
               </h2>
               <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(248,244,237,0.40)', marginBottom: '1.75rem' }}>
-                Spots fill up fast — check availability and send a booking request today.
+                Spots fill up fast. Check availability and send a booking request today.
               </p>
               <Link href="/book" className="btn-blue">Book a Lesson</Link>
             </div>

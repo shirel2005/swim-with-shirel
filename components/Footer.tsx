@@ -33,7 +33,7 @@ export default function Footer() {
                 marginBottom: '1.25rem',
               }}
             >
-              Private &amp; semi-private swim lessons for ages 6 months – 12 years. Côte Saint-Luc, Québec.
+              Private &amp; semi-private swim lessons for ages 6 months to 12 years. Côte Saint-Luc, Québec.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <a

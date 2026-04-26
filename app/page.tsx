@@ -59,7 +59,7 @@ export default function HomePage() {
             {[
               {
                 phrase: 'Always one-on-one.',
-                detail: 'Every session is private. No groups, no waiting — just undivided attention for your child.',
+                detail: 'Every session is private. No groups, no waiting. Just undivided attention for your child.',
                 offset: '0',
               },
               {
@@ -69,7 +69,7 @@ export default function HomePage() {
               },
               {
                 phrase: 'Calm, private pool.',
-                detail: 'Lessons take place at a serene private pool in Côte Saint-Luc — no crowds, no noise.',
+                detail: 'Lessons take place at a serene private pool in Côte Saint-Luc. No crowds, no noise.',
                 offset: '1.25rem',
               },
             ].map((item, i) => (
@@ -187,7 +187,7 @@ export default function HomePage() {
                 borderLeft: '3px solid rgba(74,127,165,0.28)', paddingLeft: '1.125rem',
                 marginBottom: '1.5rem',
               }}>
-                &ldquo;Every child learns differently. I take time to understand how yours ticks — and build confidence from there.&rdquo;
+                &ldquo;Every child learns differently. I take time to understand how yours ticks, and build confidence from there.&rdquo;
               </blockquote>
 
               <p style={{
@@ -195,7 +195,7 @@ export default function HomePage() {
                 color: 'rgba(13,31,60,0.52)', lineHeight: 1.8, marginBottom: '2rem',
               }}>
                 Former certified lifeguard and private swim instructor. Five years working with children
-                from 6 months to 12 years old — from first splashes to stroke refinement.
+                from 6 months to 12 years old, from first splashes to stroke refinement.
                 Lessons are personalised, unhurried, and held at a private pool in Côte Saint-Luc.
               </p>
 
@@ -279,7 +279,7 @@ export default function HomePage() {
             </blockquote>
 
             <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: 500, color: 'rgba(13,31,60,0.45)' }}>
-              — {featured.parent_name}
+              {featured.parent_name}
               {featured.child_name && (
                 <span style={{ color: 'rgba(13,31,60,0.30)' }}> · parent of {featured.child_name}</span>
               )}
@@ -326,7 +326,7 @@ export default function HomePage() {
                 <br /><em style={{ color: '#6AAFD4' }}>with Shirel.</em>
               </h2>
               <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(248,244,237,0.38)' }}>
-                Spots fill up — book early to secure your preferred time.
+                Spots fill up. Book early to secure your preferred time.
               </p>
             </div>
 

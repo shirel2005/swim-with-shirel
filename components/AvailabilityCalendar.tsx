@@ -268,7 +268,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
         <div className="card p-5">
           <h4 className="font-bold text-slate-800 mb-3 text-sm">
             {format(selectedDate, 'EEEE, MMMM d, yyyy')}
-            <span className="ml-2 text-xs font-normal" style={{ color: '#4A7FA5' }}>— {duration}-min slots</span>
+            <span className="ml-2 text-xs font-normal" style={{ color: '#4A7FA5' }}>{duration}-min slots</span>
           </h4>
 
           {selectedDateSlots.length === 0 ? (

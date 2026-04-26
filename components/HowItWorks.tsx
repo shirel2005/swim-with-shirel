@@ -6,7 +6,7 @@ const steps = [
   {
     number: '01',
     title: 'Browse Availability',
-    description: 'Check open slots that fit your schedule — mornings and afternoons, Sunday through Friday.',
+    description: 'Check open slots that fit your schedule, mornings and afternoons, Sunday through Friday.',
     accent: '#6AAFD4',
   },
   {

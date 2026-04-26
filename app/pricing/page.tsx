@@ -111,12 +111,12 @@ export default function PricingPage() {
 
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {[
-                'One-on-one private instruction — no shared lessons',
+                'One-on-one private instruction, no shared lessons',
                 'Personalised to your child\'s age, level, and confidence',
                 'Held at a calm, private pool in Côte Saint-Luc',
                 'Sunday through Friday, morning and afternoon slots',
                 'Confirmation within 24 hours of booking',
-                'Payment in person — cash or e-transfer on the day',
+                'Payment in person, cash or e-transfer on the day',
               ].map(item => (
                 <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
                   <span style={{
@@ -147,9 +147,9 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) have their own rate — $75/session (30 min) or $115/session (45 min). 10-packs: $650 (30 min) or $1,000 (45 min).' },
-              { q: 'How do 10-packs work?', a: 'Buy 10 sessions upfront at a discounted rate. Book each one individually — no need to schedule all at once. Credits never expire.' },
-              { q: 'When do I pay?', a: 'Payment is due in person on the day of each lesson — cash or e-transfer. No pre-payment required when booking online.' },
+              { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) have their own rate: $75/session (30 min) or $115/session (45 min). 10-packs: $650 (30 min) or $1,000 (45 min).' },
+              { q: 'How do 10-packs work?', a: 'Buy 10 sessions upfront at a discounted rate. Book each one individually, no need to schedule all at once. Credits never expire.' },
+              { q: 'When do I pay?', a: 'Payment is due in person on the day of each lesson, cash or e-transfer. No pre-payment required when booking online.' },
             ].map(item => (
               <div key={item.q} style={{
                 background: 'white', borderRadius: '18px',
@@ -178,7 +178,7 @@ export default function PricingPage() {
             Ready to get started?
           </h2>
           <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(13,31,60,0.45)', marginBottom: '2rem' }}>
-            Spots fill up — book early to secure your preferred time.
+            Spots fill up. Book early to secure your preferred time.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/book" className="btn-primary" style={{ fontSize: '15px', padding: '1rem 2.25rem' }}>
