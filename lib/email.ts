@@ -240,7 +240,7 @@ export async function sendBookingConfirmation({
   // Payment note
   const paymentNote = tintPanel(`
     <p style="margin:0;font-size:13px;color:${bodyText};font-family:${serif};line-height:1.65;">
-      &#128179;&nbsp; Payment is due <strong>within 2 hours of the lesson</strong> &mdash; cash or e-transfer accepted.
+      &#128179;&nbsp; Payment is due <strong>within 2 hours of the lesson</strong>. Cash or e-transfer accepted.
     </p>`)
 
   const body = `
@@ -256,7 +256,7 @@ export async function sendBookingConfirmation({
 
     <p style="margin:0 0 4px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">To cancel or reschedule, please reach out at least <strong>2 hours before</strong> your lesson.</p>
     <p style="margin:0 0 4px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">Looking forward to seeing you in the pool!</p>
-    <p style="margin:10px 0 0 0;font-size:15px;color:${navy};font-family:${serif};font-style:italic;">&mdash; Shirel</p>`
+    <p style="margin:10px 0 0 0;font-size:15px;color:${navy};font-family:${serif};font-style:italic;">Shirel</p>`
 
   const html = buildEmail('Your lesson is confirmed.', body)
   await sendRaw(parentEmail, 'Your swim lesson is confirmed | Swim with Shirel', html)
@@ -289,7 +289,7 @@ export async function sendBookingRejection({
       </p>`)}
 
     <p style="margin:0 0 4px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">Sorry for any inconvenience, and I hope to see you in the pool soon!</p>
-    <p style="margin:10px 0 0 0;font-size:15px;color:${navy};font-family:${serif};font-style:italic;">&mdash; Shirel</p>`
+    <p style="margin:10px 0 0 0;font-size:15px;color:${navy};font-family:${serif};font-style:italic;">Shirel</p>`
 
   const html = buildEmail('Booking update.', body)
   await sendRaw(parentEmail, 'Booking update | Swim with Shirel', html)
