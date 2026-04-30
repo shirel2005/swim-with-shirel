@@ -265,9 +265,9 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
 
       {/* Time picker for selected date */}
       {selectedDate && (
-        <div className="card p-5">
+        <div className="card p-4 sm:p-5">
           <h4 className="font-bold text-slate-800 mb-3 text-sm">
-            {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+            {format(selectedDate, 'EEE, MMM d, yyyy')}
             <span className="ml-2 text-xs font-normal" style={{ color: '#4A7FA5' }}>{duration}-min slots</span>
           </h4>
 
@@ -277,7 +277,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
             <div className="space-y-3">
               {/* Dropdown to add a time */}
               {availableToAdd.length > 0 ? (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                   <select
                     defaultValue=""
                     key={`${format(selectedDate, 'yyyy-MM-dd')}-${selectedSlots.length}`}
@@ -285,7 +285,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
                       const slot = availableToAdd.find(s => s.id === e.target.value)
                       if (slot) addSlot(slot)
                     }}
-                    className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-white text-slate-700 focus:outline-none"
+                    className="flex-1 px-4 py-3 rounded-xl text-sm bg-white text-slate-700 focus:outline-none"
                     style={{ border: '1px solid rgba(74,127,165,0.3)', outline: 'none' }}
                     onFocus={e => (e.target.style.borderColor = '#4A7FA5')}
                     onBlur={e => (e.target.style.borderColor = 'rgba(74,127,165,0.3)')}
@@ -297,7 +297,7 @@ export default function AvailabilityCalendar({ onSlotsChange, duration }: Availa
                       </option>
                     ))}
                   </select>
-                  <span className="text-xs text-slate-400">{availableToAdd.length} time{availableToAdd.length !== 1 ? 's' : ''} available</span>
+                  <span className="text-xs text-slate-400 self-end sm:self-auto">{availableToAdd.length} time{availableToAdd.length !== 1 ? 's' : ''} available</span>
                 </div>
               ) : (
                 <p className="text-xs rounded-xl px-3 py-2" style={{ color: '#0D1F3C', background: 'rgba(74,127,165,0.08)', border: '1px solid rgba(74,127,165,0.15)' }}>

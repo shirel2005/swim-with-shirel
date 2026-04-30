@@ -8,7 +8,7 @@ export default function AvailabilityBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const dismissed = localStorage.getItem('away-june-2025') === 'true'
+    const dismissed = localStorage.getItem('away-june15-2025') === 'true'
     if (!dismissed) setVisible(true)
   }, [])
 
@@ -19,15 +19,15 @@ export default function AvailabilityBanner() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
         <span className="text-amber-500 text-base flex-shrink-0">📅</span>
         <p className="text-sm text-amber-900 flex-1 leading-snug">
-          <strong>Availability note:</strong> I&apos;ll be away <strong>June 20 – July 15</strong>.
-          Looking for lessons during that time?{' '}
+          <strong>Availability note:</strong> I will be unavailable from <strong>June 15 to July 15</strong>.
+          If you are looking for lessons during that time, feel free to{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} className="underline font-semibold hover:text-amber-700 transition-colors">
-            Contact me
+            contact me
           </a>{' '}
-          and I&apos;ll refer you to another trusted swim instructor in the area.
+          and I can refer you to another swim instructor in the area.
         </p>
         <button
-          onClick={() => { localStorage.setItem('away-june-2025', 'true'); setVisible(false) }}
+          onClick={() => { localStorage.setItem('away-june15-2025', 'true'); setVisible(false) }}
           aria-label="Dismiss"
           className="text-amber-400 hover:text-amber-700 transition-colors flex-shrink-0 p-1 rounded"
         >

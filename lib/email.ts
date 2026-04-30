@@ -160,19 +160,15 @@ export interface ChildInfo { name: string; age?: string; experience?: string }
 export async function sendBookingConfirmation({
   parentName, parentEmail, lessonFormat, lessonType,
   bookingType = 'one-time', children = [], slots, totalPrice,
-  isWeeklyRequest, recurringDay, recurringTime,
 }: {
   parentName: string
   parentEmail: string
   lessonFormat: string
   lessonType?: string
-  bookingType?: 'one-time' | 'weekly' | '10pack'
+  bookingType?: 'one-time' | '10pack'
   children?: ChildInfo[] | string[]
   slots: Array<{ date: string; time_slot: string; duration: number }>
   totalPrice?: number
-  isWeeklyRequest: boolean
-  recurringDay?: string | null
-  recurringTime?: string | null
 }) {
   const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
   if (!creds) { console.warn('[Email] Gmail credentials not set — skipping.'); return }
@@ -183,7 +179,7 @@ export async function sendBookingConfirmation({
 
   const formatLabel   = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
   const durationLabel = lessonType?.includes('45') ? '45-Minute' : '30-Minute'
-  const bookingLabel  = bookingType === '10pack' ? '10-Pack' : bookingType === 'weekly' ? 'Weekly Recurring' : 'One-Time'
+  const bookingLabel  = bookingType === '10pack' ? '10-Pack' : 'One-Time'
   const priceLabel    = bookingType === '10pack' ? 'Package Total' : slots.length > 1 ? `Total (${slots.length} sessions)` : 'Session Price'
 
   // Price
@@ -229,12 +225,6 @@ export async function sendBookingConfirmation({
           <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
           <span style="font-size:13px;color:${brandBlue};font-weight:600;font-family:${serif};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${dimText};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
         </div>`).join('')}`)
-  } else if (isWeeklyRequest && recurringDay && recurringTime) {
-    sessionsBlock = card(`
-      ${label('Weekly Schedule')}
-      <div style="background:${tintBg};border:1px solid ${tintBorder};border-radius:10px;padding:10px 14px;">
-        <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">Every ${recurringDay} at ${formatTime(recurringTime)}</span>
-      </div>`)
   }
 
   // Payment note
@@ -261,6 +251,106 @@ export async function sendBookingConfirmation({
   const html = buildEmail('Your lesson is confirmed.', body)
   await sendRaw(parentEmail, 'Your swim lesson is confirmed | Swim with Shirel', html)
   console.log('[Email] Confirmation sent to:', parentEmail)
+}
+
+// ─── Admin booking notification ──────────────────────────────────────────────
+export async function sendAdminBookingNotification({
+  bookingId,
+  parentName, parentEmail, parentPhone,
+  children = [],
+  lessonFormat,
+  lessonType,
+  bookingType,
+  slots,
+  notes,
+  totalPrice,
+}: {
+  bookingId: number
+  parentName: string
+  parentEmail: string
+  parentPhone: string
+  children?: ChildInfo[] | string[]
+  lessonFormat: string
+  lessonType?: string
+  bookingType?: string
+  slots: Array<{ date: string; time_slot: string; duration: number }>
+  notes?: string | null
+  totalPrice?: number
+}) {
+  const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
+  if (!creds) { console.warn('[Email] Gmail credentials not set — skipping admin notification.'); return }
+
+  console.log('[Email] Sending admin notification for booking #', bookingId)
+
+  const childList: ChildInfo[] = children.map(c => typeof c === 'string' ? { name: c } : c)
+  const formatLabel   = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const durationLabel = lessonType?.includes('45') ? '45-Minute' : '30-Minute'
+  const bookingLabel  = bookingType === '10pack' ? '10-Pack' : 'One-Time'
+
+  // Parent info
+  const parentBlock = card(`
+    ${label('Parent / Guardian')}
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${detailRow('Name', parentName)}
+      ${detailRow('Email', `<a href="mailto:${parentEmail}" style="color:${brandBlue};text-decoration:none;">${parentEmail}</a>`)}
+      ${detailRow('Phone', `<a href="tel:${parentPhone.replace(/\D/g,'')}" style="color:${brandBlue};text-decoration:none;">${parentPhone}</a>`)}
+    </table>`)
+
+  // Lesson details
+  const lessonBlock = card(`
+    ${label('Lesson Details')}
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${detailRow('Duration', durationLabel)}
+      ${detailRow('Format', formatLabel)}
+      ${detailRow('Type', bookingLabel)}
+      ${totalPrice ? detailRow('Price', `$${totalPrice}`) : ''}
+    </table>`)
+
+  // Children
+  const childrenBlock = childList.length > 0 ? card(`
+    ${label(childList.length === 1 ? 'Swimmer' : `Swimmers (${childList.length})`)}
+    ${childList.map((c, i) => `
+      <div style="${i > 0 ? `border-top:1px solid ${divider};padding-top:10px;margin-top:10px;` : ''}">
+        <p style="margin:0 0 2px 0;font-size:14px;font-weight:700;color:${navy};font-family:${serif};">${c.name}</p>
+        ${(c.age || c.experience) ? `<p style="margin:0;font-size:12px;color:${mutedText};font-family:${serif};">${[c.age ? `Age ${c.age}` : '', c.experience ? experienceLabel(c.experience) : ''].filter(Boolean).join(' &middot; ')}</p>` : ''}
+      </div>`).join('')}`) : ''
+
+  // Sessions
+  const sessionsBlock = slots.length > 0 ? card(`
+    ${label(`Requested Session${slots.length > 1 ? 's' : ''}`)}
+    ${slots.map((s, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:${tintBg};border:1px solid ${tintBorder};border-radius:10px;padding:10px 14px;${i > 0 ? 'margin-top:6px;' : ''}">
+        <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
+        <span style="font-size:13px;color:${brandBlue};font-weight:600;font-family:${serif};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${dimText};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
+      </div>`).join('')}`) : tintPanel(`<p style="margin:0;font-size:13px;color:${mutedText};font-family:${serif};">No specific sessions selected yet.</p>`)
+
+  // Notes
+  const notesBlock = notes ? card(`
+    ${label('Parent Notes')}
+    <p style="margin:0;font-size:13px;color:${bodyText};font-family:${serif};line-height:1.65;font-style:italic;">&ldquo;${notes}&rdquo;</p>`) : ''
+
+  // Action button
+  const actionBlock = `
+    <div style="text-align:center;margin:24px 0 8px;">
+      <a href="https://swim-with-shirel-production.up.railway.app/admin" style="display:inline-block;background:${navy};color:${cream};font-family:${serif};font-size:13px;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none;letter-spacing:0.02em;">
+        View in Admin Panel
+      </a>
+    </div>`
+
+  const body = `
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">New booking request <strong>#${bookingId}</strong></p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">A parent has just submitted a booking request. Review the details below and confirm or follow up within 24 hours.</p>
+
+    ${parentBlock}
+    ${lessonBlock}
+    ${childrenBlock}
+    ${sessionsBlock}
+    ${notesBlock}
+    ${actionBlock}`
+
+  const html = buildEmail(`New booking request #${bookingId}`, body)
+  await sendRaw(CONTACT_EMAIL, `New booking request from ${parentName} | Swim with Shirel`, html)
+  console.log('[Email] Admin notification sent for booking #', bookingId)
 }
 
 // ─── Rejection / cancellation email ──────────────────────────────────────────

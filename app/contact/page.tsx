@@ -33,7 +33,7 @@ export default function ContactPage() {
           borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 pb-14 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pb-14 relative z-10">
           <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.65)', marginBottom: '1rem' }}>
             Contact
           </p>
@@ -58,7 +58,7 @@ export default function ContactPage() {
 
       {/* ── CONTENT ──────────────────────────────────────────────────────── */}
       <section style={{ paddingTop: '5rem', paddingBottom: '7rem' }}>
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8">
 
             {/* Left: contact cards */}

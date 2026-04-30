@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
+import { sendAdminBookingNotification } from '@/lib/email'
 
-type BookingType = 'one-time' | 'weekly' | '10pack'
+type BookingType = 'one-time' | '10pack'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,13 +18,11 @@ export async function POST(request: NextRequest) {
       booking_type: rawBookingType = 'one-time',
       pack_total = 0,
       ten_pack_id: existingTenPackId,
-      is_weekly_request,
-      recurring,
       notes,
     } = body
 
     const lesson_format: 'private' | 'semi-private' = rawLessonFormat === 'semi-private' ? 'semi-private' : 'private'
-    const booking_type: BookingType = ['one-time', 'weekly', '10pack'].includes(rawBookingType) ? rawBookingType : 'one-time'
+    const booking_type: BookingType = rawBookingType === '10pack' ? '10pack' : 'one-time'
 
     if (!parent_name?.trim()) return NextResponse.json({ error: 'Parent name is required' }, { status: 400 })
     if (!parent_email?.trim() || !parent_email.includes('@')) return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
@@ -38,18 +37,9 @@ export async function POST(request: NextRequest) {
 
     const hasBookedSlots = Array.isArray(booked_slots) && booked_slots.length > 0
     const hasSlotIds = Array.isArray(slot_ids) && slot_ids.length > 0
-    const isWeeklyReq = is_weekly_request === true || is_weekly_request === 1 || booking_type === 'weekly'
 
-    if (!hasBookedSlots && !hasSlotIds && !isWeeklyReq) {
-      return NextResponse.json({ error: 'Please select at least one session or submit a weekly request' }, { status: 400 })
-    }
-
-    if (isWeeklyReq && recurring?.days && Array.isArray(recurring.days)) {
-      const allowedDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-      const invalidDays = recurring.days.filter((d: string) => !allowedDays.includes(d))
-      if (invalidDays.length > 0) {
-        return NextResponse.json({ error: 'Weekly lessons are only available Sunday through Friday' }, { status: 400 })
-      }
+    if (!hasBookedSlots && !hasSlotIds) {
+      return NextResponse.json({ error: 'Please select at least one session' }, { status: 400 })
     }
 
     const isPack = booking_type === '10pack'
@@ -67,7 +57,6 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb()
-    const rec = isWeeklyReq ? (recurring || {}) : {}
 
     const result = db.transaction(() => {
       // Insert booking
@@ -94,13 +83,8 @@ export async function POST(request: NextRequest) {
         booking_type,
         isPack ? 10 : (pack_total || 0),
         0,
-        isWeeklyReq ? 1 : 0,
-        rec.days ? JSON.stringify(rec.days) : null,
-        rec.time || null,
-        rec.start_date || null,
-        rec.end_date || null,
-        rec.weeks || null,
-        rec.frequency || null,
+        0,           // is_weekly_request always 0 now
+        null, null, null, null, null, null,
       )
       const bookingId = bookingResult.lastInsertRowid as number
 
@@ -109,7 +93,6 @@ export async function POST(request: NextRequest) {
         let tenPackId: number
 
         if (existingTenPackId) {
-          // Caller provided an existing pack ID — verify it belongs to this email
           const existing = db.prepare(
             `SELECT id FROM ten_packs WHERE id = ? AND LOWER(parent_email) = ? AND status = 'active'`
           ).get(existingTenPackId, parent_email.trim().toLowerCase()) as { id: number } | undefined
@@ -117,7 +100,6 @@ export async function POST(request: NextRequest) {
           if (existing) {
             tenPackId = existing.id
           } else {
-            // Pack not found or expired — create new
             const newPack = db.prepare(`
               INSERT INTO ten_packs (parent_name, parent_email, parent_phone, children, lesson_type, lesson_format, total_sessions, sessions_used, status)
               VALUES (?, ?, ?, ?, ?, ?, 10, 0, 'active')
@@ -125,7 +107,6 @@ export async function POST(request: NextRequest) {
             tenPackId = newPack.lastInsertRowid as number
           }
         } else {
-          // Create new ten_packs record
           const newPack = db.prepare(`
             INSERT INTO ten_packs (parent_name, parent_email, parent_phone, children, lesson_type, lesson_format, total_sessions, sessions_used, status)
             VALUES (?, ?, ?, ?, ?, ?, 10, 0, 'active')
@@ -133,7 +114,6 @@ export async function POST(request: NextRequest) {
           tenPackId = newPack.lastInsertRowid as number
         }
 
-        // Link booking to ten_pack
         db.prepare('UPDATE bookings SET ten_pack_id = ? WHERE id = ?').run(tenPackId, bookingId)
 
         return { bookingId, tenPackId }
@@ -141,6 +121,27 @@ export async function POST(request: NextRequest) {
 
       return { bookingId, tenPackId: null }
     })()
+
+    // Send admin notification email (non-blocking)
+    const slotsForEmail = (hasBookedSlots ? booked_slots : []).map((s: { date: string; start_time: string; duration: number }) => ({
+      date: s.date,
+      time_slot: s.start_time,
+      duration: s.duration,
+    }))
+
+    sendAdminBookingNotification({
+      bookingId: result.bookingId,
+      parentName: parent_name.trim(),
+      parentEmail: parent_email.trim(),
+      parentPhone: parent_phone.trim(),
+      children: validChildren,
+      lessonFormat: lesson_format,
+      lessonType: lesson_type,
+      bookingType: booking_type,
+      slots: slotsForEmail,
+      notes: notes || null,
+      totalPrice,
+    }).catch(err => console.error('[Email] Admin notification failed:', err))
 
     return NextResponse.json({ success: true, bookingId: result.bookingId, tenPackId: result.tenPackId }, { status: 201 })
   } catch (error) {

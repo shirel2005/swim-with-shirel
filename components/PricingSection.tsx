@@ -37,7 +37,7 @@ const tiers: PricingTier[] = [
 export default function PricingSection() {
   return (
     <section id="pricing" style={{ backgroundColor: '#F8F4ED', paddingTop: '5rem', paddingBottom: '6rem' }}>
-      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
+      <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
 
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end gap-8 lg:gap-24 mb-14">

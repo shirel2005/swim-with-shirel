@@ -7,7 +7,7 @@ import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from '@/lib/contact'
 export default function Footer() {
   return (
     <footer style={{ backgroundColor: '#0D1F3C', color: '#F8F4ED' }}>
-      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
 
           {/* Brand */}

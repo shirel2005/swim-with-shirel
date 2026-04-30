@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Booking } from '@/lib/types'
 import { format, parseISO } from 'date-fns'
 import {
-  Trash2, CheckCircle, XCircle, RefreshCw, Repeat,
+  Trash2, CheckCircle, XCircle, RefreshCw,
   ChevronDown, ChevronUp, Package, User, Users, Clock,
   Calendar, Plus, Minus,
 } from 'lucide-react'
@@ -224,11 +224,6 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                             <Package size={10} />10-Pack
                           </span>
                         )}
-                        {isWeekly && (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-                            <Repeat size={10} />Weekly
-                          </span>
-                        )}
                         {isSemi && (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
                             <Users size={10} />Semi-Private
@@ -280,7 +275,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                     )}
                     {isWeekly && booking.recurring_day && (
                       <span className="flex items-center gap-1">
-                        <Repeat size={11} />{(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()} at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}
+                        {(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()} at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}
                       </span>
                     )}
                   </div>

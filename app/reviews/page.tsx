@@ -31,7 +31,7 @@ export default function ReviewsPage() {
           borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 pb-14 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pb-14 relative z-10">
           <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.65)', marginBottom: '1rem' }}>
             Reviews
           </p>
@@ -56,7 +56,7 @@ export default function ReviewsPage() {
 
       {/* ── CONTENT ──────────────────────────────────────────────────────── */}
       <section style={{ paddingTop: '5rem', paddingBottom: '7rem' }}>
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
 
           {/* Leave a review */}
           <div style={{

@@ -25,8 +25,8 @@ export default function Navbar() {
     { href: '/about',     label: 'About'    },
     { href: '/pricing',   label: 'Pricing'  },
     { href: '/policies',  label: 'Policies' },
-    { href: '/contact',   label: 'Contact'  },
     { href: '/reviews',   label: 'Reviews'  },
+    { href: '/contact',   label: 'Contact'  },
   ]
 
   const isActive = (href: string) =>
@@ -102,29 +102,38 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div
-          className="md:hidden px-6 pb-6 pt-2"
-          style={{ backgroundColor: 'rgba(248,244,237,0.98)', borderTop: '1px solid rgba(13,31,60,0.06)' }}
+          className="md:hidden px-5 pb-6 pt-1"
+          style={{ backgroundColor: 'rgba(248,244,237,0.99)', borderTop: '1px solid rgba(13,31,60,0.06)' }}
         >
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="py-3 text-sm font-medium"
+                className="flex items-center py-3.5 text-sm"
                 style={{
                   fontFamily: 'var(--font-dm-sans, sans-serif)',
                   color: isActive(link.href) ? '#0D1F3C' : 'rgba(13,31,60,0.55)',
-                  borderBottom: '1px solid rgba(13,31,60,0.05)',
+                  borderBottom: '1px solid rgba(13,31,60,0.06)',
                   textDecoration: 'none',
-                  fontWeight: isActive(link.href) ? 600 : 400,
+                  fontWeight: isActive(link.href) ? 700 : 400,
+                  letterSpacing: isActive(link.href) ? '0' : '0.01em',
                 }}
               >
+                {isActive(link.href) && (
+                  <span style={{ display: 'inline-block', width: 3, height: 14, background: '#4A7FA5', borderRadius: 2, marginRight: 10, flexShrink: 0 }} />
+                )}
                 {link.label}
               </Link>
             ))}
-            <Link href="/book" className="btn-primary mt-4 text-center" style={{ justifyContent: 'center' }}>
-              Book Now
-            </Link>
+            <div className="pt-4 pb-1 grid grid-cols-2 gap-3">
+              <Link href="/book" className="btn-primary" style={{ justifyContent: 'center', fontSize: '14px', padding: '0.75rem' }}>
+                Book Now
+              </Link>
+              <Link href="/admin" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '14px', border: '1.5px solid rgba(13,31,60,0.12)', fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: 600, color: 'rgba(13,31,60,0.40)', textDecoration: 'none', padding: '0.75rem' }}>
+                Admin
+              </Link>
+            </div>
           </div>
         </div>
       )}

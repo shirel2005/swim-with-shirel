@@ -42,14 +42,14 @@ export default function Hero() {
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 h-full">
+      <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 h-full">
         <div
-          className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center"
-          style={{ minHeight: '94vh', paddingTop: '5rem', paddingBottom: '4rem' }}
+          className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-16 items-center"
+          style={{ minHeight: '94vh', paddingTop: '3.5rem', paddingBottom: '4rem' }}
         >
 
           {/* ── LEFT: Text ── */}
-          <div className="order-2 lg:order-1">
+          <div className="order-1 lg:order-1">
 
             {/* Eyebrow */}
             <div className="flex items-center gap-2.5 mb-8">
@@ -137,7 +137,7 @@ export default function Hero() {
           </div>
 
           {/* ── RIGHT: Photo composition ── */}
-          <div className="order-1 lg:order-2 relative flex justify-center lg:justify-end">
+          <div className="order-2 lg:order-2 relative flex justify-center lg:justify-end">
 
             {/* Blob background accent layer 1 */}
             <div

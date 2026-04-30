@@ -38,11 +38,11 @@ export default function HomePage() {
           borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
 
           {/* Italic intro line */}
           <p
-            className="mb-12 lg:mb-16"
+            className="mb-10 lg:mb-16"
             style={{
               fontFamily: 'var(--font-fraunces, Georgia, serif)',
               fontSize: 'clamp(18px, 2.5vw, 28px)',
@@ -55,7 +55,7 @@ export default function HomePage() {
           </p>
 
           {/* Three brand promises — horizontal, staggered */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 relative">
             {[
               {
                 phrase: 'Always one-on-one.',
@@ -79,6 +79,7 @@ export default function HomePage() {
                   marginTop: item.offset,
                   paddingRight: i < 2 ? '2rem' : '0',
                   borderRight: i < 2 ? '1px solid rgba(248,244,237,0.06)' : 'none',
+                  borderTop: i > 0 ? undefined : undefined,
                   paddingLeft: i > 0 ? '2rem' : '0',
                 }}
               >
@@ -115,12 +116,12 @@ export default function HomePage() {
       <HowItWorks />
 
       {/* ── MEET SHIREL — asymmetric, editorial, organic photo ───────────── */}
-      <section style={{ backgroundColor: '#F8F4ED', paddingTop: '7rem', paddingBottom: '7rem', overflow: 'hidden', position: 'relative' }}>
+      <section style={{ backgroundColor: '#F8F4ED', paddingTop: '5rem', paddingBottom: '5rem', overflow: 'hidden', position: 'relative' }}>
         {/* Cream-section blobs */}
         <div className="absolute pointer-events-none" style={{ top: '5%', right: '-8%', width: '32vw', height: '55vh', background: 'radial-gradient(ellipse, rgba(74,127,165,0.07) 0%, transparent 65%)', borderRadius: '42% 58% 54% 46% / 48% 52% 48% 52%' }} aria-hidden="true" />
         <div className="absolute pointer-events-none" style={{ bottom: '8%', left: '-6%', width: '24vw', height: '38vh', background: 'radial-gradient(ellipse, rgba(13,31,60,0.04) 0%, transparent 65%)', borderRadius: '58% 42% 46% 54% / 52% 48% 52% 48%' }} aria-hidden="true" />
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-16 lg:gap-28 items-center">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-10 lg:gap-28 items-center">
 
             {/* Portrait with layered organic accents */}
             <div className="relative mx-auto lg:mx-0 self-start flex-shrink-0">
@@ -224,7 +225,7 @@ export default function HomePage() {
           borderRadius: '60% 40% 55% 45% / 50% 60% 40% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-20">
             <div className="flex-1">
               <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.65)', marginBottom: '1rem' }}>
@@ -310,7 +311,7 @@ export default function HomePage() {
           borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12">
 
             <div style={{ maxWidth: '560px' }}>

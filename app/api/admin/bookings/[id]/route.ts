@@ -125,13 +125,10 @@ export async function PATCH(
             parentEmail: booking.parent_email,
             lessonFormat: booking.lesson_format || 'private',
             lessonType: booking.lesson_type || undefined,
-            bookingType: (booking.booking_type || 'one-time') as 'one-time' | 'weekly' | '10pack',
+            bookingType: (booking.booking_type === '10pack' ? '10pack' : 'one-time') as 'one-time' | '10pack',
             children: childInfoList,
             slots,
             totalPrice: booking.total_price,
-            isWeeklyRequest: booking.is_weekly_request === 1,
-            recurringDay: booking.recurring_day,
-            recurringTime: booking.recurring_time,
           })
         } catch (emailError) {
           console.error('[Email] Failed to send confirmation (booking still confirmed):', emailError)

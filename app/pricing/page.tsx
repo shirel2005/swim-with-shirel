@@ -33,7 +33,7 @@ export default function PricingPage() {
           borderRadius: '60% 40% 55% 45% / 50% 60% 40% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 pb-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pb-16 relative z-10">
           <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.65)', marginBottom: '1rem' }}>
             Pricing
           </p>
@@ -90,7 +90,7 @@ export default function PricingPage() {
           borderRadius: '55% 45% 50% 50% / 50% 55% 45% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
             <div>
@@ -144,7 +144,7 @@ export default function PricingPage() {
 
       {/* ── FAQ / POLICY NOTE ─────────────────────────────────────────────── */}
       <section style={{ backgroundColor: '#F8F4ED', paddingTop: '5rem', paddingBottom: '5rem' }}>
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) have their own rate: $75/session (30 min) or $115/session (45 min). 10-packs: $650 (30 min) or $1,000 (45 min).' },

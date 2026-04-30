@@ -28,7 +28,7 @@ export default function BookPage() {
           borderRadius: '60% 40% 55% 45% / 50% 60% 40% 50%',
         }} aria-hidden="true" />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 pb-14 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 pb-14 relative z-10">
           <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(106,175,212,0.65)', marginBottom: '1rem' }}>
             Book a lesson
           </p>
@@ -64,7 +64,7 @@ export default function BookPage() {
       </section>
 
       {/* ── FORM ─────────────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-12 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-10 pb-20">
         <BookingForm />
       </div>
 

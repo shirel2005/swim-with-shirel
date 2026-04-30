@@ -35,7 +35,7 @@ export default function AboutPage() {
           aria-hidden="true"
         />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-8 items-end">
 
             {/* Left: Text */}
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
       {/* ── STORY — warm, conversational, readable ────────────────────────── */}
       <section style={{ backgroundColor: '#F8F4ED', paddingTop: '6rem', paddingBottom: '6rem' }}>
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
 
           {/* Asymmetric two-col: large opening line + narrative */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-start">
@@ -312,7 +312,7 @@ export default function AboutPage() {
           aria-hidden="true"
         />
 
-        <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
           <p className="section-label" style={{ color: 'rgba(106,175,212,0.65)' }}>Why choose Shirel</p>
           <h2
             style={{

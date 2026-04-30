@@ -56,7 +56,7 @@ export default function HowItWorks() {
         aria-hidden="true"
       />
 
-      <div className="max-w-7xl mx-auto px-8 sm:px-10 lg:px-16 relative z-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16 relative z-10">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-20 lg:mb-24">
