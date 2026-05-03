@@ -23,14 +23,14 @@ const tiers: PricingTier[] = [
     singlePrice: '$50',
     packPrice: '$450',
     packSave: 'Save $50',
-    desc: 'Focused and effective. Great for beginners and younger swimmers.',
+    desc: 'Focused and effective. One-on-one attention — ideal for younger children and beginners building their first water confidence.',
   },
   {
     duration: '45 min',
     singlePrice: '$75',
     packPrice: '$700',
     packSave: 'Save $50',
-    desc: 'More room for technique, play, and deeper skill-building.',
+    desc: 'More room for personalised skill-building, technique, and play. Still fully private and unhurried.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function PricingSection() {
                 maxWidth: '260px',
               }}
             >
-              Payment in person, cash or e-transfer. Semi-private: $75/session (30 min) or $115/session (45 min).
+              All sessions are private or semi-private. Payment in person, cash or e-transfer. Semi-private rate: $75/session (30 min) or $115/session (45 min).
             </p>
           </div>
         </div>

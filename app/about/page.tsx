@@ -271,9 +271,12 @@ export default function AboutPage() {
 
               <p>
                 Lessons take place at my private pool in{' '}
-                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>Côte Saint-Luc</strong>, in a
-                calm, safe, and encouraging environment. I bring patience, structure, and genuine
-                warmth to every session.
+                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>Côte Saint-Luc</strong> — a calm, enclosed, and quiet setting. There are no public crowds, no shared lanes, and no noise. Just a relaxed, focused environment where your child can learn at their own pace.
+              </p>
+
+              <p>
+                I welcome{' '}
+                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>families of all backgrounds</strong>. The private setting makes these lessons especially well-suited for families who value discretion, modesty, or a more personal approach — whether for cultural, religious, or simply personal reasons. Everyone is welcome here, and every family is treated with care and respect.
               </p>
 
               <div style={{ paddingTop: '1rem' }}>
@@ -328,7 +331,7 @@ export default function AboutPage() {
             <em style={{ color: '#6AAFD4' }}>personal.</em>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
                 num: '01',
@@ -344,6 +347,11 @@ export default function AboutPage() {
                 num: '03',
                 title: 'Real results',
                 body: 'Students consistently progress from fearful beginners to confident swimmers. Many return season after season because they love it.',
+              },
+              {
+                num: '04',
+                title: 'A welcoming space',
+                body: 'Private, discreet, and respectful. Ideal for families who value a more personal setting — including religious and modest-observant families.',
               },
             ].map((item, i) => (
               <div
@@ -424,10 +432,11 @@ export default function AboutPage() {
               fontFamily: 'var(--font-dm-sans, sans-serif)',
               fontSize: '14px',
               color: 'rgba(13,31,60,0.45)',
+              lineHeight: 1.75,
               marginBottom: '2.5rem',
             }}
           >
-            Spots fill up fast. Book early to secure your preferred time.
+            Private, one-on-one instruction in a calm and welcoming setting. Spots fill up fast — book early to secure your preferred time.
           </p>
           <Link href="/book" className="btn-primary" style={{ fontSize: '15px', padding: '1rem 2.5rem' }}>
             Book a Lesson with Shirel

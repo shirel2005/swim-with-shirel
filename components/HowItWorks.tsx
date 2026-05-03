@@ -18,7 +18,7 @@ const steps = [
   {
     number: '03',
     title: 'Get Confirmed',
-    description: "Shirel confirms within 24 hours. You'll get an email with all the details. Payment is in person.",
+    description: "Shirel confirms within 24 hours. You'll receive all the details by email. Lessons are private, one-on-one, and held at a calm enclosed pool. Payment is in person.",
     accent: '#C8E0F0',
   },
 ]

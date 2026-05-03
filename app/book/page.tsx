@@ -50,8 +50,15 @@ export default function BookPage() {
             fontFamily: 'var(--font-dm-sans, sans-serif)',
             fontSize: '15px', color: 'rgba(248,244,237,0.42)', lineHeight: 1.75, maxWidth: '440px',
           }}>
-            Select your preferred time, fill in your details, and submit a request.
-            Shirel confirms within 24 hours.
+            Select your preferred time, fill in your details, and submit a request. Shirel confirms within 24 hours.
+          </p>
+          <p style={{
+            fontFamily: 'var(--font-dm-sans, sans-serif)',
+            fontSize: '13px', color: 'rgba(106,175,212,0.55)', lineHeight: 1.65,
+            maxWidth: '380px', marginTop: '0.875rem',
+            borderLeft: '2px solid rgba(106,175,212,0.20)', paddingLeft: '0.875rem',
+          }}>
+            All lessons are private or semi-private — held at a calm, enclosed pool. A comfortable, respectful setting for every family.
           </p>
         </div>
 

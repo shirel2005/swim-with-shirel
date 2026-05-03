@@ -69,7 +69,7 @@ export default function HomePage() {
               },
               {
                 phrase: 'Calm, private pool.',
-                detail: 'Lessons take place at a serene private pool in Côte Saint-Luc. No crowds, no noise.',
+                detail: 'Lessons take place at a quiet, private pool in Côte Saint-Luc. No crowds, no noise — a comfortable space for every family.',
                 offset: '1.25rem',
               },
             ].map((item, i) => (
@@ -215,6 +215,63 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── WHO IT'S FOR — private / welcoming note ──────────────────────── */}
+      <section style={{ backgroundColor: '#F8F4ED', paddingTop: '0', paddingBottom: '5rem' }}>
+        <div className="max-w-7xl mx-auto px-5 sm:px-10 lg:px-16">
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '24px',
+              border: '1.5px solid rgba(13,31,60,0.07)',
+              padding: 'clamp(1.5rem, 4vw, 2.5rem)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '2rem',
+            }}
+          >
+            {[
+              {
+                title: 'Private & semi-private only',
+                body: 'No large groups, ever. Every lesson is either one-on-one or with a second child you know — giving your child complete, focused attention.',
+              },
+              {
+                title: 'A calm, enclosed setting',
+                body: 'The pool is private, quiet, and away from public spaces. An unhurried, comfortable environment for children and parents alike.',
+              },
+              {
+                title: 'Welcoming to every family',
+                body: 'A respectful, discreet setting — ideal for families who value privacy, modesty, or a more personal approach to learning.',
+              },
+            ].map(item => (
+              <div key={item.title}>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-fraunces, Georgia, serif)',
+                    fontSize: '17px',
+                    fontWeight: 700,
+                    color: '#0D1F3C',
+                    marginBottom: '0.625rem',
+                    lineHeight: 1.25,
+                  }}
+                >
+                  {item.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontSize: '13px',
+                    color: 'rgba(13,31,60,0.50)',
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── PRICING TEASER — clean bridge, not full pricing ────────────────── */}
       <section
         style={{ backgroundColor: '#0D1F3C', paddingTop: '5rem', paddingBottom: '6rem', position: 'relative', overflow: 'hidden' }}
@@ -326,8 +383,8 @@ export default function HomePage() {
                 Book a lesson
                 <br /><em style={{ color: '#6AAFD4' }}>with Shirel.</em>
               </h2>
-              <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(248,244,237,0.38)' }}>
-                Spots fill up. Book early to secure your preferred time.
+              <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(248,244,237,0.38)', lineHeight: 1.75 }}>
+                Private, one-on-one instruction in a calm and respectful setting. Spots fill up — book early to secure your preferred time.
               </p>
             </div>
 

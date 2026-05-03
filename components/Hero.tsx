@@ -111,7 +111,7 @@ export default function Hero() {
 
             {/* Description */}
             <p
-              className="max-w-sm leading-relaxed mb-9"
+              className="max-w-sm leading-relaxed mb-5"
               style={{
                 fontFamily: 'var(--font-dm-sans, sans-serif)',
                 fontSize: 'clamp(13px, 1.2vw, 15px)',
@@ -119,10 +119,24 @@ export default function Hero() {
                 lineHeight: 1.75,
               }}
             >
-              Private &amp; semi-private swim lessons for children
-              aged{' '}
+              One-on-one &amp; semi-private swim lessons for children aged{' '}
               <span style={{ color: '#4A7FA5', fontWeight: 600 }}>6 months to 12 years</span>.
-              Lessons are calm, personalised, and held at a beautiful private pool.
+              Every session is personalised, unhurried, and held at a calm, fully private pool.
+            </p>
+
+            {/* Privacy note */}
+            <p
+              className="max-w-sm mb-9"
+              style={{
+                fontFamily: 'var(--font-dm-sans, sans-serif)',
+                fontSize: 'clamp(11px, 1vw, 13px)',
+                color: 'rgba(74,127,165,0.65)',
+                lineHeight: 1.65,
+                borderLeft: '2px solid rgba(74,127,165,0.22)',
+                paddingLeft: '0.875rem',
+              }}
+            >
+              A discreet, comfortable setting — welcoming to families who value privacy, modesty, and a respectful environment.
             </p>
 
             {/* CTAs */}
