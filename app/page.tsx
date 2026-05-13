@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Hero from '@/components/Hero'
+import SeasonNote from '@/components/SeasonNote'
 import HowItWorks from '@/components/HowItWorks'
 import { Review } from '@/lib/types'
 import { Mail, Phone, ArrowRight } from 'lucide-react'
@@ -26,6 +27,9 @@ export default function HomePage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <Hero />
+
+      {/* ── SEASON NOTE ──────────────────────────────────────────────────── */}
+      <SeasonNote />
 
       {/* ── BRAND STATEMENT — elegant three-phrase bridge ─────────────────── */}
       <section

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Fraunces, DM_Sans } from 'next/font/google'
+import { Fraunces, DM_Sans, Caveat } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -17,6 +17,13 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
   display: 'swap',
   weight: ['300', '400', '500', '600', '700'],
+})
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  variable: '--font-caveat',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
 })
 
 const BASE_URL = 'https://swim-with-shirel-production.up.railway.app'
@@ -50,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // or dynamic values (e.g. date) that differ between server and client renders.
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fraunces.variable} ${dmSans.variable} flex flex-col min-h-screen`}
+        className={`${fraunces.variable} ${dmSans.variable} ${caveat.variable} flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
         <AvailabilityBanner />
