@@ -2,7 +2,7 @@ import { CreditCard, Clock, CloudRain, Info } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Policies – Swim with Shirel',
+  title: 'Policies | Swim with Shirel',
 }
 
 const policies = [

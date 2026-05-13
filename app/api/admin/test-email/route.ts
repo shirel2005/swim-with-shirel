@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Send test email to yourself
-    const subject = 'Test — Swim with Shirel email working ✅'
+    const subject = 'Test: Swim with Shirel email working ✅'
     const html = '<p>If you got this, Gmail API email is working correctly!</p>'
     const to = 'swim.with.shirel@gmail.com'
     const raw = Buffer.from([
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Gmail API send failed', details: err })
     }
 
-    return NextResponse.json({ success: true, message: `Test email sent to ${to} — check your inbox!` })
+    return NextResponse.json({ success: true, message: `Test email sent to ${to}. Check your inbox!` })
   } catch (err: unknown) {
     return NextResponse.json({ success: false, error: String(err) })
   }

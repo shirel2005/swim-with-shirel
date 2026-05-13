@@ -23,7 +23,7 @@ const tiers: PricingTier[] = [
     singlePrice: '$50',
     packPrice: '$450',
     packSave: 'Save $50',
-    desc: 'Focused and effective. One-on-one attention — ideal for younger children and beginners building their first water confidence.',
+    desc: 'Focused and effective. One-on-one attention, ideal for younger children and beginners building their first water confidence.',
   },
   {
     duration: '45 min',

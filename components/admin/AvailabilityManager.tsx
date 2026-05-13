@@ -333,7 +333,7 @@ export default function AvailabilityManager({ adminPassword }: Props) {
                         className="w-4 h-4 accent-sky-700"
                       />
                       <span className="text-sm font-semibold text-slate-700">
-                        {formatTime(w.start_time)} – {formatTime(w.end_time)}
+                        {formatTime(w.start_time)} - {formatTime(w.end_time)}
                       </span>
                       <span className="text-xs text-sky-600 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-full">
                         {(() => {

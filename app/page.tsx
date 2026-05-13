@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Hero from '@/components/Hero'
-import SeasonNote from '@/components/SeasonNote'
 import HowItWorks from '@/components/HowItWorks'
 import { Review } from '@/lib/types'
 import { Mail, Phone, ArrowRight } from 'lucide-react'
@@ -27,9 +26,6 @@ export default function HomePage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <Hero />
-
-      {/* ── SEASON NOTE ──────────────────────────────────────────────────── */}
-      <SeasonNote />
 
       {/* ── BRAND STATEMENT — elegant three-phrase bridge ─────────────────── */}
       <section
@@ -73,7 +69,7 @@ export default function HomePage() {
               },
               {
                 phrase: 'Calm, private pool.',
-                detail: 'Lessons take place at a quiet, private pool in Côte Saint-Luc. No crowds, no noise — a comfortable space for every family.',
+                detail: 'Lessons take place at a quiet, private pool in Côte Saint-Luc. No crowds, no noise. A comfortable space for every family.',
                 offset: '1.25rem',
               },
             ].map((item, i) => (
@@ -153,7 +149,7 @@ export default function HomePage() {
               >
                 <Image
                   src="/shirel.jpg"
-                  alt="Shirel – swim instructor"
+                  alt="Shirel, swim instructor"
                   fill className="object-cover"
                   style={{ objectPosition: 'center 12%' }}
                   sizes="(max-width: 1024px) 280px, 300px"
@@ -236,7 +232,7 @@ export default function HomePage() {
             {[
               {
                 title: 'Private & semi-private only',
-                body: 'No large groups, ever. Every lesson is either one-on-one or with a second child you know — giving your child complete, focused attention.',
+                body: 'No large groups, ever. Every lesson is either one-on-one or with a second child you know, giving your child complete, focused attention.',
               },
               {
                 title: 'A calm, enclosed setting',
@@ -244,7 +240,7 @@ export default function HomePage() {
               },
               {
                 title: 'Welcoming to every family',
-                body: 'A respectful, discreet setting — ideal for families who value privacy, modesty, or a more personal approach to learning.',
+                body: 'A respectful, discreet setting, ideal for families who value privacy, modesty, or a more personal approach to learning.',
               },
             ].map(item => (
               <div key={item.title}>
@@ -388,7 +384,7 @@ export default function HomePage() {
                 <br /><em style={{ color: '#6AAFD4' }}>with Shirel.</em>
               </h2>
               <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '14px', color: 'rgba(248,244,237,0.38)', lineHeight: 1.75 }}>
-                Private, one-on-one instruction in a calm and respectful setting. Spots fill up — book early to secure your preferred time.
+                Private, one-on-one instruction in a calm and respectful setting. Spots fill up fast. Book early to secure your preferred time.
               </p>
             </div>
 

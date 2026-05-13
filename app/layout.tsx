@@ -29,7 +29,7 @@ const caveat = Caveat({
 const BASE_URL = 'https://swim-with-shirel-production.up.railway.app'
 
 export const metadata: Metadata = {
-  title: 'Swim with Shirel – Swimming Lessons in Côte Saint-Luc',
+  title: 'Swim with Shirel: Swimming Lessons in Côte Saint-Luc',
   description:
     'Private and semi-private swimming lessons in Côte Saint-Luc for children of all levels.',
   metadataBase: new URL(BASE_URL),
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
       'Private and semi-private swimming lessons in Côte Saint-Luc for children of all levels.',
     url: BASE_URL,
     siteName: 'Swim with Shirel',
-    images: [{ url: '/pool-bg.jpg', width: 1200, height: 630, alt: 'Private pool – Swim with Shirel' }],
+    images: [{ url: '/pool-bg.jpg', width: 1200, height: 630, alt: 'Private pool, Swim with Shirel' }],
     locale: 'en_CA',
     type: 'website',
   },

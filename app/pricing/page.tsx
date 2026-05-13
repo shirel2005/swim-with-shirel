@@ -3,7 +3,7 @@ import PricingSection from '@/components/PricingSection'
 import { Check } from 'lucide-react'
 
 export const metadata = {
-  title: 'Pricing – Swim with Shirel',
+  title: 'Pricing | Swim with Shirel',
   description: 'Transparent pricing for private swim lessons in Côte Saint-Luc. Sessions from $50.',
 }
 
@@ -61,7 +61,7 @@ export default function PricingPage() {
               maxWidth: '480px',
             }}
           >
-            No hidden fees. No unnecessary add-ons. All lessons are private or semi-private — one-on-one attention at a calm, enclosed pool. Choose the option that fits your child and your schedule.
+            No hidden fees. No unnecessary add-ons. All lessons are private or semi-private, with one-on-one attention at a calm, enclosed pool. Choose the option that fits your child and your schedule.
           </p>
         </div>
 
@@ -111,10 +111,10 @@ export default function PricingPage() {
 
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               {[
-                'One-on-one private instruction — no groups, no shared lanes',
+                'One-on-one private instruction, no groups, no shared lanes',
                 'Personalised to your child\'s age, level, and confidence',
                 'Held at a calm, enclosed private pool in Côte Saint-Luc',
-                'Discreet, comfortable setting — welcoming to all families',
+                'Discreet, comfortable setting, welcoming to all families',
                 'Sunday through Friday, morning and afternoon slots',
                 'Confirmation within 24 hours of booking',
                 'Payment in person, cash or e-transfer on the day',
@@ -151,7 +151,7 @@ export default function PricingPage() {
               { q: 'What about semi-private?', a: 'Semi-private lessons (exactly 2 children together) have their own rate: $75/session (30 min) or $115/session (45 min). 10-packs: $650 (30 min) or $1,000 (45 min). Still small, personal, and attentive.' },
               { q: 'How do 10-packs work?', a: 'Buy 10 sessions upfront at a discounted rate. Book each one individually, no need to schedule all at once. Credits never expire.' },
               { q: 'When do I pay?', a: 'Payment is due in person on the day of each lesson, cash or e-transfer. No pre-payment required when booking online.' },
-              { q: 'Is this suitable for our family?', a: 'The pool is private, enclosed, and away from public spaces. The setting is discreet and respectful — welcoming to families of all backgrounds, including religious and modest-observant families.' },
+              { q: 'Is this suitable for our family?', a: 'The pool is private, enclosed, and away from public spaces. The setting is discreet and respectful, welcoming to families of all backgrounds, including religious and modest-observant families.' },
             ].map(item => (
               <div key={item.q} style={{
                 background: 'white', borderRadius: '18px',

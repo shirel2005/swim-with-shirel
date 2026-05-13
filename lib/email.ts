@@ -203,7 +203,7 @@ export async function sendBookingConfirmation({
   // 10-pack note
   const packBlock = bookingType === '10pack' ? tintPanel(`
     <p style="margin:0;font-size:13px;color:${navy};font-family:${serif};line-height:1.65;">
-      <strong>10-Pack active.</strong>&nbsp; Your pack covers 10 lessons. Book one or two sessions at a time — remaining credits are always saved.
+      <strong>10-Pack active.</strong>&nbsp; Your pack covers 10 lessons. Book one or two sessions at a time. Remaining credits are always saved.
     </p>`) : ''
 
   // Children

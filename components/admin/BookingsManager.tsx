@@ -275,7 +275,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                     )}
                     {isWeekly && booking.recurring_day && (
                       <span className="flex items-center gap-1">
-                        {(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()} at {booking.recurring_time ? formatTime(booking.recurring_time) : '—'}
+                        {(() => { try { const p = JSON.parse(booking.recurring_day!); return Array.isArray(p) ? p.join(', ') : booking.recurring_day } catch { return booking.recurring_day } })()} at {booking.recurring_time ? formatTime(booking.recurring_time) : '-'}
                       </span>
                     )}
                   </div>

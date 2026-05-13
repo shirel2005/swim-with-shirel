@@ -58,7 +58,7 @@ export default function BookPage() {
             maxWidth: '380px', marginTop: '0.875rem',
             borderLeft: '2px solid rgba(106,175,212,0.20)', paddingLeft: '0.875rem',
           }}>
-            All lessons are private or semi-private — held at a calm, enclosed pool. A comfortable, respectful setting for every family.
+            All lessons are private or semi-private, held at a calm, enclosed pool. A comfortable, respectful setting for every family.
           </p>
         </div>
 

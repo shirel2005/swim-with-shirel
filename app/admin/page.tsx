@@ -221,7 +221,7 @@ export default function AdminPage() {
               </p>
             </div>
             <p style={{ fontFamily: 'var(--font-fraunces, Georgia, serif)', fontSize: '28px', fontWeight: 900, color: '#0D1F3C', lineHeight: 1 }}>
-              {stats ? `$${stats.confirmed_earnings.toLocaleString()}` : '—'}
+              {stats ? `$${stats.confirmed_earnings.toLocaleString()}` : '-'}
             </p>
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', color: 'rgba(13,31,60,0.35)', marginTop: '0.375rem' }}>
               {stats ? `${stats.confirmed_bookings} confirmed booking${stats.confirmed_bookings !== 1 ? 's' : ''}` : 'Loading…'}
@@ -248,7 +248,7 @@ export default function AdminPage() {
               </p>
             </div>
             <p style={{ fontFamily: 'var(--font-fraunces, Georgia, serif)', fontSize: '28px', fontWeight: 900, color: '#0D1F3C', lineHeight: 1 }}>
-              {stats ? `$${stats.pending_earnings.toLocaleString()}` : '—'}
+              {stats ? `$${stats.pending_earnings.toLocaleString()}` : '-'}
             </p>
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', color: 'rgba(13,31,60,0.35)', marginTop: '0.375rem' }}>
               Awaiting confirmation
@@ -275,7 +275,7 @@ export default function AdminPage() {
               </p>
             </div>
             <p style={{ fontFamily: 'var(--font-fraunces, Georgia, serif)', fontSize: '28px', fontWeight: 900, color: '#0D1F3C', lineHeight: 1 }}>
-              {stats ? stats.total_bookings : '—'}
+              {stats ? stats.total_bookings : '-'}
             </p>
             <p style={{ fontFamily: 'var(--font-dm-sans)', fontSize: '11px', color: 'rgba(13,31,60,0.35)', marginTop: '0.375rem' }}>
               All time

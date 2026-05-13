@@ -39,12 +39,12 @@ function parseJSON<T>(raw: string | null | undefined, fallback: T): T {
 function weekLabel(weekStart: Date): string {
   const weekEnd = addDays(weekStart, 6)
   if (isSameMonth(weekStart, weekEnd) && isSameYear(weekStart, weekEnd)) {
-    return `${format(weekStart, 'MMMM d')}–${format(weekEnd, 'd, yyyy')}`
+    return `${format(weekStart, 'MMMM d')}-${format(weekEnd, 'd, yyyy')}`
   }
   if (isSameYear(weekStart, weekEnd)) {
-    return `${format(weekStart, 'MMM d')} – ${format(weekEnd, 'MMM d, yyyy')}`
+    return `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`
   }
-  return `${format(weekStart, 'MMM d, yyyy')} – ${format(weekEnd, 'MMM d, yyyy')}`
+  return `${format(weekStart, 'MMM d, yyyy')} - ${format(weekEnd, 'MMM d, yyyy')}`
 }
 
 function getEntriesForDate(bookings: Booking[], dateStr: string): LessonEntry[] {
@@ -394,7 +394,7 @@ export default function ScheduleView({ adminPassword }: Props) {
                         }}>
                           {entry.childNames.length > 0
                             ? entry.childNames.join(' + ')
-                            : '—'}
+                            : '-'}
                         </span>
 
                         {/* Format pill */}

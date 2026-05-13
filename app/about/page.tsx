@@ -134,7 +134,7 @@ export default function AboutPage() {
                   ) : (
                     <Image
                       src="/shirel.jpg"
-                      alt="Shirel – swim instructor"
+                      alt="Shirel, swim instructor"
                       fill
                       className="object-cover"
                       style={{ objectPosition: 'center 15%' }}
@@ -271,12 +271,12 @@ export default function AboutPage() {
 
               <p>
                 Lessons take place at my private pool in{' '}
-                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>Côte Saint-Luc</strong> — a calm, enclosed, and quiet setting. There are no public crowds, no shared lanes, and no noise. Just a relaxed, focused environment where your child can learn at their own pace.
+                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>Côte Saint-Luc</strong>, a calm, enclosed, and quiet setting. There are no public crowds, no shared lanes, and no noise. Just a relaxed, focused environment where your child can learn at their own pace.
               </p>
 
               <p>
                 I welcome{' '}
-                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>families of all backgrounds</strong>. The private setting makes these lessons especially well-suited for families who value discretion, modesty, or a more personal approach — whether for cultural, religious, or simply personal reasons. Everyone is welcome here, and every family is treated with care and respect.
+                <strong style={{ color: '#0D1F3C', fontWeight: 700 }}>families of all backgrounds</strong>. The private setting makes these lessons especially well-suited for families who value discretion, modesty, or a more personal approach, whether for cultural, religious, or simply personal reasons. Everyone is welcome here, and every family is treated with care and respect.
               </p>
 
               <div style={{ paddingTop: '1rem' }}>
@@ -351,7 +351,7 @@ export default function AboutPage() {
               {
                 num: '04',
                 title: 'A welcoming space',
-                body: 'Private, discreet, and respectful. Ideal for families who value a more personal setting — including religious and modest-observant families.',
+                body: 'Private, discreet, and respectful. Ideal for families who value a more personal setting, including religious and modest-observant families.',
               },
             ].map((item, i) => (
               <div
@@ -436,7 +436,7 @@ export default function AboutPage() {
               marginBottom: '2.5rem',
             }}
           >
-            Private, one-on-one instruction in a calm and welcoming setting. Spots fill up fast — book early to secure your preferred time.
+            Private, one-on-one instruction in a calm and welcoming setting. Spots fill up fast. Book early to secure your preferred time.
           </p>
           <Link href="/book" className="btn-primary" style={{ fontSize: '15px', padding: '1rem 2.5rem' }}>
             Book a Lesson with Shirel
