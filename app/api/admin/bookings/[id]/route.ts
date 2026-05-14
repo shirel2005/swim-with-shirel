@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-import { sendBookingConfirmation, sendBookingRejection } from '@/lib/email'
+import {
+  sendBookingConfirmation,
+  sendBookingRejection,
+  sendAdminConfirmationNotification,
+  sendAdminRejectionLog,
+} from '@/lib/email'
 
 function checkAdminAuth(request: NextRequest): boolean {
   const password = request.headers.get('x-admin-password') || ''
@@ -88,77 +93,95 @@ export async function PATCH(
       console.error('[10-pack] Failed to update ten_pack sessions:', packErr)
     }
 
-    // Send confirmation email — isolated, never crashes the app
-    if (status === 'confirmed' && previousStatus !== 'confirmed') {
-      setImmediate(async () => {
-        try {
-          let slots: Array<{ date: string; time_slot: string; duration: number; assigned_children?: string[] }> = []
-          try {
-            // Prefer session_assignments so we can include per-child info in the email
-            const sessionAssignments = JSON.parse(booking.session_assignments || '[]')
-            if (Array.isArray(sessionAssignments) && sessionAssignments.length > 0) {
-              slots = sessionAssignments.map((s: { date: string; start_time: string; duration: number; assigned_children?: string[] }) => ({
-                date: s.date,
-                time_slot: s.start_time,
-                duration: s.duration,
-                assigned_children: s.assigned_children || [],
-              }))
-            } else {
-              const bookedSlots = JSON.parse(booking.booked_slots || '[]')
-              if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
-                slots = bookedSlots.map((s: { date: string; start_time: string; duration: number }) => ({
-                  date: s.date,
-                  time_slot: s.start_time,
-                  duration: s.duration,
-                }))
-              } else {
-                const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-                if (slotIds.length > 0) {
-                  try {
-                    const placeholders = slotIds.map(() => '?').join(',')
-                    slots = db
-                      .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
-                      .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
-                  } catch {}
-                }
-              }
-            }
-          } catch {}
-
-          let childrenParsed: Array<{ name: string; age?: string; experience?: string }> = []
-          try { childrenParsed = JSON.parse(booking.children || '[]') } catch {}
-          const childInfoList = childrenParsed
-            .filter((c) => c?.name?.trim())
-            .map((c) => ({ name: c.name, age: c.age, experience: c.experience }))
-
-          await sendBookingConfirmation({
-            parentName: booking.parent_name,
-            parentEmail: booking.parent_email,
-            lessonFormat: booking.lesson_format || 'private',
-            lessonType: booking.lesson_type || undefined,
-            bookingType: (booking.booking_type === '10pack' ? '10pack' : 'one-time') as 'one-time' | '10pack',
-            children: childInfoList,
-            slots,
-            totalPrice: booking.total_price,
-          })
-        } catch (emailError) {
-          console.error('[Email] Failed to send confirmation (booking still confirmed):', emailError)
+    // Build shared slot + children data used by both confirmation emails
+    type EmailSlot = { date: string; time_slot: string; duration: number; assigned_children?: string[] }
+    let emailSlots: EmailSlot[] = []
+    try {
+      const sa = JSON.parse(booking.session_assignments || '[]')
+      if (Array.isArray(sa) && sa.length > 0) {
+        emailSlots = sa.map((s: { date: string; start_time: string; duration: number; assigned_children?: string[] }) => ({
+          date: s.date, time_slot: s.start_time, duration: s.duration, assigned_children: s.assigned_children || [],
+        }))
+      } else {
+        const bs = JSON.parse(booking.booked_slots || '[]')
+        if (Array.isArray(bs) && bs.length > 0) {
+          emailSlots = bs.map((s: { date: string; start_time: string; duration: number }) => ({
+            date: s.date, time_slot: s.start_time, duration: s.duration,
+          }))
+        } else {
+          const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+          if (slotIds.length > 0) {
+            const placeholders = slotIds.map(() => '?').join(',')
+            emailSlots = db
+              .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
+              .all(...slotIds) as EmailSlot[]
+          }
         }
-      })
+      }
+    } catch (slotParseErr) {
+      console.error(`[Email] Failed to parse slots for booking #${id}:`, slotParseErr)
     }
 
-    // Send cancellation/rejection email — only when newly cancelled, not if already was cancelled
+    let childInfoList: Array<{ name: string; age?: string; experience?: string }> = []
+    try {
+      childInfoList = (JSON.parse(booking.children || '[]') as Array<{ name?: string; age?: string; experience?: string }>)
+        .filter(c => c?.name?.trim())
+        .map(c => ({ name: c.name!, age: c.age, experience: c.experience }))
+    } catch {}
+
+    // Send emails — awaited directly (no setImmediate) so failures are visible in logs.
+    // Each call is individually try/caught so one failure never blocks the other.
+    if (status === 'confirmed' && previousStatus !== 'confirmed') {
+      try {
+        await sendBookingConfirmation({
+          parentName: booking.parent_name,
+          parentEmail: booking.parent_email,
+          lessonFormat: booking.lesson_format || 'private',
+          lessonType: booking.lesson_type || undefined,
+          bookingType: (booking.booking_type === '10pack' ? '10pack' : 'one-time') as 'one-time' | '10pack',
+          children: childInfoList,
+          slots: emailSlots,
+          totalPrice: booking.total_price,
+        })
+      } catch (e) {
+        console.error(`[Email] FAILED | type=booking_confirmation | booking=#${id} | error=${String(e)}`)
+      }
+
+      try {
+        await sendAdminConfirmationNotification({
+          bookingId: id,
+          parentName: booking.parent_name,
+          parentEmail: booking.parent_email,
+          children: childInfoList,
+          lessonFormat: booking.lesson_format || 'private',
+          lessonType: booking.lesson_type || undefined,
+          slots: emailSlots,
+          totalPrice: booking.total_price,
+        })
+      } catch (e) {
+        console.error(`[Email] FAILED | type=admin_confirmation_notification | booking=#${id} | error=${String(e)}`)
+      }
+    }
+
     if (status === 'cancelled' && previousStatus !== 'cancelled') {
-      setImmediate(async () => {
-        try {
-          await sendBookingRejection({
-            parentName: booking.parent_name,
-            parentEmail: booking.parent_email,
-          })
-        } catch (emailError) {
-          console.error('[Email] Failed to send cancellation notice (booking still cancelled):', emailError)
-        }
-      })
+      try {
+        await sendBookingRejection({
+          parentName: booking.parent_name,
+          parentEmail: booking.parent_email,
+        })
+      } catch (e) {
+        console.error(`[Email] FAILED | type=booking_rejection | booking=#${id} | error=${String(e)}`)
+      }
+
+      try {
+        await sendAdminRejectionLog({
+          bookingId: id,
+          parentName: booking.parent_name,
+          parentEmail: booking.parent_email,
+        })
+      } catch (e) {
+        console.error(`[Email] FAILED | type=admin_rejection_log | booking=#${id} | error=${String(e)}`)
+      }
     }
 
     return NextResponse.json({ success: true })

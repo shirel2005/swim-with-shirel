@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-import { sendAdminBookingNotification } from '@/lib/email'
+import { sendAdminBookingNotification, sendBookingRequestReceived } from '@/lib/email'
 
 type BookingType = 'one-time' | '10pack'
 
@@ -122,13 +122,14 @@ export async function POST(request: NextRequest) {
       return { bookingId, tenPackId: null }
     })()
 
-    // Send admin notification email (non-blocking)
+    // Build slot list for emails
     const slotsForEmail = (hasBookedSlots ? booked_slots : []).map((s: { date: string; start_time: string; duration: number }) => ({
       date: s.date,
       time_slot: s.start_time,
       duration: s.duration,
     }))
 
+    // Send both notification emails non-blocking — they must never delay or break the booking response
     sendAdminBookingNotification({
       bookingId: result.bookingId,
       parentName: parent_name.trim(),
@@ -141,7 +142,19 @@ export async function POST(request: NextRequest) {
       slots: slotsForEmail,
       notes: notes || null,
       totalPrice,
-    }).catch(err => console.error('[Email] Admin notification failed:', err))
+    }).catch(err => console.error(`[Email] FAILED | type=admin_booking_notification | booking=#${result.bookingId} | error=${String(err)}`))
+
+    sendBookingRequestReceived({
+      bookingId: result.bookingId,
+      parentName: parent_name.trim(),
+      parentEmail: parent_email.trim(),
+      lessonFormat: lesson_format,
+      lessonType: lesson_type,
+      bookingType: booking_type,
+      children: validChildren,
+      slots: slotsForEmail,
+      totalPrice,
+    }).catch(err => console.error(`[Email] FAILED | type=booking_request_received | booking=#${result.bookingId} | error=${String(err)}`))
 
     return NextResponse.json({ success: true, bookingId: result.bookingId, tenPackId: result.tenPackId }, { status: 201 })
   } catch (error) {

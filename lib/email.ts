@@ -156,6 +156,22 @@ function experienceLabel(exp: string): string {
 // ─── Exported types ───────────────────────────────────────────────────────────
 export interface ChildInfo { name: string; age?: string; experience?: string }
 
+// ─── Structured email logger ──────────────────────────────────────────────────
+function emailLog(
+  status: 'attempt' | 'success' | 'error',
+  type: string,
+  recipient: string,
+  bookingId?: number | null,
+  error?: unknown,
+) {
+  const tag = status === 'error' ? '[Email] FAILED ' : status === 'attempt' ? '[Email] attempt' : '[Email] success'
+  const parts = [`${tag} | type=${type} | to=${recipient}`]
+  if (bookingId != null) parts.push(`booking=#${bookingId}`)
+  if (error) parts.push(`error=${String(error)}`)
+  if (status === 'error') console.error(parts.join(' | '))
+  else console.log(parts.join(' | '))
+}
+
 // ─── Confirmation email ───────────────────────────────────────────────────────
 export async function sendBookingConfirmation({
   parentName, parentEmail, lessonFormat, lessonType,
@@ -171,9 +187,12 @@ export async function sendBookingConfirmation({
   totalPrice?: number
 }) {
   const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
-  if (!creds) { console.warn('[Email] Gmail credentials not set — skipping.'); return }
+  if (!creds) {
+    console.error('[Email] FAILED | type=booking_confirmation | Gmail credentials missing — check GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN env vars')
+    return
+  }
 
-  console.log('[Email] Sending confirmation to:', parentEmail)
+  emailLog('attempt', 'booking_confirmation', parentEmail)
 
   const childList: ChildInfo[] = children.map(c => typeof c === 'string' ? { name: c } : c)
 
@@ -253,7 +272,7 @@ export async function sendBookingConfirmation({
 
   const html = buildEmail('Your lesson is confirmed.', body)
   await sendRaw(parentEmail, 'Your swim lesson is confirmed | Swim with Shirel', html)
-  console.log('[Email] Confirmation sent to:', parentEmail)
+  emailLog('success', 'booking_confirmation', parentEmail)
 }
 
 // ─── Admin booking notification ──────────────────────────────────────────────
@@ -281,9 +300,12 @@ export async function sendAdminBookingNotification({
   totalPrice?: number
 }) {
   const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
-  if (!creds) { console.warn('[Email] Gmail credentials not set — skipping admin notification.'); return }
+  if (!creds) {
+    console.error('[Email] FAILED | type=admin_booking_notification | Gmail credentials missing — check env vars')
+    return
+  }
 
-  console.log('[Email] Sending admin notification for booking #', bookingId)
+  emailLog('attempt', 'admin_booking_notification', CONTACT_EMAIL, bookingId)
 
   const childList: ChildInfo[] = children.map(c => typeof c === 'string' ? { name: c } : c)
   const formatLabel   = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
@@ -353,7 +375,7 @@ export async function sendAdminBookingNotification({
 
   const html = buildEmail(`New booking request #${bookingId}`, body)
   await sendRaw(CONTACT_EMAIL, `New booking request from ${parentName} | Swim with Shirel`, html)
-  console.log('[Email] Admin notification sent for booking #', bookingId)
+  emailLog('success', 'admin_booking_notification', CONTACT_EMAIL, bookingId)
 }
 
 // ─── Rejection / cancellation email ──────────────────────────────────────────
@@ -365,9 +387,12 @@ export async function sendBookingRejection({
   parentEmail: string
 }) {
   const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
-  if (!creds) { console.warn('[Email] Gmail credentials not set — skipping.'); return }
+  if (!creds) {
+    console.error('[Email] FAILED | type=booking_rejection | Gmail credentials missing — check env vars')
+    return
+  }
 
-  console.log('[Email] Sending cancellation notice to:', parentEmail)
+  emailLog('attempt', 'booking_rejection', parentEmail)
 
   const body = `
     <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Hi <strong>${parentName}</strong>,</p>
@@ -386,5 +411,195 @@ export async function sendBookingRejection({
 
   const html = buildEmail('Booking update.', body)
   await sendRaw(parentEmail, 'Booking update | Swim with Shirel', html)
-  console.log('[Email] Cancellation notice sent to:', parentEmail)
+  emailLog('success', 'booking_rejection', parentEmail)
+}
+
+// ─── Parent "request received" acknowledgement ────────────────────────────────
+export async function sendBookingRequestReceived({
+  bookingId, parentName, parentEmail, lessonFormat, lessonType,
+  bookingType = 'one-time', children = [], slots, totalPrice,
+}: {
+  bookingId: number
+  parentName: string
+  parentEmail: string
+  lessonFormat: string
+  lessonType?: string
+  bookingType?: 'one-time' | '10pack'
+  children?: ChildInfo[] | string[]
+  slots: Array<{ date: string; time_slot: string; duration: number }>
+  totalPrice?: number
+}) {
+  const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
+  if (!creds) {
+    console.error('[Email] FAILED | type=booking_request_received | Gmail credentials missing — check env vars')
+    return
+  }
+
+  emailLog('attempt', 'booking_request_received', parentEmail, bookingId)
+
+  const childList: ChildInfo[] = (children as Array<string | ChildInfo>).map(c =>
+    typeof c === 'string' ? { name: c } : c
+  )
+
+  const formatLabel   = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const durationLabel = lessonType?.includes('45') ? '45-Minute' : '30-Minute'
+  const bookingLabel  = bookingType === '10pack' ? '10-Pack' : 'One-Time'
+
+  const detailsBlock = card(`
+    ${label('What you requested')}
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${lessonType ? detailRow('Duration', durationLabel) : ''}
+      ${detailRow('Format', formatLabel)}
+      ${detailRow('Booking', bookingLabel)}
+      ${totalPrice ? detailRow('Price', `$${totalPrice}`) : ''}
+    </table>`)
+
+  const childrenBlock = childList.length > 0 ? card(`
+    ${label(childList.length === 1 ? 'Swimmer' : 'Swimmers')}
+    ${childList.map((c, i) => `
+      <div style="${i > 0 ? `border-top:1px solid ${divider};padding-top:12px;margin-top:12px;` : ''}">
+        <p style="margin:0 0 2px 0;font-size:15px;font-weight:700;color:${navy};font-family:${serif};">${c.name}</p>
+        ${(c.age || c.experience) ? `<p style="margin:0;font-size:12px;color:${mutedText};font-family:${serif};">${[c.age ? `Age ${c.age}` : '', c.experience ? experienceLabel(c.experience) : ''].filter(Boolean).join(' &middot; ')}</p>` : ''}
+      </div>`).join('')}`) : ''
+
+  const slotsBlock = slots.length > 0 ? card(`
+    ${label(`Requested Session${slots.length > 1 ? 's' : ''}`)}
+    ${slots.map((s, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:${tintBg};border:1px solid ${tintBorder};border-radius:10px;padding:10px 14px;${i > 0 ? 'margin-top:6px;' : ''}">
+        <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
+        <span style="font-size:13px;color:${brandBlue};font-weight:600;font-family:${serif};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${dimText};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
+      </div>`).join('')}`) : ''
+
+  const nextStepsBlock = tintPanel(`
+    <p style="margin:0 0 6px 0;font-size:13px;font-weight:700;color:${navy};font-family:${serif};">What happens next?</p>
+    <p style="margin:0;font-size:13px;color:${bodyText};font-family:${serif};line-height:1.65;">
+      Shirel will review your request and confirm within <strong>24 hours</strong>. You&rsquo;ll receive a second email once your lesson is confirmed.
+    </p>`)
+
+  const body = `
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Hi <strong>${parentName}</strong>,</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">We&rsquo;ve received your booking request. Here&rsquo;s a summary of what you asked for.</p>
+
+    ${detailsBlock}
+    ${childrenBlock}
+    ${slotsBlock}
+    ${nextStepsBlock}
+
+    <p style="margin:0 0 4px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">No action needed on your end for now. If you have any questions, feel free to reply to this email.</p>
+    <p style="margin:10px 0 0 0;font-size:15px;color:${navy};font-family:${serif};font-style:italic;">Shirel</p>`
+
+  const html = buildEmail('Booking request received.', body)
+  await sendRaw(parentEmail, 'Booking request received | Swim with Shirel', html)
+  emailLog('success', 'booking_request_received', parentEmail, bookingId)
+}
+
+// ─── Admin confirmation record email ─────────────────────────────────────────
+export async function sendAdminConfirmationNotification({
+  bookingId, parentName, parentEmail, parentPhone,
+  children = [], lessonFormat, lessonType, slots, totalPrice,
+}: {
+  bookingId: number
+  parentName: string
+  parentEmail: string
+  parentPhone?: string
+  children?: ChildInfo[] | string[]
+  lessonFormat: string
+  lessonType?: string
+  slots: Array<{ date: string; time_slot: string; duration: number; assigned_children?: string[] }>
+  totalPrice?: number
+}) {
+  const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
+  if (!creds) {
+    console.error('[Email] FAILED | type=admin_confirmation_notification | Gmail credentials missing — check env vars')
+    return
+  }
+
+  emailLog('attempt', 'admin_confirmation_notification', CONTACT_EMAIL, bookingId)
+
+  const childList: ChildInfo[] = (children as Array<string | ChildInfo>).map(c =>
+    typeof c === 'string' ? { name: c } : c
+  )
+
+  const formatLabel   = lessonFormat === 'semi-private' ? 'Semi-Private' : 'Private'
+  const durationLabel = lessonType?.includes('45') ? '45-Minute' : '30-Minute'
+
+  const parentBlock = card(`
+    ${label('Parent / Guardian')}
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${detailRow('Name', parentName)}
+      ${detailRow('Email', `<a href="mailto:${parentEmail}" style="color:${brandBlue};text-decoration:none;">${parentEmail}</a>`)}
+      ${parentPhone ? detailRow('Phone', `<a href="tel:${parentPhone.replace(/\D/g,'')}" style="color:${brandBlue};text-decoration:none;">${parentPhone}</a>`) : ''}
+    </table>`)
+
+  const lessonBlock = card(`
+    ${label('Lesson Details')}
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${detailRow('Duration', durationLabel)}
+      ${detailRow('Format', formatLabel)}
+      ${totalPrice ? detailRow('Price', `$${totalPrice}`) : ''}
+    </table>`)
+
+  const childrenBlock = childList.length > 0 ? card(`
+    ${label(childList.length === 1 ? 'Swimmer' : `Swimmers (${childList.length})`)}
+    ${childList.map((c, i) => `
+      <div style="${i > 0 ? `border-top:1px solid ${divider};padding-top:10px;margin-top:10px;` : ''}">
+        <p style="margin:0 0 2px 0;font-size:14px;font-weight:700;color:${navy};font-family:${serif};">${c.name}</p>
+        ${(c.age || c.experience) ? `<p style="margin:0;font-size:12px;color:${mutedText};font-family:${serif};">${[c.age ? `Age ${c.age}` : '', c.experience ? experienceLabel(c.experience) : ''].filter(Boolean).join(' &middot; ')}</p>` : ''}
+      </div>`).join('')}`) : ''
+
+  const sessionsBlock = slots.length > 0 ? card(`
+    ${label(`Confirmed Session${slots.length > 1 ? 's' : ''}`)}
+    ${slots.map((s, i) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:${tintBg};border:1px solid ${tintBorder};border-radius:10px;padding:10px 14px;${i > 0 ? 'margin-top:6px;' : ''}">
+        <div>
+          <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
+          ${s.assigned_children && s.assigned_children.length > 0 ? `<span style="font-size:12px;color:${mutedText};font-family:${serif};margin-left:6px;">&mdash; ${s.assigned_children.join(', ')}</span>` : ''}
+        </div>
+        <span style="font-size:13px;color:${brandBlue};font-weight:600;font-family:${serif};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${dimText};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
+      </div>`).join('')}`) : ''
+
+  const body = `
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking <strong>#${bookingId}</strong> confirmed</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">You confirmed this booking. A confirmation email has been sent to the parent. This is your record copy.</p>
+
+    ${parentBlock}
+    ${lessonBlock}
+    ${childrenBlock}
+    ${sessionsBlock}`
+
+  const html = buildEmail(`Confirmed: booking #${bookingId}`, body)
+  await sendRaw(CONTACT_EMAIL, `Confirmed: ${parentName} — booking #${bookingId} | Swim with Shirel`, html)
+  emailLog('success', 'admin_confirmation_notification', CONTACT_EMAIL, bookingId)
+}
+
+// ─── Admin rejection log email ────────────────────────────────────────────────
+export async function sendAdminRejectionLog({
+  bookingId, parentName, parentEmail,
+}: {
+  bookingId: number
+  parentName: string
+  parentEmail: string
+}) {
+  const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
+  if (!creds) {
+    console.error('[Email] FAILED | type=admin_rejection_log | Gmail credentials missing — check env vars')
+    return
+  }
+
+  emailLog('attempt', 'admin_rejection_log', CONTACT_EMAIL, bookingId)
+
+  const body = `
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking <strong>#${bookingId}</strong> cancelled</p>
+    <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">This booking was cancelled and the parent has been notified.</p>
+
+    ${card(`
+      ${label('Parent')}
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${detailRow('Name', parentName)}
+        ${detailRow('Email', `<a href="mailto:${parentEmail}" style="color:${brandBlue};text-decoration:none;">${parentEmail}</a>`)}
+      </table>`)}`
+
+  const html = buildEmail(`Cancelled: booking #${bookingId}`, body)
+  await sendRaw(CONTACT_EMAIL, `Cancelled: ${parentName} — booking #${bookingId} | Swim with Shirel`, html)
+  emailLog('success', 'admin_rejection_log', CONTACT_EMAIL, bookingId)
 }
