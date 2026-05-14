@@ -167,7 +167,7 @@ export async function sendBookingConfirmation({
   lessonType?: string
   bookingType?: 'one-time' | '10pack'
   children?: ChildInfo[] | string[]
-  slots: Array<{ date: string; time_slot: string; duration: number }>
+  slots: Array<{ date: string; time_slot: string; duration: number; assigned_children?: string[] }>
   totalPrice?: number
 }) {
   const creds = process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN
@@ -222,7 +222,10 @@ export async function sendBookingConfirmation({
       ${label(`Confirmed Session${slots.length > 1 ? 's' : ''}`)}
       ${slots.map((s, i) => `
         <div style="display:flex;align-items:center;justify-content:space-between;background:${tintBg};border:1px solid ${tintBorder};border-radius:10px;padding:10px 14px;${i > 0 ? 'margin-top:6px;' : ''}">
-          <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
+          <div>
+            <span style="font-size:13px;font-weight:600;color:${navy};font-family:${serif};">${formatDate(s.date)}</span>
+            ${s.assigned_children && s.assigned_children.length > 0 ? `<span style="font-size:12px;color:${mutedText};font-family:${serif};margin-left:6px;">&mdash; ${s.assigned_children.join(', ')}</span>` : ''}
+          </div>
           <span style="font-size:13px;color:${brandBlue};font-weight:600;font-family:${serif};white-space:nowrap;margin-left:10px;">${formatTime(s.time_slot)}&thinsp;<span style="color:${dimText};font-size:12px;font-weight:400;">${s.duration}&thinsp;min</span></span>
         </div>`).join('')}`)
   }

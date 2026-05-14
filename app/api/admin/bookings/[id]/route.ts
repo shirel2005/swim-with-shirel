@@ -92,24 +92,35 @@ export async function PATCH(
     if (status === 'confirmed' && previousStatus !== 'confirmed') {
       setImmediate(async () => {
         try {
-          let slots: Array<{ date: string; time_slot: string; duration: number }> = []
+          let slots: Array<{ date: string; time_slot: string; duration: number; assigned_children?: string[] }> = []
           try {
-            const bookedSlots = JSON.parse(booking.booked_slots || '[]')
-            if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
-              slots = bookedSlots.map((s: { date: string; start_time: string; duration: number }) => ({
+            // Prefer session_assignments so we can include per-child info in the email
+            const sessionAssignments = JSON.parse(booking.session_assignments || '[]')
+            if (Array.isArray(sessionAssignments) && sessionAssignments.length > 0) {
+              slots = sessionAssignments.map((s: { date: string; start_time: string; duration: number; assigned_children?: string[] }) => ({
                 date: s.date,
                 time_slot: s.start_time,
                 duration: s.duration,
+                assigned_children: s.assigned_children || [],
               }))
             } else {
-              const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-              if (slotIds.length > 0) {
-                try {
-                  const placeholders = slotIds.map(() => '?').join(',')
-                  slots = db
-                    .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
-                    .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
-                } catch {}
+              const bookedSlots = JSON.parse(booking.booked_slots || '[]')
+              if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
+                slots = bookedSlots.map((s: { date: string; start_time: string; duration: number }) => ({
+                  date: s.date,
+                  time_slot: s.start_time,
+                  duration: s.duration,
+                }))
+              } else {
+                const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
+                if (slotIds.length > 0) {
+                  try {
+                    const placeholders = slotIds.map(() => '?').join(',')
+                    slots = db
+                      .prepare(`SELECT date, time_slot, duration FROM availability WHERE id IN (${placeholders})`)
+                      .all(...slotIds) as Array<{ date: string; time_slot: string; duration: number }>
+                  } catch {}
+                }
               }
             }
           } catch {}

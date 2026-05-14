@@ -6,8 +6,9 @@ import { format, parseISO } from 'date-fns'
 import {
   Trash2, CheckCircle, XCircle, RefreshCw,
   ChevronDown, ChevronUp, Package, User, Users, Clock,
-  Calendar, Plus, Minus,
+  Calendar, Plus, Minus, Copy,
 } from 'lucide-react'
+import DuplicateBookingModal from './DuplicateBookingModal'
 
 interface BookingsManagerProps { adminPassword: string }
 type StatusFilter = 'all' | 'pending' | 'confirmed' | 'cancelled'
@@ -69,6 +70,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
   const [filter, setFilter] = useState<StatusFilter>('all')
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const [duplicatingBooking, setDuplicatingBooking] = useState<Booking | null>(null)
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -430,6 +432,10 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                       <RefreshCw size={13} />Reset to Pending
                     </button>
                   )}
+                  <button onClick={() => setDuplicatingBooking(booking)} disabled={isLoading}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-sky-700 border border-sky-200 hover:bg-sky-50 disabled:opacity-50 transition-colors">
+                    <Copy size={13} />Duplicate for new dates
+                  </button>
                   <button onClick={() => deleteBooking(booking.id)} disabled={isLoading}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 border border-red-100 hover:bg-red-50 disabled:opacity-50 transition-colors ml-auto">
                     <Trash2 size={13} />Delete
@@ -439,6 +445,18 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
             )
           })}
         </div>
+      )}
+
+      {duplicatingBooking && (
+        <DuplicateBookingModal
+          booking={duplicatingBooking}
+          adminPassword={adminPassword}
+          onClose={() => setDuplicatingBooking(null)}
+          onSuccess={() => {
+            fetchBookings()
+            setDuplicatingBooking(null)
+          }}
+        />
       )}
     </div>
   )
