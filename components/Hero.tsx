@@ -150,7 +150,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ── RIGHT: Photo composition + sticky note ── */}
+          {/* ── RIGHT: Photo composition ── */}
           <div className="order-2 lg:order-2 relative flex flex-col items-center lg:items-end">
 
             {/* Blob background accent layer 1 */}
@@ -233,93 +233,6 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* ── Sticky note — pinned below the pool photo ── */}
-            <div
-              style={{
-                marginTop: '-1.75rem',
-                width: 'clamp(220px, 38vw, 400px)',
-                position: 'relative',
-                zIndex: 5,
-              }}
-            >
-              {/* Tape strip */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '56px',
-                  height: '20px',
-                  background: 'rgba(250,225,120,0.68)',
-                  borderRadius: '2px',
-                  boxShadow: '0 1px 3px rgba(13,31,60,0.07)',
-                  zIndex: 2,
-                }}
-              />
-              <div
-                style={{
-                  backgroundColor: '#FDF6D8',
-                  borderRadius: '3px',
-                  padding: 'clamp(1.25rem, 3vw, 1.625rem) clamp(1.25rem, 3vw, 1.75rem)',
-                  boxShadow: '0 6px 24px rgba(13,31,60,0.11), 0 1px 4px rgba(13,31,60,0.06), inset 0 1px 0 rgba(255,255,255,0.55)',
-                  transform: 'rotate(-1deg)',
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: 'var(--font-caveat, cursive)',
-                    fontSize: 'clamp(20px, 3.5vw, 24px)',
-                    color: '#0D1F3C',
-                    fontWeight: 600,
-                    lineHeight: 1.15,
-                    marginBottom: '0.6rem',
-                  }}
-                >
-                  Just a quick update 💛
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-dm-sans, sans-serif)',
-                    fontSize: 'clamp(11.5px, 1.2vw, 13px)',
-                    color: 'rgba(13,31,60,0.68)',
-                    lineHeight: 1.75,
-                    marginBottom: '0.5rem',
-                  }}
-                >
-                  Waiting for the weather and pool to warm up before officially starting the season. Availability may still shift slightly as we get closer.
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-dm-sans, sans-serif)',
-                    fontSize: 'clamp(11.5px, 1.2vw, 13px)',
-                    color: 'rgba(13,31,60,0.68)',
-                    lineHeight: 1.75,
-                  }}
-                >
-                  In the meantime, past families are warmly invited to{' '}
-                  <Link
-                    href="/reviews"
-                    style={{ color: '#4A7FA5', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '2px' }}
-                  >
-                    leave a review
-                  </Link>
-                  . Thank you so much for your patience and support!
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-caveat, cursive)',
-                    fontSize: 'clamp(16px, 2.5vw, 19px)',
-                    color: 'rgba(13,31,60,0.38)',
-                    marginTop: '0.75rem',
-                    fontWeight: 500,
-                  }}
-                >
-                  Shirel 🌊
-                </p>
-              </div>
-            </div>
 
           </div>
 
