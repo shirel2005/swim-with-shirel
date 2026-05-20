@@ -19,7 +19,7 @@ export default function AvailabilityBanner() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
         <span className="text-amber-500 text-base flex-shrink-0">📅</span>
         <p className="text-sm text-amber-900 flex-1 leading-snug">
-          <strong>Availability note:</strong> I will be unavailable from <strong>June 15 to July 15</strong>.
+          <strong>Availability note:</strong> I will be unavailable from <strong>June 15 to July 10</strong>.
           If you are looking for lessons during that time, feel free to{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} className="underline font-semibold hover:text-amber-700 transition-colors">
             contact me
