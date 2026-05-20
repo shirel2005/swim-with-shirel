@@ -9,6 +9,7 @@ import {
   Calendar, Plus, Minus, Copy,
 } from 'lucide-react'
 import DuplicateBookingModal from './DuplicateBookingModal'
+import ManualBookingModal from './ManualBookingModal'
 
 interface BookingsManagerProps { adminPassword: string }
 type StatusFilter = 'all' | 'pending' | 'confirmed' | 'cancelled'
@@ -71,6 +72,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
   const [duplicatingBooking, setDuplicatingBooking] = useState<Booking | null>(null)
+  const [showManualModal, setShowManualModal] = useState(false)
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -165,11 +167,19 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h2 className="text-xl font-bold text-slate-900">Bookings ({bookings.length})</h2>
-        <button onClick={fetchBookings} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-sky-700 border border-sky-200 hover:bg-sky-50 transition-colors">
-          <RefreshCw size={13} />Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowManualModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-emerald-700 border border-emerald-200 hover:bg-emerald-50 transition-colors"
+          >
+            <Plus size={13} />Add Manual Lesson
+          </button>
+          <button onClick={fetchBookings} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-sky-700 border border-sky-200 hover:bg-sky-50 transition-colors">
+            <RefreshCw size={13} />Refresh
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -445,6 +455,17 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
             )
           })}
         </div>
+      )}
+
+      {showManualModal && (
+        <ManualBookingModal
+          adminPassword={adminPassword}
+          onClose={() => setShowManualModal(false)}
+          onSuccess={() => {
+            fetchBookings()
+            setShowManualModal(false)
+          }}
+        />
       )}
 
       {duplicatingBooking && (
