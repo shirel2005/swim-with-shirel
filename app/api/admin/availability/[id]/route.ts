@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-
-function checkAdminAuth(request: NextRequest): boolean {
-  return (request.headers.get('x-admin-password') || '') === (process.env.ADMIN_PASSWORD || '')
-}
+import { checkAdminAuth } from '@/lib/admin-auth'
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   if (!checkAdminAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

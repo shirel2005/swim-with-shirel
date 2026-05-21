@@ -361,13 +361,13 @@ export async function sendAdminBookingNotification({
   // Action button
   const actionBlock = `
     <div style="text-align:center;margin:24px 0 8px;">
-      <a href="https://swim-with-shirel-production.up.railway.app/admin" style="display:inline-block;background:${navy};color:${cream};font-family:${serif};font-size:13px;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none;letter-spacing:0.02em;">
+      <a href="${process.env.SITE_URL || 'https://swim-with-shirel-production.up.railway.app'}/admin" style="display:inline-block;background:${navy};color:${cream};font-family:${serif};font-size:13px;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none;letter-spacing:0.02em;">
         View in Admin Panel
       </a>
     </div>`
 
   const body = `
-    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">New booking request <strong>#${bookingId}</strong></p>
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">New booking request from <strong>${parentName}</strong></p>
     <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">A parent has just submitted a booking request. Review the details below and confirm or follow up within 24 hours.</p>
 
     ${parentBlock}
@@ -377,7 +377,7 @@ export async function sendAdminBookingNotification({
     ${notesBlock}
     ${actionBlock}`
 
-  const html = buildEmail(`New booking request #${bookingId}`, body)
+  const html = buildEmail(`New booking request`, body)
   await sendRaw(CONTACT_EMAIL, `New booking request from ${parentName} | Swim with Shirel`, html)
   emailLog('success', 'admin_booking_notification', CONTACT_EMAIL, bookingId)
 }
@@ -563,7 +563,7 @@ export async function sendAdminConfirmationNotification({
       </div>`).join('')}`) : ''
 
   const body = `
-    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking <strong>#${bookingId}</strong> confirmed</p>
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking confirmed for <strong>${parentName}</strong></p>
     <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">You confirmed this booking. A confirmation email has been sent to the parent. This is your record copy.</p>
 
     ${parentBlock}
@@ -571,8 +571,8 @@ export async function sendAdminConfirmationNotification({
     ${childrenBlock}
     ${sessionsBlock}`
 
-  const html = buildEmail(`Confirmed: booking #${bookingId}`, body)
-  await sendRaw(CONTACT_EMAIL, `Confirmed: ${parentName} — booking #${bookingId} | Swim with Shirel`, html)
+  const html = buildEmail(`Booking confirmed`, body)
+  await sendRaw(CONTACT_EMAIL, `Confirmed: ${parentName} | Swim with Shirel`, html)
   emailLog('success', 'admin_confirmation_notification', CONTACT_EMAIL, bookingId)
 }
 
@@ -593,7 +593,7 @@ export async function sendAdminRejectionLog({
   emailLog('attempt', 'admin_rejection_log', CONTACT_EMAIL, bookingId)
 
   const body = `
-    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking <strong>#${bookingId}</strong> cancelled</p>
+    <p style="margin:0 0 6px 0;font-size:16px;color:${navy};font-family:${serif};">Booking cancelled for <strong>${parentName}</strong></p>
     <p style="margin:0 0 24px 0;font-size:14px;color:${mutedText};font-family:${serif};line-height:1.75;">This booking was cancelled and the parent has been notified.</p>
 
     ${card(`
@@ -603,7 +603,7 @@ export async function sendAdminRejectionLog({
         ${detailRow('Email', `<a href="mailto:${parentEmail}" style="color:${brandBlue};text-decoration:none;">${parentEmail}</a>`)}
       </table>`)}`
 
-  const html = buildEmail(`Cancelled: booking #${bookingId}`, body)
-  await sendRaw(CONTACT_EMAIL, `Cancelled: ${parentName} — booking #${bookingId} | Swim with Shirel`, html)
+  const html = buildEmail(`Booking cancelled`, body)
+  await sendRaw(CONTACT_EMAIL, `Cancelled: ${parentName} | Swim with Shirel`, html)
   emailLog('success', 'admin_rejection_log', CONTACT_EMAIL, bookingId)
 }

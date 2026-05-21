@@ -11,7 +11,8 @@ import { CONTACT_EMAIL } from '@/lib/contact'
 
 function checkAdminAuth(req: NextRequest): boolean {
   const password = req.headers.get('x-admin-password') || req.nextUrl.searchParams.get('p') || ''
-  return password === (process.env.ADMIN_PASSWORD || '')
+  const expected = process.env.ADMIN_PASSWORD || ''
+  return password === expected && expected !== ''
 }
 
 // Shared mock data for all test emails

@@ -20,15 +20,6 @@ export function getDb(): Database.Database {
 
   // Create tables
   db.exec(`
-    CREATE TABLE IF NOT EXISTS availability (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      date TEXT NOT NULL,
-      time_slot TEXT NOT NULL,
-      duration INTEGER NOT NULL,
-      is_available INTEGER DEFAULT 1,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-
     CREATE TABLE IF NOT EXISTS bookings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       parent_name TEXT NOT NULL,

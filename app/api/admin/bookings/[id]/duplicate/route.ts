@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-
-function checkAdminAuth(req: NextRequest): boolean {
-  const password = req.headers.get('x-admin-password') || ''
-  return password === (process.env.ADMIN_PASSWORD || '')
-}
+import { checkAdminAuth } from '@/lib/admin-auth'
 
 export async function POST(
   request: NextRequest,

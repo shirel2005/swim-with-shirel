@@ -20,7 +20,7 @@ const dmSans = DM_Sans({
 })
 
 
-const BASE_URL = 'https://swim-with-shirel-production.up.railway.app'
+const BASE_URL = process.env.SITE_URL || 'https://swim-with-shirel-production.up.railway.app'
 
 export const metadata: Metadata = {
   title: 'Swim with Shirel: Swimming Lessons in Côte Saint-Luc',

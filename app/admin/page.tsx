@@ -6,7 +6,7 @@ import BookingsManager from '@/components/admin/BookingsManager'
 import ReviewsManager from '@/components/admin/ReviewsManager'
 import AvailabilityManager from '@/components/admin/AvailabilityManager'
 import ScheduleView from '@/components/admin/ScheduleView'
-import { LogOut, Calendar, BookOpen, Star, Mail, Phone, DollarSign, Clock, Users, CalendarDays, TrendingUp } from 'lucide-react'
+import { LogOut, Calendar, BookOpen, Star, Mail, Phone, DollarSign, Clock, Users, CalendarDays } from 'lucide-react'
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from '@/lib/contact'
 
 type Tab = 'bookings' | 'reviews' | 'availability' | 'schedule'

@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-
-function checkAdminAuth(request: NextRequest): boolean {
-  const password = request.headers.get('x-admin-password') || ''
-  const expected = process.env.ADMIN_PASSWORD || ''
-  return password === expected
-}
-
-function getPricePerSlot(duration: number, format: string | null): number {
-  const isPrivate = !format || format === 'private'
-  if (duration === 30) return isPrivate ? 50 : 75
-  return isPrivate ? 75 : 115
-}
+import { checkAdminAuth } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
   if (!checkAdminAuth(request)) {
@@ -24,69 +13,25 @@ export async function GET(request: NextRequest) {
 
     if (searchParams.get('stats') === 'true') {
       const bookings = db
-        .prepare('SELECT * FROM bookings')
-        .all() as Array<{
-          slot_ids: string
-          booked_slots: string
-          status: string
-          lesson_format: string | null
-          total_price: number
-        }>
+        .prepare("SELECT status, total_price FROM bookings")
+        .all() as Array<{ status: string; total_price: number }>
 
       let confirmed_earnings = 0
       let pending_earnings = 0
-      let total_bookings = bookings.length
       let confirmed_bookings = 0
+      const total_bookings = bookings.length
 
-      for (const booking of bookings) {
-        let slotEarnings = 0
-
-        // Try new booked_slots format first
-        try {
-          const bookedSlots = JSON.parse(booking.booked_slots || '[]')
-          if (Array.isArray(bookedSlots) && bookedSlots.length > 0) {
-            for (const s of bookedSlots as Array<{ duration: number }>) {
-              slotEarnings += getPricePerSlot(s.duration, booking.lesson_format)
-            }
-          } else {
-            // Fallback to legacy slot_ids
-            const slotIds: number[] = JSON.parse(booking.slot_ids || '[]')
-            if (slotIds.length > 0) {
-              try {
-                const placeholders = slotIds.map(() => '?').join(',')
-                const slotRows = db
-                  .prepare(`SELECT duration FROM availability WHERE id IN (${placeholders})`)
-                  .all(...slotIds) as Array<{ duration: number }>
-
-                for (const s of slotRows) {
-                  slotEarnings += getPricePerSlot(s.duration, booking.lesson_format)
-                }
-              } catch {
-                slotEarnings = slotIds.length * 50
-              }
-            } else {
-              // Use stored total_price if no slot data available
-              slotEarnings = booking.total_price || 50
-            }
-          }
-        } catch {
-          slotEarnings = booking.total_price || 50
-        }
-
-        if (booking.status === 'confirmed') {
-          confirmed_earnings += slotEarnings
+      for (const b of bookings) {
+        const price = b.total_price || 0
+        if (b.status === 'confirmed') {
+          confirmed_earnings += price
           confirmed_bookings++
-        } else if (booking.status === 'pending') {
-          pending_earnings += slotEarnings
+        } else if (b.status === 'pending') {
+          pending_earnings += price
         }
       }
 
-      return NextResponse.json({
-        confirmed_earnings,
-        pending_earnings,
-        total_bookings,
-        confirmed_bookings,
-      })
+      return NextResponse.json({ confirmed_earnings, pending_earnings, total_bookings, confirmed_bookings })
     }
 
     const bookings = db

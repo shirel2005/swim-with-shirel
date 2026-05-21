@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-
-function checkAdminAuth(request: NextRequest): boolean {
-  const password = request.headers.get('x-admin-password') || ''
-  return password === (process.env.ADMIN_PASSWORD || '')
-}
+import { checkAdminAuth } from '@/lib/admin-auth'
 
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(':').map(Number)

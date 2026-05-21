@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
+import { checkAdminAuth } from '@/lib/admin-auth'
 import { AvailabilityWindow } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
-
-function checkAdminAuth(request: NextRequest): boolean {
-  return (request.headers.get('x-admin-password') || '') === (process.env.ADMIN_PASSWORD || '')
-}
 
 export async function GET(request: NextRequest) {
   if (!checkAdminAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -228,12 +228,17 @@ export default function BookingForm() {
     if (!validateStep(5)) return
     setSubmitting(true)
     try {
+      const combinedNotes = [
+        notes.trim(),
+        semiPairName.trim() ? `Pairing with: ${semiPairName.trim()}` : '',
+      ].filter(Boolean).join(' | ') || null
+
       const payload = {
         parent_name: parent.name.trim(), parent_email: parent.email.trim(), parent_phone: parent.phone.trim(),
         lesson_format: lessonFormat, lesson_type: lessonType, booking_type: bookingType, pack_total: isPack ? 10 : 0,
         children: validChildren.map(({ name, age, experience, notes: n }) => ({ name, age, experience, notes: n })),
         booked_slots: sessions.map(s => ({ window_id: s.window_id, date: s.date, start_time: s.start_time, duration: s.duration })),
-        session_assignments: buildAssignments(), notes: notes.trim() || null, slot_ids: [],
+        session_assignments: buildAssignments(), notes: combinedNotes, slot_ids: [],
         ten_pack_id: selectedTenPackId || undefined,
       }
       const res = await fetch('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
@@ -277,7 +282,7 @@ export default function BookingForm() {
             {' · '}
             <a href={`tel:${CONTACT_PHONE_TEL}`} style={{ color: '#4A7FA5' }}>{CONTACT_PHONE}</a>
           </p>
-          <button onClick={() => { setStep(1); setParentState({ name: '', email: '', phone: '' }); setChildren([newChild(0)]); setBookingType('one-time'); setLessonTypeState('30min'); setLessonFormat('private'); setSessions([]); setAssignments({}); setNotes(''); setErrors({}); setSuccess(false); setQuickFilled(false) }}
+          <button onClick={() => { setStep(1); setParentState({ name: '', email: '', phone: '' }); setChildren([newChild(0)]); setBookingType('one-time'); setLessonTypeState('30min'); setLessonFormat('private'); setSemiPairName(''); setSessions([]); setAssignments({}); setNotes(''); setErrors({}); setSuccess(false); setQuickFilled(false) }}
             className="btn-primary" style={{ fontSize: '14px', padding: '0.75rem 1.5rem' }}>
             Book Another Lesson
           </button>

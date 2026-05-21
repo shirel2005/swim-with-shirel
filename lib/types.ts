@@ -14,15 +14,6 @@ export interface ComputedSlot {
   duration: 30 | 45
 }
 
-export interface AvailabilitySlot {
-  id: number
-  date: string         // YYYY-MM-DD
-  time_slot: string    // HH:MM
-  duration: 30 | 45
-  is_available: number // 1 = available, 0 = booked
-  created_at: string
-}
-
 // Updated Child — experience replaces skill_level, age is required
 export interface Child {
   id: string           // temp client-side ID
