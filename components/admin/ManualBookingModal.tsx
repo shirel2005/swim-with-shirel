@@ -89,6 +89,7 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
   const [emailError, setEmailError] = useState<string | undefined>()
   const [emailSentAt, setEmailSentAt] = useState<string | undefined>()
+  const [sendEmailOnCreate, setSendEmailOnCreate] = useState(false)
 
   // Auto-suggest price when format/duration/session count changes (unless admin has typed a custom price)
   useEffect(() => {
@@ -229,6 +230,9 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
       const data = await res.json()
       setResult(data)
       onSuccess()
+      if (sendEmailOnCreate) {
+        await sendEmailForBooking(data.booking_id)
+      }
     } catch {
       setError('Network error. Please try again.')
     } finally {
@@ -236,15 +240,11 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
     }
   }
 
-  const handleSendEmail = async () => {
-    if (!result) return
-    if (emailStatus === 'sent') {
-      if (!window.confirm('A confirmation email was already sent. Send another copy?')) return
-    }
+  const sendEmailForBooking = async (bookingId: number) => {
     setEmailStatus('sending')
     setEmailError(undefined)
     try {
-      const res = await fetch(`/api/admin/bookings/${result.booking_id}/send-email`, {
+      const res = await fetch(`/api/admin/bookings/${bookingId}/send-email`, {
         method: 'POST',
         headers: { 'x-admin-password': adminPassword },
       })
@@ -259,6 +259,14 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
       setEmailStatus('failed')
       setEmailError(String(e))
     }
+  }
+
+  const handleSendEmail = async () => {
+    if (!result) return
+    if (emailStatus === 'sent') {
+      if (!window.confirm('A confirmation email was already sent. Send another copy?')) return
+    }
+    await sendEmailForBooking(result.booking_id)
   }
 
   const hasConflicts = Object.keys(conflicts).length > 0
@@ -284,7 +292,7 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
             </div>
             <div>
               <h2 className="font-bold text-slate-900 text-base">Add Manual Lesson</h2>
-              <p className="text-xs text-slate-500">Saves as confirmed — email is not sent automatically</p>
+              <p className="text-xs text-slate-500">Saves as confirmed · email sending is optional</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors flex-shrink-0">
@@ -299,7 +307,9 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
               <CheckCircle size={30} className="text-emerald-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1">Lesson created!</h3>
-            <p className="text-sm text-slate-500 mb-6">Saved as confirmed. No email has been sent yet.</p>
+            <p className="text-sm text-slate-500 mb-6">
+              {sendEmailOnCreate ? 'Saved as confirmed.' : 'Saved as confirmed. No email has been sent yet.'}
+            </p>
 
             {/* Email status badge */}
             <div className="w-full max-w-sm mb-4">
@@ -751,6 +761,26 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
                 </label>
               </div>
             )}
+
+            {/* ── Send email option ─────────────────────────────────────── */}
+            <div className="bg-sky-50 border border-sky-100 rounded-xl p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sendEmailOnCreate}
+                  onChange={e => setSendEmailOnCreate(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded accent-sky-600 flex-shrink-0"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">Send confirmation email to parent</p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {parentEmail.trim()
+                      ? `A booking confirmation will be emailed to ${parentEmail.trim()}.`
+                      : 'A booking confirmation will be emailed to the parent.'}
+                  </p>
+                </div>
+              </label>
+            </div>
 
             {/* ── Error ────────────────────────────────────────────────────── */}
             {error && (
