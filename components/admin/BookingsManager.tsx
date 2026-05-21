@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Booking } from '@/lib/types'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import {
   Trash2, CheckCircle, XCircle, RefreshCw,
   ChevronDown, ChevronUp, Package, User, Users, Clock,
@@ -37,7 +37,10 @@ function formatTime(t: string) {
 }
 
 function formatDateLabel(d: string) {
-  try { return format(parseISO(d), 'EEE, MMM d') } catch { return d }
+  try {
+    const [year, month, day] = d.split('-').map(Number)
+    return format(new Date(year, month - 1, day), 'EEE, MMM d')
+  } catch { return d }
 }
 
 function experienceLabel(exp: string) {

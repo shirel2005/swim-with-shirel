@@ -138,9 +138,13 @@ function formatTime(t: string): string {
 
 function formatDate(d: string): string {
   try {
-    return new Date(d + 'T00:00:00').toLocaleDateString('en-CA', {
+    const [year, month, day] = d.split('-').map(Number)
+    // Use UTC noon to avoid day-shift: midnight UTC converts to the previous
+    // evening in Montreal (UTC-4/UTC-5), but noon UTC stays on the same calendar day.
+    const dt = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+    return dt.toLocaleDateString('en-CA', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      timeZone: 'America/Toronto',
+      timeZone: 'America/Montreal',
     })
   } catch { return d }
 }

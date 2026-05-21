@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X, Copy, Plus, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { Booking } from '@/lib/types'
 
 interface SessionTemplate {
@@ -212,7 +212,7 @@ export default function DuplicateBookingModal({ booking, adminPassword, onClose,
                         <div className="flex items-center gap-2">
                           {dateConflicts && <AlertTriangle size={13} className="text-amber-500 flex-shrink-0" />}
                           <span className="text-sm font-semibold text-slate-800">
-                            {format(parseISO(date), 'EEE, MMMM d, yyyy')}
+                            {(() => { const [y,m,dy] = date.split('-').map(Number); return format(new Date(y, m-1, dy), 'EEE, MMMM d, yyyy') })()}
                           </span>
                         </div>
                         {dateConflicts && (
