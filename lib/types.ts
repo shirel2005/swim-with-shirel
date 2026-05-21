@@ -71,6 +71,9 @@ export interface Booking {
   ten_pack_id: number | null
   tp_sessions_used?: number  // from LEFT JOIN ten_packs (auto-tracked)
   tp_total_sessions?: number // from LEFT JOIN ten_packs
+  is_manual: number
+  confirmation_email_sent: number
+  confirmation_email_sent_at: string | null
   is_weekly_request: number
   recurring_day: string | null
   recurring_time: string | null

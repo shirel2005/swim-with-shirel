@@ -82,8 +82,13 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
   const [creating, setCreating] = useState(false)
   const [conflicts, setConflicts] = useState<Record<string, string[]>>({})
   const [overrideConflicts, setOverrideConflicts] = useState(false)
-  const [result, setResult] = useState<{ booking_id: number; email_sent: boolean; email_error?: string } | null>(null)
+  const [result, setResult] = useState<{ booking_id: number } | null>(null)
   const [error, setError] = useState('')
+
+  // Email state (shown in success view)
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
+  const [emailError, setEmailError] = useState<string | undefined>()
+  const [emailSentAt, setEmailSentAt] = useState<string | undefined>()
 
   // Auto-suggest price when format/duration/session count changes (unless admin has typed a custom price)
   useEffect(() => {
@@ -231,6 +236,31 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
     }
   }
 
+  const handleSendEmail = async () => {
+    if (!result) return
+    if (emailStatus === 'sent') {
+      if (!window.confirm('A confirmation email was already sent. Send another copy?')) return
+    }
+    setEmailStatus('sending')
+    setEmailError(undefined)
+    try {
+      const res = await fetch(`/api/admin/bookings/${result.booking_id}/send-email`, {
+        method: 'POST',
+        headers: { 'x-admin-password': adminPassword },
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.detail || data.error || 'Failed to send email')
+      }
+      const data = await res.json()
+      setEmailStatus('sent')
+      setEmailSentAt(data.sent_at)
+    } catch (e) {
+      setEmailStatus('failed')
+      setEmailError(String(e))
+    }
+  }
+
   const hasConflicts = Object.keys(conflicts).length > 0
   const childNames = children.map(c => c.name).filter(Boolean)
 
@@ -254,7 +284,7 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
             </div>
             <div>
               <h2 className="font-bold text-slate-900 text-base">Add Manual Lesson</h2>
-              <p className="text-xs text-slate-500">Saves as confirmed and sends a confirmation email to the parent</p>
+              <p className="text-xs text-slate-500">Saves as confirmed — email is not sent automatically</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors flex-shrink-0">
@@ -269,32 +299,54 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
               <CheckCircle size={30} className="text-emerald-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1">Lesson created!</h3>
-            <p className="text-sm text-slate-500 mb-6">
-              Booking <span className="font-semibold text-slate-700">#{result.booking_id}</span> saved as confirmed.
-            </p>
+            <p className="text-sm text-slate-500 mb-6">Saved as confirmed. No email has been sent yet.</p>
 
-            {result.email_sent ? (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-3.5 flex items-center gap-3 w-full max-w-sm">
-                <Mail size={16} className="text-emerald-600 flex-shrink-0" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-emerald-800">Confirmation email sent</p>
-                  <p className="text-xs text-emerald-700 mt-0.5">Parent received their booking confirmation.</p>
+            {/* Email status badge */}
+            <div className="w-full max-w-sm mb-4">
+              {emailStatus === 'sent' ? (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-3.5 flex items-center gap-3">
+                  <Mail size={16} className="text-emerald-600 flex-shrink-0" />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-emerald-800">Confirmation email sent</p>
+                    <p className="text-xs text-emerald-700 mt-0.5">Parent received their booking confirmation.</p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3.5 flex items-start gap-3 w-full max-w-sm">
-                <AlertTriangle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-amber-800">Email not sent</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    {result.email_error
-                      ? `Error: ${result.email_error.slice(0, 120)}`
-                      : 'Check server logs for details.'}
-                  </p>
-                  <p className="text-xs text-amber-600 mt-1">The booking was saved successfully — you can resend manually.</p>
+              ) : emailStatus === 'failed' ? (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3.5 flex items-start gap-3">
+                  <AlertTriangle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-red-700">Email failed to send</p>
+                    {emailError && (
+                      <p className="text-xs text-red-600 mt-0.5">{emailError.slice(0, 160)}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 flex items-center gap-3">
+                  <Mail size={16} className="text-slate-400 flex-shrink-0" />
+                  <p className="text-sm text-slate-500 text-left">Email not yet sent to parent.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Send / Resend button */}
+            <button
+              onClick={handleSendEmail}
+              disabled={emailStatus === 'sending'}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white hover:bg-sky-800 disabled:opacity-40 transition-colors w-full max-w-sm justify-center"
+            >
+              {emailStatus === 'sending' ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Sending…
+                </>
+              ) : (
+                <>
+                  <Mail size={14} />
+                  {emailStatus === 'sent' ? 'Resend Confirmation Email' : 'Send Confirmation Email'}
+                </>
+              )}
+            </button>
           </div>
         ) : (
 

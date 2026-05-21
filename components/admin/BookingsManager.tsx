@@ -6,7 +6,7 @@ import { format } from 'date-fns'
 import {
   Trash2, CheckCircle, XCircle, RefreshCw,
   ChevronDown, ChevronUp, Package, User, Users, Clock,
-  Calendar, Plus, Minus, Copy,
+  Calendar, Plus, Minus, Copy, Mail,
 } from 'lucide-react'
 import DuplicateBookingModal from './DuplicateBookingModal'
 import ManualBookingModal from './ManualBookingModal'
@@ -76,6 +76,7 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
   const [duplicatingBooking, setDuplicatingBooking] = useState<Booking | null>(null)
   const [showManualModal, setShowManualModal] = useState(false)
+  const [emailSendLoading, setEmailSendLoading] = useState<number | null>(null)
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -124,6 +125,29 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
       await fetchBookings()
     } catch { alert('Failed to delete.') }
     finally { setActionLoading(null) }
+  }
+
+  const sendConfirmationEmail = async (id: number, alreadySent: boolean) => {
+    if (alreadySent) {
+      if (!confirm('A confirmation email was already sent to this parent. Send another copy?')) return
+    }
+    setEmailSendLoading(id)
+    try {
+      const res = await fetch(`/api/admin/bookings/${id}/send-email`, {
+        method: 'POST',
+        headers: { 'x-admin-password': adminPassword },
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        alert(`Failed to send email: ${data.detail || data.error || 'Unknown error'}`)
+      } else {
+        await fetchBookings()
+      }
+    } catch {
+      alert('Network error. Could not send email.')
+    } finally {
+      setEmailSendLoading(null)
+    }
   }
 
   const toggleExpand = (id: number) => {
@@ -247,6 +271,16 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                         {!isSemi && !isPack && !isWeekly && (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-50 text-slate-500 border border-slate-200">
                             <User size={10} />Private
+                          </span>
+                        )}
+                        {booking.is_manual === 1 && (
+                          <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                            booking.confirmation_email_sent
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            <Mail size={9} />
+                            {booking.confirmation_email_sent ? 'Email sent' : 'Email not sent'}
                           </span>
                         )}
                       </div>
@@ -449,6 +483,19 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-sky-700 border border-sky-200 hover:bg-sky-50 disabled:opacity-50 transition-colors">
                     <Copy size={13} />Duplicate for new dates
                   </button>
+                  {booking.is_manual === 1 && booking.status === 'confirmed' && (
+                    <button
+                      onClick={() => sendConfirmationEmail(booking.id, booking.confirmation_email_sent === 1)}
+                      disabled={isLoading || emailSendLoading === booking.id}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-sky-700 border border-sky-200 hover:bg-sky-50 disabled:opacity-50 transition-colors"
+                    >
+                      {emailSendLoading === booking.id ? (
+                        <><div className="w-3 h-3 border-2 border-sky-400/40 border-t-sky-700 rounded-full animate-spin" />Sending…</>
+                      ) : (
+                        <><Mail size={13} />{booking.confirmation_email_sent ? 'Resend Confirmation Email' : 'Send Confirmation Email'}</>
+                      )}
+                    </button>
+                  )}
                   <button onClick={() => deleteBooking(booking.id)} disabled={isLoading}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 border border-red-100 hover:bg-red-50 disabled:opacity-50 transition-colors ml-auto">
                     <Trash2 size={13} />Delete
@@ -466,7 +513,6 @@ export default function BookingsManager({ adminPassword }: BookingsManagerProps)
           onClose={() => setShowManualModal(false)}
           onSuccess={() => {
             fetchBookings()
-            setShowManualModal(false)
           }}
         />
       )}

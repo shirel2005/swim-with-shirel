@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
-import { sendBookingConfirmation, sendAdminConfirmationNotification } from '@/lib/email'
 
 function checkAdminAuth(request: NextRequest): boolean {
   const password = request.headers.get('x-admin-password') || ''
@@ -147,8 +146,9 @@ export async function POST(request: NextRequest) {
           children, slot_ids, booked_slots, session_assignments,
           total_price, status, notes,
           lesson_type, lesson_format, booking_type,
-          pack_total, pack_used
-        ) VALUES (?, ?, ?, ?, '[]', ?, ?, ?, 'confirmed', ?, ?, ?, ?, 0, 0)`,
+          pack_total, pack_used,
+          is_manual, confirmation_email_sent
+        ) VALUES (?, ?, ?, ?, '[]', ?, ?, ?, 'confirmed', ?, ?, ?, ?, 0, 0, 1, 0)`,
       )
       .run(
         parent_name.trim(),
@@ -165,69 +165,9 @@ export async function POST(request: NextRequest) {
       )
 
     const bookingId = Number(insertResult.lastInsertRowid)
-    console.log(`[Manual Booking] Created booking #${bookingId} (confirmed) for ${parent_email.trim()}`)
+    console.log(`[Manual Booking] Created booking #${bookingId} (confirmed, no email) for ${parent_email.trim()}`)
 
-    // ── Send emails ───────────────────────────────────────────────────────────
-    const emailSlots = sessionAssignments.map(s => ({
-      date: s.date,
-      time_slot: s.start_time,
-      duration: s.duration,
-      assigned_children: s.assigned_children,
-    }))
-
-    const childInfoList = (
-      children as Array<{ name: string; age?: string; experience?: string }>
-    ).map(c => ({ name: c.name, age: c.age, experience: c.experience }))
-
-    let emailSent = false
-    let emailError: string | undefined
-
-    try {
-      await sendBookingConfirmation({
-        parentName: parent_name.trim(),
-        parentEmail: parent_email.trim().toLowerCase(),
-        lessonFormat: lesson_format,
-        lessonType: lessonTypeValue,
-        bookingType: booking_type === '10pack' ? '10pack' : 'one-time',
-        children: childInfoList,
-        slots: emailSlots,
-        totalPrice: Number(total_price),
-      })
-      emailSent = true
-      console.log(
-        `[Manual Booking] Confirmation email sent | booking=#${bookingId} | to=${parent_email.trim().toLowerCase()}`,
-      )
-    } catch (e) {
-      emailError = String(e)
-      console.error(
-        `[Email] FAILED | type=manual_booking_confirmation | booking=#${bookingId} | error=${emailError}`,
-      )
-    }
-
-    try {
-      await sendAdminConfirmationNotification({
-        bookingId,
-        parentName: parent_name.trim(),
-        parentEmail: parent_email.trim().toLowerCase(),
-        parentPhone: parent_phone.trim(),
-        children: childInfoList,
-        lessonFormat: lesson_format,
-        lessonType: lessonTypeValue,
-        slots: emailSlots,
-        totalPrice: Number(total_price),
-      })
-    } catch (e) {
-      console.error(
-        `[Email] FAILED | type=manual_admin_record | booking=#${bookingId} | error=${String(e)}`,
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      booking_id: bookingId,
-      email_sent: emailSent,
-      ...(emailError && { email_error: emailError }),
-    })
+    return NextResponse.json({ success: true, booking_id: bookingId })
   } catch (error) {
     console.error('Error creating manual booking:', error)
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })

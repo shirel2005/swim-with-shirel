@@ -93,6 +93,9 @@ export function getDb(): Database.Database {
     `ALTER TABLE bookings ADD COLUMN pack_total INTEGER DEFAULT 0`,
     `ALTER TABLE bookings ADD COLUMN pack_used INTEGER DEFAULT 0`,
     `ALTER TABLE bookings ADD COLUMN ten_pack_id INTEGER`,
+    `ALTER TABLE bookings ADD COLUMN is_manual INTEGER DEFAULT 0`,
+    `ALTER TABLE bookings ADD COLUMN confirmation_email_sent INTEGER DEFAULT 0`,
+    `ALTER TABLE bookings ADD COLUMN confirmation_email_sent_at TEXT`,
   ]
   for (const sql of alterCols) {
     try { db.exec(sql) } catch {}
