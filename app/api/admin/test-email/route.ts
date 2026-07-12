@@ -85,12 +85,21 @@ export async function GET(request: NextRequest) {
   }
 
   if (!tokenOk) {
+    const isExpired = typeof tokenError === 'string' && tokenError.includes('invalid_grant')
     return NextResponse.json({
       success: false,
-      error: 'OAuth token refresh failed — refresh token may be expired or revoked',
+      error: isExpired
+        ? 'Gmail authorization expired. Reconnect email.'
+        : 'OAuth token refresh failed — refresh token may be expired or revoked',
       tokenError,
       env: envCheck,
-      fix: 'Re-run the Google OAuth flow to get a new refresh token and update the GMAIL_REFRESH_TOKEN env var in Railway',
+      fix: [
+        '1. On your local machine, run: node scripts/get-gmail-token.js',
+        '2. Sign in as swim.with.shirel@gmail.com and approve the consent screen',
+        '3. Copy the printed GMAIL_REFRESH_TOKEN value',
+        '4. Go to Railway → swim-with-shirel → Variables → update GMAIL_REFRESH_TOKEN',
+        '5. Railway will auto-redeploy — then re-test this endpoint',
+      ],
     }, { status: 500 })
   }
 

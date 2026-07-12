@@ -1,7 +1,14 @@
 import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_TEL } from './contact'
 
 // ─── Gmail OAuth2 ─────────────────────────────────────────────────────────────
+// Cache the access token for its full 1-hour validity. The refresh token is
+// never regenerated here — only short-lived access tokens are fetched.
+let _tokenCache: { token: string; expiresAt: number } | null = null
+
 async function getAccessToken(): Promise<string> {
+  if (_tokenCache && Date.now() < _tokenCache.expiresAt - 60_000) {
+    return _tokenCache.token
+  }
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -13,7 +20,13 @@ async function getAccessToken(): Promise<string> {
     }),
   })
   const data = await res.json()
-  if (!data.access_token) throw new Error('Failed to get Gmail access token: ' + JSON.stringify(data))
+  if (!data.access_token) {
+    if (data.error === 'invalid_grant') {
+      throw new Error('Gmail authorization expired. Reconnect email. (Run: node scripts/get-gmail-token.js to generate a new token, then update GMAIL_REFRESH_TOKEN in Railway)')
+    }
+    throw new Error('Failed to get Gmail access token: ' + JSON.stringify(data))
+  }
+  _tokenCache = { token: data.access_token, expiresAt: Date.now() + (data.expires_in ?? 3600) * 1000 }
   return data.access_token
 }
 
