@@ -82,6 +82,8 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
   const [creating, setCreating] = useState(false)
   const [conflicts, setConflicts] = useState<Record<string, string[]>>({})
   const [overrideConflicts, setOverrideConflicts] = useState(false)
+  const [weekendDates, setWeekendDates] = useState<string[]>([])
+  const [overrideWeekend, setOverrideWeekend] = useState(false)
   const [result, setResult] = useState<{ booking_id: number } | null>(null)
   const [error, setError] = useState('')
 
@@ -173,13 +175,14 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
     return null
   }
 
-  const handleSubmit = async (override = false) => {
+  const handleSubmit = async () => {
     const err = validate()
     if (err) { setError(err); return }
 
     setCreating(true)
     setError('')
     setConflicts({})
+    setWeekendDates([])
 
     const childNames = children.map(c => c.name.trim())
     const sessionsToSubmit = sessions.map(s => ({
@@ -209,12 +212,18 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
           booking_type: bookingType,
           total_price: parseFloat(totalPrice) || 0,
           ...(lessonNotes.trim() && { notes: lessonNotes.trim() }),
-          override_conflicts: override,
+          override_conflicts: overrideConflicts,
+          override_weekend: overrideWeekend,
         }),
       })
 
       if (res.status === 409) {
         const data = await res.json()
+        if (data.error === 'weekend_dates') {
+          setWeekendDates(data.dates || [])
+          setCreating(false)
+          return
+        }
         setConflicts(data.conflicts || {})
         setCreating(false)
         return
@@ -643,6 +652,8 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
                               updateSession(session.id, 'date', e.target.value)
                               setConflicts({})
                               setOverrideConflicts(false)
+                              setWeekendDates([])
+                              setOverrideWeekend(false)
                             }}
                           />
                         </div>
@@ -728,6 +739,32 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
               )}
             </section>
 
+            {/* ── Weekend warning ──────────────────────────────────────────── */}
+            {weekendDates.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <div className="flex items-start gap-2.5 mb-3">
+                  <AlertTriangle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-800 mb-1">Weekend date(s) selected</p>
+                    <p className="text-xs text-amber-700">
+                      Lessons are only offered Monday-Friday. The following dates fall on a Saturday or Sunday: {weekendDates.join(', ')}.
+                    </p>
+                  </div>
+                </div>
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={overrideWeekend}
+                    onChange={e => setOverrideWeekend(e.target.checked)}
+                    className="w-4 h-4 rounded accent-amber-600"
+                  />
+                  <span className="text-xs font-semibold text-amber-800">
+                    Override and create on this weekend date anyway
+                  </span>
+                </label>
+              </div>
+            )}
+
             {/* ── Conflict warning ─────────────────────────────────────────── */}
             {hasConflicts && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
@@ -810,8 +847,8 @@ export default function ManualBookingModal({ adminPassword, onClose, onSuccess }
               Cancel
             </button>
             <button
-              onClick={() => handleSubmit(overrideConflicts)}
-              disabled={creating || (hasConflicts && !overrideConflicts)}
+              onClick={() => handleSubmit()}
+              disabled={creating || (hasConflicts && !overrideConflicts) || (weekendDates.length > 0 && !overrideWeekend)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-40 transition-colors"
             >
               {creating ? (

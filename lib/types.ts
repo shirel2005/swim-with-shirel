@@ -33,7 +33,7 @@ export interface SessionAssignment {
 }
 
 export interface RecurringRequest {
-  days: string[]   // Sun–Fri allowed
+  days: string[]   // Mon–Fri allowed
   time: string
   start_date: string
   end_date: string

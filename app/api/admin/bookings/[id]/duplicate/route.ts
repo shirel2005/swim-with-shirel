@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
 import { checkAdminAuth } from '@/lib/admin-auth'
 
+// Lessons are only offered Monday-Friday; date is 'yyyy-MM-dd' so parse as local, not UTC.
+function isWeekend(dateStr: string): boolean {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const day = new Date(y, m - 1, d).getDay()
+  return day === 0 || day === 6
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -15,10 +22,20 @@ export async function POST(
     if (isNaN(sourceId)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
 
     const body = await request.json()
-    const { dates, override = false } = body as { dates: string[]; override?: boolean }
+    const { dates, override = false, override_weekend = false } = body as { dates: string[]; override?: boolean; override_weekend?: boolean }
 
     if (!Array.isArray(dates) || dates.length === 0) {
       return NextResponse.json({ error: 'No dates provided' }, { status: 400 })
+    }
+
+    if (!override_weekend) {
+      const weekendDates = dates.filter(isWeekend)
+      if (weekendDates.length > 0) {
+        return NextResponse.json(
+          { error: 'weekend_dates', message: 'Lessons are only offered Monday-Friday.', dates: weekendDates },
+          { status: 409 }
+        )
+      }
     }
 
     const db = getDb()

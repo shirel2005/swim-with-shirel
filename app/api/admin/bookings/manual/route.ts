@@ -11,6 +11,13 @@ function hasOverlap(s1: number, d1: number, s2: number, d2: number): boolean {
   return s1 < s2 + d2 && s2 < s1 + d1
 }
 
+// Lessons are only offered Monday-Friday; date is 'yyyy-MM-dd' so parse as local, not UTC.
+function isWeekend(dateStr: string): boolean {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const day = new Date(y, m - 1, d).getDay()
+  return day === 0 || day === 6
+}
+
 export async function POST(request: NextRequest) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -30,6 +37,7 @@ export async function POST(request: NextRequest) {
       total_price = 0,
       notes,
       override_conflicts = false,
+      override_weekend = false,
     } = body
 
     // ── Validate ──────────────────────────────────────────────────────────────
@@ -60,6 +68,19 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb()
+
+    // ── Weekend detection ─────────────────────────────────────────────────────
+    if (!override_weekend) {
+      const weekendDates = Array.from(new Set(
+        (sessions as Array<{ date: string }>).filter(s => isWeekend(s.date)).map(s => s.date)
+      ))
+      if (weekendDates.length > 0) {
+        return NextResponse.json(
+          { error: 'weekend_dates', message: 'Lessons are only offered Monday-Friday.', dates: weekendDates },
+          { status: 409 }
+        )
+      }
+    }
 
     // ── Conflict detection ────────────────────────────────────────────────────
     if (!override_conflicts) {

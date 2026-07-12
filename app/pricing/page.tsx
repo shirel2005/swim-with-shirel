@@ -115,7 +115,7 @@ export default function PricingPage() {
                 'Personalised to your child\'s age, level, and confidence',
                 'Held at a calm, enclosed private pool in Côte Saint-Luc',
                 'Discreet, comfortable setting, welcoming to all families',
-                'Sunday through Friday, morning and afternoon slots',
+                'Monday through Friday, morning and afternoon slots',
                 'Confirmation within 24 hours of booking',
                 'Payment in person, cash or e-transfer on the day',
               ].map(item => (

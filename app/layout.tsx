@@ -3,7 +3,6 @@ import { Fraunces, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import AvailabilityBanner from '@/components/AvailabilityBanner'
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -54,7 +53,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${fraunces.variable} ${dmSans.variable} flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
-        <AvailabilityBanner />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

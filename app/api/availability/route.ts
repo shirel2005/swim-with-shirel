@@ -14,6 +14,13 @@ function minutesToTime(m: number): string {
   return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
 }
 
+// Lessons are only offered Monday-Friday; date is 'yyyy-MM-dd' so parse as local, not UTC.
+function isWeekend(dateStr: string): boolean {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const day = new Date(y, m - 1, d).getDay()
+  return day === 0 || day === 6
+}
+
 interface BookedTime { date: string; start_time: string; duration: number }
 
 function hasConflict(date: string, startMin: number, duration: number, booked: BookedTime[]): boolean {
@@ -33,10 +40,10 @@ export async function GET() {
       timeZone: 'America/Toronto', year: 'numeric', month: '2-digit', day: '2-digit'
     }).format(new Date())
 
-    // Get all future windows
-    const windows = db.prepare(
+    // Get all future windows (Sat/Sun excluded even if an admin override created them)
+    const windows = (db.prepare(
       'SELECT * FROM availability_windows WHERE date >= ? ORDER BY date, start_time'
-    ).all(today) as AvailabilityWindow[]
+    ).all(today) as AvailabilityWindow[]).filter(w => !isWeekend(w.date))
 
     // Get all confirmed bookings and extract their booked times
     const confirmedBookings = db.prepare(

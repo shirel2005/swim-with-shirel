@@ -25,6 +25,8 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   const [addError, setAddError] = useState('')
   const [addSuccess, setAddSuccess] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [allowWeekends, setAllowWeekends] = useState(false)
+  const [showPast, setShowPast] = useState(false)
 
   const fetchWindows = async () => {
     setLoading(true)
@@ -37,6 +39,19 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   }
 
   useEffect(() => { fetchWindows() }, [adminPassword])
+
+  // If the override is turned off, drop any weekend dates already selected
+  useEffect(() => {
+    if (allowWeekends) return
+    setSelectedDates(prev => {
+      const next = new Set(Array.from(prev).filter(dStr => {
+        const [y, m, d] = dStr.split('-').map(Number)
+        const day = new Date(y, m - 1, d).getDay()
+        return day !== 0 && day !== 6
+      }))
+      return next.size === prev.size ? prev : next
+    })
+  }, [allowWeekends])
 
   // Calendar helpers
   const today = new Date()
@@ -51,8 +66,11 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   let d = calStart
   while (d <= calEnd) { calDays.push(new Date(d)); d = addDays(d, 1) }
 
+  const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6
+
   const toggleDate = (date: Date) => {
     if (isBefore(date, today)) return
+    if (isWeekend(date) && !allowWeekends) return
     const dateStr = format(date, 'yyyy-MM-dd')
     const next = new Set(selectedDates)
     if (next.has(dateStr)) next.delete(dateStr)
@@ -76,12 +94,20 @@ export default function AvailabilityManager({ adminPassword }: Props) {
       const res = await fetch('/api/admin/availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
-        body: JSON.stringify({ dates: validDates, start_time: startTime, end_time: endTime }),
+        body: JSON.stringify({ dates: validDates, start_time: startTime, end_time: endTime, override_weekend: allowWeekends }),
       })
       const data = await res.json()
-      if (!res.ok) { setAddError(data.error || 'Failed to add.'); return }
+      if (!res.ok) {
+        if (data.error === 'weekend_dates') {
+          setAddError(`Lessons are only offered Monday-Friday. Check "Allow weekend dates" to add availability on ${data.dates.join(', ')} anyway.`)
+        } else {
+          setAddError(data.error || 'Failed to add.')
+        }
+        return
+      }
       setAddSuccess(`Added availability for ${validDates.length} date${validDates.length !== 1 ? 's' : ''}.`)
       setSelectedDates(new Set())
+      setAllowWeekends(false)
       await fetchWindows()
       setTimeout(() => setAddSuccess(''), 3000)
     } catch { setAddError('Unexpected error.') }
@@ -114,13 +140,18 @@ export default function AvailabilityManager({ adminPassword }: Props) {
     setSelectedIds(next)
   }
 
-  // Group windows by date
+  // Group windows by date, split into upcoming (default view) vs past (archived)
+  const todayStr = format(today, 'yyyy-MM-dd')
   const grouped: Record<string, AvailabilityWindow[]> = {}
+  const groupedPast: Record<string, AvailabilityWindow[]> = {}
   for (const w of windows) {
-    if (!grouped[w.date]) grouped[w.date] = []
-    grouped[w.date].push(w)
+    const bucket = w.date < todayStr ? groupedPast : grouped
+    if (!bucket[w.date]) bucket[w.date] = []
+    bucket[w.date].push(w)
   }
   const sortedDates = Object.keys(grouped).sort()
+  const sortedPastDates = Object.keys(groupedPast).sort()
+  const pastCount = sortedPastDates.reduce((sum, d) => sum + groupedPast[d].length, 0)
 
   const formatDateLabel = (d: string) => { try { return format(parseISO(d), 'EEE, MMM d, yyyy') } catch { return d } }
   const formatTime = (t: string) => { try { const [h, m] = t.split(':').map(Number); const ampm = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12}:${String(m).padStart(2,'0')} ${ampm}` } catch { return t } }
@@ -143,7 +174,7 @@ export default function AvailabilityManager({ adminPassword }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-slate-900">Availability Windows ({windows.length})</h2>
+        <h2 className="text-xl font-bold text-slate-900">Availability Windows ({windows.length - pastCount})</h2>
         <div className="flex items-center gap-2">
           {selectedIds.size > 0 && (
             <button onClick={deleteSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors">
@@ -222,12 +253,14 @@ export default function AvailabilityManager({ adminPassword }: Props) {
                   const isCurrentMonth = isSameMonth(calDay, calMonth)
                   const isSelected = selectedDates.has(dateStr)
                   const isToday = isSameDay(calDay, new Date())
+                  const isWknd = isWeekend(calDay)
+                  const isBlocked = isPast || (isWknd && !allowWeekends)
 
                   let cls = 'h-9 flex items-center justify-center text-xs transition-all duration-150 rounded-lg m-0.5 select-none'
 
                   if (!isCurrentMonth) {
                     cls += ' text-slate-200 cursor-default'
-                  } else if (isPast) {
+                  } else if (isBlocked) {
                     cls += ' text-slate-300 cursor-not-allowed'
                   } else if (isSelected) {
                     cls += ' bg-sky-700 text-white font-bold cursor-pointer shadow-sm scale-105'
@@ -240,7 +273,8 @@ export default function AvailabilityManager({ adminPassword }: Props) {
                     <div
                       key={idx}
                       className={cls}
-                      onClick={() => isCurrentMonth && !isPast ? toggleDate(calDay) : undefined}
+                      title={isWknd && !isPast && isCurrentMonth ? 'Lessons are only offered Monday-Friday' : undefined}
+                      onClick={() => isCurrentMonth && !isBlocked ? toggleDate(calDay) : undefined}
                     >
                       {format(calDay, 'd')}
                     </div>
@@ -273,6 +307,18 @@ export default function AvailabilityManager({ adminPassword }: Props) {
                 ))}
               </div>
             )}
+
+            <label className="mt-3 flex items-center gap-2 cursor-pointer w-fit">
+              <input
+                type="checkbox"
+                checked={allowWeekends}
+                onChange={e => setAllowWeekends(e.target.checked)}
+                className="w-4 h-4 rounded accent-amber-600"
+              />
+              <span className="text-xs font-semibold text-amber-700">
+                Allow weekend dates (override — lessons are normally Monday-Friday only)
+              </span>
+            </label>
           </div>
 
           {/* Time range */}
@@ -358,6 +404,59 @@ export default function AvailabilityManager({ adminPassword }: Props) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Past Availability (archived, collapsed by default) */}
+      {sortedPastDates.length > 0 && (
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => setShowPast(v => !v)}
+            className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            <ChevronRight size={15} className={`transition-transform ${showPast ? 'rotate-90' : ''}`} />
+            Past Availability ({pastCount})
+          </button>
+
+          {showPast && (
+            <div className="space-y-4 mt-4">
+              {sortedPastDates.map(date => (
+                <div key={date} className="card overflow-hidden opacity-70">
+                  <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <h4 className="font-semibold text-slate-600 text-sm">{formatDateLabel(date)}</h4>
+                    <span className="text-xs text-slate-400">{groupedPast[date].length} window{groupedPast[date].length !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="divide-y divide-slate-50">
+                    {groupedPast[date].map(w => (
+                      <div key={w.id} className="flex items-center justify-between px-5 py-3">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(w.id)}
+                            onChange={() => toggleSelect(w.id)}
+                            className="w-4 h-4 accent-slate-400"
+                          />
+                          <span className="text-sm font-semibold text-slate-500">
+                            {formatTime(w.start_time)} - {formatTime(w.end_time)}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => deleteWindow(w.id)}
+                          disabled={actionLoading === w.id}
+                          className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading === w.id
+                            ? <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                            : <Trash2 size={15} />}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
