@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Hero from '@/components/Hero'
+import SeasonNotice from '@/components/SeasonNotice'
 import HowItWorks from '@/components/HowItWorks'
 import { Review } from '@/lib/types'
 import { Mail, Phone, ArrowRight } from 'lucide-react'
@@ -23,6 +24,9 @@ export default function HomePage() {
 
   return (
     <div style={{ backgroundColor: '#F8F4ED' }}>
+
+      {/* ── SEASON NOTICE — lessons paused until May 2027 ────────────────── */}
+      <SeasonNotice />
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <Hero />
